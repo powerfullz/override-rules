@@ -15,6 +15,7 @@ const loadBalance = parseBool(inArg.loadbalance) || false,
     ipv6Enabled = parseBool(inArg.ipv6) || false,
     fullConfig = parseBool(inArg.full) || false,
     keepAliveEnabled = parseBool(inArg.keepalive) || false;
+    isStashConfig = parseBool(inArg.stash) || false;
 
 function buildBaseLists({ landing, lowCost, countryInfo }) {
     const countryGroupNames = countryInfo
@@ -225,6 +226,33 @@ const dnsConfig = {
     "proxy-server-nameserver": [
         "quic://223.5.5.5",
         "tls://dot.pub",
+    ]
+};
+
+const stashDNSConfig = {
+    "default-nameserver": [
+        "119.29.29.29",
+        "223.5.5.5",
+    ],
+    "nameserver": [
+        "system",
+        "quic://223.5.5.5",
+        "tls://dot.pub",
+    ],
+    "fake-ip-filter": [
+    "geoip:cn",
+    "geoip:private",
+    "+.stun.*.*",
+    "+.stun.*.*.*",
+    "+.stun.*.*.*.*",
+    "+.stun.*.*.*.*.*",
+    "lens.l.google.com",
+    "*.n.n.srv.nintendo.net",
+    "+.stun.playstation.net",
+    "xbox.*.*.microsoft.com",
+    "*.*.xboxlive.com",
+    "*.msftncsi.com",
+    "*.msftconnecttest.com"
     ]
 };
 
@@ -675,6 +703,14 @@ function main(config) {
     const countryInfo = parseCountries(config); // [{ country, count }]
     const lowCost = hasLowCost(config);
 
+    // 如果是 Stash 配置，则为节点加入 benchmark-url 和 benchmark-timeout 两个参数
+    if (isStashConfig) {
+        defaultProxies.forEach(proxy => {
+            proxy['benchmark-url'] = "http://cp.cloudflare.com/";
+            proxy['benchmark-timeout'] = 5;
+        });
+    }
+
     // 构建基础数组
     const {
         defaultProxies,
@@ -734,7 +770,7 @@ function main(config) {
         "rule-providers": ruleProviders,
         "rules": rules,
         "sniffer": snifferConfig,
-        "dns": dnsConfig,
+        "dns": isStashConfig ? stashDNSConfig : dnsConfig,
         "geodata-mode": true,
         "geox-url": geoxURL,
     });
