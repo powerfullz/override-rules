@@ -230,29 +230,26 @@ const dnsConfig = {
 };
 
 const stashDNSConfig = {
-    "default-nameserver": [
+    "nameserver": [
+        "system",
         "119.29.29.29",
         "223.5.5.5",
     ],
-    "nameserver": [
-        "system",
-        "quic://223.5.5.5",
-        "tls://dot.pub",
-    ],
     "fake-ip-filter": [
-    "geoip:cn",
-    "geoip:private",
-    "+.stun.*.*",
-    "+.stun.*.*.*",
-    "+.stun.*.*.*.*",
-    "+.stun.*.*.*.*.*",
-    "lens.l.google.com",
-    "*.n.n.srv.nintendo.net",
-    "+.stun.playstation.net",
-    "xbox.*.*.microsoft.com",
-    "*.*.xboxlive.com",
-    "*.msftncsi.com",
-    "*.msftconnecttest.com"
+        "geoip:cn",
+        "geoip:private",
+        "Mijia Cloud",
+        "+.stun.*.*",
+        "+.stun.*.*.*",
+        "+.stun.*.*.*.*",
+        "+.stun.*.*.*.*.*",
+        "lens.l.google.com",
+        "*.n.n.srv.nintendo.net",
+        "+.stun.playstation.net",
+        "xbox.*.*.microsoft.com",
+        "*.*.xboxlive.com",
+        "*.msftncsi.com",
+        "*.msftconnecttest.com"
     ]
 };
 
