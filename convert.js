@@ -1,6 +1,6 @@
 /*
 powerfullz 的 Substore 订阅转换脚本
-https://github.com/powerfullz/override-rules
+https://github.com/hx1ang/override-rules
 传入参数：
 - loadbalance: 启用负载均衡 (默认false)
 - landing: 启用落地节点功能 (默认false)
