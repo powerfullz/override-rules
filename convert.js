@@ -9,7 +9,7 @@ https://github.com/powerfullz/override-rules
 - full: 输出完整配置（适合纯内核启动，默认 false）
 - keepalive: 启用 tcp-keep-alive（默认 false）
 - fakeip: DNS 使用 FakeIP 模式（默认 false，false 为 RedirHost）
-- quic: 屏蔽 QUIC 流量（UDP 443，默认 false）
+- quic: 允许 QUIC 流量（UDP 443，默认 false）
 
 说明：所有参数均可通过 $arguments 传入，支持字符串 true/false 或 1/0。
 */
@@ -262,7 +262,7 @@ const baseRules = [
 
 function buildRules({ quicEnabled }) {
     const ruleList = [...baseRules];
-    if (quicEnabled) {
+    if (!quicEnabled) {
         // 屏蔽 QUIC 流量，避免网络环境 UDP 速度不佳时影响体验
         ruleList.unshift("AND,(DST-PORT,443),(NETWORK,UDP),REJECT");
     }
@@ -315,7 +315,7 @@ function buildDnsConfig({ mode, fakeIpFilter }) {
             "tcp://8.26.56.2"
         ],
         "proxy-server-nameserver": [
-            "quic://223.5.5.5",
+            "https://dns.alidns.com/dns-query",
             "tls://dot.pub"
         ]
     };
