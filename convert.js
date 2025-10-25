@@ -76,7 +76,7 @@ const {
 
 function getCountryGroupNames(countryInfo, minCount) {
     return countryInfo
-        .filter(item => item.count > minCount)
+        .filter(item => item.count >= minCount)
         .map(item => item.country + NODE_SUFFIX);
 }
 
@@ -240,19 +240,19 @@ const ruleProviders = {
 }
 
 const baseRules = [
-    "RULE-SET,ADBlock,广告拦截",
-    "RULE-SET,AdditionalFilter,广告拦截",
-    "RULE-SET,SogouInput,搜狗输入法",
-    "RULE-SET,TruthSocial,Truth Social",
-    "RULE-SET,StaticResources,静态资源",
-    "RULE-SET,CDNResources,静态资源",
-    "RULE-SET,AdditionalCDNResources,静态资源",
-    "RULE-SET,Crypto,Crypto",
-    "RULE-SET,EHentai,E-Hentai",
-    "RULE-SET,TikTok,TikTok",
-    "RULE-SET,SteamFix,直连",
-    "RULE-SET,GoogleFCM,直连",
-    "GEOSITE,GOOGLE-PLAY@CN,直连",
+    `RULE-SET,ADBlock,广告拦截`,
+    `RULE-SET,AdditionalFilter,广告拦截`,
+    `RULE-SET,SogouInput,搜狗输入法`,
+    `RULE-SET,TruthSocial,Truth Social`,
+    `RULE-SET,StaticResources,静态资源`,
+    `RULE-SET,CDNResources,静态资源`,
+    `RULE-SET,AdditionalCDNResources,静态资源`,
+    `RULE-SET,Crypto,Crypto`,
+    `RULE-SET,EHentai,E-Hentai`,
+    `RULE-SET,TikTok,TikTok`,
+    `RULE-SET,SteamFix,${PROXY_GROUPS.DIRECT}`,
+    `RULE-SET,GoogleFCM,${PROXY_GROUPS.DIRECT}`,
+    `GEOSITE,GOOGLE-PLAY@CN,${PROXY_GROUPS.DIRECT}`,
     "GEOSITE,CATEGORY-AI-!CN,AI",
     "GEOSITE,TELEGRAM,Telegram",
     "GEOSITE,YOUTUBE,YouTube",
@@ -260,17 +260,17 @@ const baseRules = [
     "GEOSITE,SPOTIFY,Spotify",
     "GEOSITE,BAHAMUT,Bahamut",
     "GEOSITE,BILIBILI,Bilibili",
-    "GEOSITE,MICROSOFT@CN,直连",
+    `GEOSITE,MICROSOFT@CN,${PROXY_GROUPS.DIRECT}`,
     "GEOSITE,PIKPAK,PikPak",
-    "GEOSITE,GFW,选择节点",
-    "GEOSITE,CN,直连",
-    "GEOSITE,PRIVATE,直连",
+    `GEOSITE,GFW,${PROXY_GROUPS.SELECT}`,
+    `GEOSITE,CN,${PROXY_GROUPS.DIRECT}`,
+    `GEOSITE,PRIVATE,${PROXY_GROUPS.DIRECT}`,
     "GEOIP,NETFLIX,Netflix,no-resolve",
     "GEOIP,TELEGRAM,Telegram,no-resolve",
-    "GEOIP,CN,直连",
-    "GEOIP,PRIVATE,直连",
+    `GEOIP,CN,${PROXY_GROUPS.DIRECT}`,
+    `GEOIP,PRIVATE,${PROXY_GROUPS.DIRECT}`,
     "DST-PORT,22,SSH(22端口)",
-    "MATCH,选择节点"
+    `MATCH,${PROXY_GROUPS.SELECT}`
 ];
 
 function buildRules({ quicEnabled }) {
@@ -528,18 +528,18 @@ function buildProxyGroups({
     const hasUS = countries.includes("美国");
     // 排除落地节点、选择节点和故障转移以避免死循环
     const frontProxySelector = landing
-        ? defaultSelector.filter(name => name !== "落地节点" && name !== "故障转移")
+        ? defaultSelector.filter(name => name !== PROXY_GROUPS.LANDING && name !== PROXY_GROUPS.FALLBACK)
         : [];
 
     return [
         {
-            "name": "选择节点",
+            "name": PROXY_GROUPS.SELECT,
             "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png",
             "type": "select",
             "proxies": defaultSelector
         },
         {
-            "name": "手动选择",
+            "name": PROXY_GROUPS.MANUAL,
             "icon": "https://cdn.jsdelivr.net/gh/shindgewongxj/WHATSINStash@master/icon/select.png",
             "include-all": true,
             "type": "select"
@@ -553,14 +553,14 @@ function buildProxyGroups({
             "proxies": frontProxySelector
         } : null,
         (landing) ? {
-            "name": "落地节点",
+            "name": PROXY_GROUPS.LANDING,
             "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png",
             "type": "select",
             "include-all": true,
             "filter": "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地",
         } : null,
         {
-            "name": "故障转移",
+            "name": PROXY_GROUPS.FALLBACK,
             "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Bypass.png",
             "type": "fallback",
             "url": "https://cp.cloudflare.com/generate_204",
@@ -597,7 +597,7 @@ function buildProxyGroups({
             "name": "Bilibili",
             "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/bilibili.png",
             "type": "select",
-            "proxies": (hasTW && hasHK) ? ["直连", "台湾节点", "香港节点"] : defaultProxiesDirect
+            "proxies": (hasTW && hasHK) ? [PROXY_GROUPS.DIRECT, "台湾节点", "香港节点"] : defaultProxiesDirect
         },
         {
             "name": "Netflix",
@@ -633,13 +633,13 @@ function buildProxyGroups({
             "name": "Truth Social",
             "icon": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/icons/TruthSocial.png",
             "type": "select",
-            "proxies": (hasUS) ? ["美国节点", "选择节点", "手动选择"] : defaultProxies
+            "proxies": (hasUS) ? ["美国节点", PROXY_GROUPS.SELECT, PROXY_GROUPS.MANUAL] : defaultProxies
         },
         {
             "name": "Bahamut",
             "icon": "https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Bahamut.png",
             "type": "select",
-            "proxies": (hasTW) ? ["台湾节点", "选择节点", "手动选择", "直连"] : defaultProxies
+            "proxies": (hasTW) ? ["台湾节点", PROXY_GROUPS.SELECT, PROXY_GROUPS.MANUAL, PROXY_GROUPS.DIRECT] : defaultProxies
         },
         {
             "name": "Crypto",
@@ -658,15 +658,15 @@ function buildProxyGroups({
             "icon": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Sougou.png",
             "type": "select",
             "proxies": [
-                "直连", "REJECT"
+                PROXY_GROUPS.DIRECT, "REJECT"
             ]
         },
         {
-            "name": "直连",
+            "name": PROXY_GROUPS.DIRECT,
             "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Direct.png",
             "type": "select",
             "proxies": [
-                "DIRECT", "选择节点"
+                "DIRECT", PROXY_GROUPS.SELECT
             ]
         },
         {
@@ -674,11 +674,11 @@ function buildProxyGroups({
             "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png",
             "type": "select",
             "proxies": [
-                "REJECT", "直连"
+                "REJECT", PROXY_GROUPS.DIRECT
             ]
         },
         (lowCost) ? {
-            "name": "低倍率节点",
+            "name": PROXY_GROUPS.LOW_COST,
             "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lab.png",
             "type": "url-test",
             "url": "https://cp.cloudflare.com/generate_204",
