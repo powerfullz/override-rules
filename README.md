@@ -48,12 +48,15 @@ https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/conv
 
 目前支持的参数：
 
-*   `loadbalance`: 启用负载均衡 (默认false)
-*   `landing`: 启用落地节点功能 (默认false)
-*   `ipv6`: 启用 IPv6 支持 (默认false)
-*   `full`：生成完整配置（默认false，用于纯内核启动）
-*   `keepalive`: 启用 TCP Keep Alive（默认 false）[^fn2]
-*   `fakeip`：DNS 增强模式使用`fake-ip`而不是`redir-host`（默认false）
+*   `loadbalance`：启用负载均衡（url-test/load-balance，默认 false）
+*   `landing`：启用落地节点功能（如机场家宽/星链/落地分组，默认 false）
+*   `ipv6`：启用 IPv6 支持（默认 false）
+*   `full`：生成完整配置（适合纯内核启动，默认 false）
+*   `keepalive`：启用 TCP Keep Alive（默认 false）[^fn2]
+*   `fakeip`：DNS 增强模式使用 `fake-ip` 而不是 `redir-host`（默认 false）
+*   `quic`：屏蔽 QUIC 流量（UDP 443，默认 false）
+
+说明：所有参数均可通过 `$arguments` 传入，支持字符串 true/false 或 1/0。
 
 [^fn2]: 无特殊需求不要启用，否则会造成[移动设备异常耗电问题](https://github.com/vernesong/OpenClash/issues/2614)。
 
