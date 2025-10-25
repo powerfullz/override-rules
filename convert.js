@@ -10,8 +10,7 @@ https://github.com/powerfullz/override-rules
 - keepalive: 启用 tcp-keep-alive（默认 false）
 - fakeip: DNS 使用 FakeIP 模式（默认 false，false 为 RedirHost）
 - quic: 允许 QUIC 流量（UDP 443，默认 false）
-
-说明：所有参数均可通过 $arguments 传入，支持字符串 true/false 或 1/0。
+- threshold: 国家节点数量小于该值时不显示分组 (默认 0)
 */
 
 const NODE_SUFFIX = "节点";
@@ -22,6 +21,14 @@ function parseBool(value) {
         return value.toLowerCase() === "true" || value === "1";
     }
     return false;
+}
+
+function parseNumber(value, defaultValue = 0) {
+    if (value === null || typeof value === 'undefined') {
+        return defaultValue;
+    }
+    const num = parseInt(value, 10);
+    return isNaN(num) ? defaultValue : num;
 }
 
 /**
@@ -44,10 +51,15 @@ function buildFeatureFlags(args) {
         quic: "quicEnabled"
     };
 
-    return Object.entries(spec).reduce((acc, [sourceKey, targetKey]) => {
+    const flags = Object.entries(spec).reduce((acc, [sourceKey, targetKey]) => {
         acc[targetKey] = parseBool(args[sourceKey]) || false;
         return acc;
     }, {});
+
+    // 单独处理数字参数
+    flags.countryThreshold = parseNumber(args.threshold, 0);
+
+    return flags;
 }
 
 const rawArgs = typeof $arguments !== 'undefined' ? $arguments : {};
@@ -58,12 +70,13 @@ const {
     fullConfig,
     keepAliveEnabled,
     fakeIPEnabled,
-    quicEnabled
+    quicEnabled,
+    countryThreshold
 } = buildFeatureFlags(rawArgs);
 
-function getCountryGroupNames(countryInfo) {
+function getCountryGroupNames(countryInfo, minCount) {
     return countryInfo
-        .filter(item => item.count > 2)
+        .filter(item => item.count > minCount)
         .map(item => item.country + NODE_SUFFIX);
 }
 
@@ -681,7 +694,7 @@ function main(config) {
     // 解析地区与低倍率信息
     const countryInfo = parseCountries(resultConfig); // [{ country, count }]
     const lowCost = hasLowCost(resultConfig);
-    const countryGroupNames = getCountryGroupNames(countryInfo);
+    const countryGroupNames = getCountryGroupNames(countryInfo, countryThreshold);
     const countries = stripNodeSuffix(countryGroupNames);
 
     // 构建基础数组
