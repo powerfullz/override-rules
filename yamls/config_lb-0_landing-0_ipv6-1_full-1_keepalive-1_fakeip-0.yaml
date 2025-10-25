@@ -15,7 +15,7 @@ disable-keep-alive: false
 profile:
   store-selected: true
 proxy-groups:
-  - name: 选择节点
+  - name: 选择代理
     icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png
     type: select
     proxies:
@@ -105,14 +105,14 @@ proxy-groups:
     type: select
     proxies:
       - 美国节点
-      - 选择节点
+      - 选择代理
       - 手动选择
   - name: Bahamut
     icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Bahamut.png
     type: select
     proxies:
       - 台湾节点
-      - 选择节点
+      - 选择代理
       - 手动选择
       - 直连
   - name: Crypto
@@ -134,7 +134,7 @@ proxy-groups:
     type: select
     proxies:
       - DIRECT
-      - 选择节点
+      - 选择代理
   - name: 广告拦截
     icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png
     type: select
@@ -202,7 +202,7 @@ proxy-groups:
     include-all: true
     type: select
     proxies:
-      - 选择节点
+      - 选择代理
       - 手动选择
       - 故障转移
       - 静态资源
@@ -337,7 +337,7 @@ rules:
   - GEOSITE,BILIBILI,Bilibili
   - GEOSITE,MICROSOFT@CN,直连
   - GEOSITE,PIKPAK,PikPak
-  - GEOSITE,GFW,选择节点
+  - GEOSITE,GFW,选择代理
   - GEOSITE,CN,直连
   - GEOSITE,PRIVATE,直连
   - GEOIP,NETFLIX,Netflix,no-resolve
@@ -345,7 +345,7 @@ rules:
   - GEOIP,CN,直连
   - GEOIP,PRIVATE,直连
   - DST-PORT,22,SSH(22端口)
-  - MATCH,选择节点
+  - MATCH,选择代理
 sniffer:
   sniff:
     TLS:
