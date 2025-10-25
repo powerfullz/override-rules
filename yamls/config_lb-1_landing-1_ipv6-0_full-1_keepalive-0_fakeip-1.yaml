@@ -73,7 +73,7 @@ proxy-groups:
     icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cloudflare.png
     type: select
     proxies: &a1
-      - 选择节点
+      - 选择代理
       - 香港节点
       - 台湾节点
       - 新加坡节点
