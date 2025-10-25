@@ -172,31 +172,31 @@ proxy-groups:
     icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png
     include-all: true
     filter: (?i)香港|港|HK|hk|Hong Kong|HongKong|hongkong|🇭🇰
-    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地|0.[0-5]|低倍率|省流|大流量|实验性
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地|0\.[0-5]|低倍率|省流|大流量|实验性
     type: load-balance
   - name: 台湾节点
     icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png
     include-all: true
     filter: (?i)台|新北|彰化|TW|Taiwan|🇹🇼
-    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地|0.[0-5]|低倍率|省流|大流量|实验性
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地|0\.[0-5]|低倍率|省流|大流量|实验性
     type: load-balance
   - name: 新加坡节点
     icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png
     include-all: true
     filter: (?i)新加坡|坡|狮城|SG|Singapore|🇸🇬
-    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地|0.[0-5]|低倍率|省流|大流量|实验性
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地|0\.[0-5]|低倍率|省流|大流量|实验性
     type: load-balance
   - name: 日本节点
     icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png
     include-all: true
     filter: (?i)日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan|🇯🇵
-    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地|0.[0-5]|低倍率|省流|大流量|实验性
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地|0\.[0-5]|低倍率|省流|大流量|实验性
     type: load-balance
   - name: 美国节点
     icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png
     include-all: true
     filter: (?i)美国|美|US|United States|🇺🇸
-    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地|0.[0-5]|低倍率|省流|大流量|实验性
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地|0\.[0-5]|低倍率|省流|大流量|实验性
     type: load-balance
   - name: GLOBAL
     icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png
@@ -240,12 +240,12 @@ rule-providers:
     url: https://adrules.top/adrules-mihomo.mrs
     path: ./ruleset/ADBlock.mrs
   TruthSocial:
+    type: http
+    behavior: classical
+    format: text
+    interval: 86400
     url: https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/TruthSocial.list
     path: ./ruleset/TruthSocial.list
-    behavior: classical
-    interval: 86400
-    format: text
-    type: http
   SogouInput:
     type: http
     behavior: classical
@@ -291,10 +291,10 @@ rule-providers:
   GoogleFCM:
     type: http
     behavior: classical
-    interval: 86400
     format: text
-    path: ./ruleset/FirebaseCloudMessaging.list
+    interval: 86400
     url: https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/FirebaseCloudMessaging.list
+    path: ./ruleset/FirebaseCloudMessaging.list
   AdditionalFilter:
     type: http
     behavior: classical
