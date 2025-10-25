@@ -1,123 +1,232 @@
 /*
 powerfullz 的 Substore 订阅转换脚本
 https://github.com/powerfullz/override-rules
-传入参数：
-- loadbalance: 启用负载均衡 (默认false)
-- landing: 启用落地节点功能 (默认false)
-- ipv6: 启用 IPv6 支持 (默认false)
-- full: 启用完整配置，用于纯内核启动 (默认false)
-- keepalive: 启用 tcp-keep-alive (默认false)
-- fakeip: DNS 使用 FakeIP 而不是 RedirHost (默认false)
+
+支持的传入参数：
+- loadbalance: 启用负载均衡（url-test/load-balance，默认 false）
+- landing: 启用落地节点功能（如机场家宽/星链/落地分组，默认 false）
+- ipv6: 启用 IPv6 支持（默认 false）
+- full: 输出完整配置（适合纯内核启动，默认 false）
+- keepalive: 启用 tcp-keep-alive（默认 false）
+- fakeip: DNS 使用 FakeIP 模式（默认 false，false 为 RedirHost）
+- quic: 屏蔽 QUIC 流量（UDP 443，默认 false）
+
+说明：所有参数均可通过 $arguments 传入，支持字符串 true/false 或 1/0。
 */
 
-const inArg = typeof $arguments !== 'undefined' ? $arguments : {};
-const loadBalance = parseBool(inArg.loadbalance) || false,
-    landing = parseBool(inArg.landing) || false,
-    ipv6Enabled = parseBool(inArg.ipv6) || false,
-    fullConfig = parseBool(inArg.full) || false,
-    keepAliveEnabled = parseBool(inArg.keepalive) || false,
-    fakeIPEnabled = parseBool(inArg.fakeip) || false;
+const NODE_SUFFIX = "节点";
 
-function buildBaseLists({ landing, lowCost, countryInfo }) {
-    const countryGroupNames = countryInfo
-        .filter(item => item.count > 2)
-        .map(item => item.country + "节点");
-
-    // defaultSelector (选择节点 组里展示的候选) 
-    // 故障转移, 落地节点(可选), 各地区节点, 低倍率节点(可选), 手动选择, DIRECT
-    const selector = ["故障转移"]; // 把 fallback 放在最前
-    if (landing) selector.push("落地节点");
-    selector.push(...countryGroupNames);
-    if (lowCost) selector.push("低倍率节点");
-    selector.push("手动选择", "DIRECT");
-
-    // defaultProxies (各分类策略引用) 
-    // 选择节点, 各地区节点, 低倍率节点(可选), 手动选择, 直连
-    const defaultProxies = ["选择节点", ...countryGroupNames];
-    if (lowCost) defaultProxies.push("低倍率节点");
-    defaultProxies.push("手动选择", "直连");
-
-    // direct 优先的列表
-    const defaultProxiesDirect = ["直连", ...countryGroupNames, "选择节点", "手动选择"]; // 直连优先
-    if (lowCost) {
-        // 在直连策略里低倍率次于地区、早于选择节点
-        defaultProxiesDirect.splice(1 + countryGroupNames.length, 0, "低倍率节点");
+function parseBool(value) {
+    if (typeof value === "boolean") return value;
+    if (typeof value === "string") {
+        return value.toLowerCase() === "true" || value === "1";
     }
+    return false;
+}
 
-    const defaultFallback = [];
-    if (landing) defaultFallback.push("落地节点");
-    defaultFallback.push(...countryGroupNames);
-    if (lowCost) defaultFallback.push("低倍率节点");
-    // 可选是否加入 手动选择 / DIRECT；按容灾语义加入。
-    defaultFallback.push("手动选择", "DIRECT");
+/**
+ * 解析传入的脚本参数，并将其转换为内部使用的功能开关（feature flags）。
+ * @param {object} args - 传入的原始参数对象，如 $arguments。
+ * @returns {object} - 包含所有功能开关状态的对象。
+ *
+ * 该函数通过一个 `spec` 对象定义了外部参数名（如 `loadbalance`）到内部变量名（如 `loadBalance`）的映射关系。
+ * 它会遍历 `spec` 中的每一项，对 `args` 对象中对应的参数值调用 `parseBool` 函数进行布尔化处理，
+ * 并将结果存入返回的对象中。
+ */
+function buildFeatureFlags(args) {
+    const spec = {
+        loadbalance: "loadBalance",
+        landing: "landing",
+        ipv6: "ipv6Enabled",
+        full: "fullConfig",
+        keepalive: "keepAliveEnabled",
+        fakeip: "fakeIPEnabled",
+        quic: "quicEnabled"
+    };
 
-    return { defaultProxies, defaultProxiesDirect, defaultSelector: selector, defaultFallback, countryGroupNames };
+    return Object.entries(spec).reduce((acc, [sourceKey, targetKey]) => {
+        acc[targetKey] = parseBool(args[sourceKey]) || false;
+        return acc;
+    }, {});
+}
+
+const rawArgs = typeof $arguments !== 'undefined' ? $arguments : {};
+const {
+    loadBalance,
+    landing,
+    ipv6Enabled,
+    fullConfig,
+    keepAliveEnabled,
+    fakeIPEnabled,
+    quicEnabled
+} = buildFeatureFlags(rawArgs);
+
+function getCountryGroupNames(countryInfo) {
+    return countryInfo
+        .filter(item => item.count > 2)
+        .map(item => item.country + NODE_SUFFIX);
+}
+
+function stripNodeSuffix(groupNames) {
+    const suffixPattern = new RegExp(`${NODE_SUFFIX}$`);
+    return groupNames.map(name => name.replace(suffixPattern, ""));
+}
+
+const PROXY_GROUPS = {
+    SELECT: "选择节点",
+    MANUAL: "手动选择",
+    FALLBACK: "故障转移",
+    DIRECT: "直连",
+    LANDING: "落地节点",
+    LOW_COST: "低倍率节点",
+};
+
+// 辅助函数，用于根据条件构建数组，自动过滤掉无效值（如 false, null）
+const buildList = (...elements) => elements.flat().filter(Boolean);
+
+function buildBaseLists({ landing, lowCost, countryGroupNames }) {
+    // 使用辅助函数和常量，以声明方式构建各个代理列表
+
+    // “选择节点”组的候选列表
+    const defaultSelector = buildList(
+        PROXY_GROUPS.FALLBACK,
+        landing && PROXY_GROUPS.LANDING,
+        countryGroupNames,
+        lowCost && PROXY_GROUPS.LOW_COST,
+        PROXY_GROUPS.MANUAL,
+        "DIRECT"
+    );
+
+    // 默认的代理列表，用于大多数策略组
+    const defaultProxies = buildList(
+        PROXY_GROUPS.SELECT,
+        countryGroupNames,
+        lowCost && PROXY_GROUPS.LOW_COST,
+        PROXY_GROUPS.MANUAL,
+        PROXY_GROUPS.DIRECT
+    );
+
+    // “直连”优先的代理列表
+    const defaultProxiesDirect = buildList(
+        PROXY_GROUPS.DIRECT,
+        countryGroupNames,
+        lowCost && PROXY_GROUPS.LOW_COST,
+        PROXY_GROUPS.SELECT,
+        PROXY_GROUPS.MANUAL
+    );
+
+    // “故障转移”组的代理列表
+    const defaultFallback = buildList(
+        landing && PROXY_GROUPS.LANDING,
+        countryGroupNames,
+        lowCost && PROXY_GROUPS.LOW_COST,
+        PROXY_GROUPS.MANUAL,
+        "DIRECT"
+    );
+
+    return { defaultProxies, defaultProxiesDirect, defaultSelector, defaultFallback };
 }
 
 const ruleProviders = {
     "ADBlock": {
-        "type": "http", "behavior": "domain", "format": "mrs", "interval": 86400,
+        "type": "http",
+        "behavior": "domain",
+        "format": "mrs",
+        "interval": 86400,
         "url": "https://adrules.top/adrules-mihomo.mrs",
         "path": "./ruleset/ADBlock.mrs"
     },
     "TruthSocial": {
+        "type": "http",
+        "behavior": "classical",
+        "format": "text",
+        "interval": 86400,
         "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/TruthSocial.list",
-        "path": "./ruleset/TruthSocial.list",
-        "behavior": "classical", "interval": 86400, "format": "text", "type": "http"
+        "path": "./ruleset/TruthSocial.list"
     },
     "SogouInput": {
-        "type": "http", "behavior": "classical", "format": "text", "interval": 86400,
+        "type": "http",
+        "behavior": "classical",
+        "format": "text",
+        "interval": 86400,
         "url": "https://ruleset.skk.moe/Clash/non_ip/sogouinput.txt",
         "path": "./ruleset/SogouInput.txt"
     },
     "StaticResources": {
-        "type": "http", "behavior": "domain", "format": "text", "interval": 86400,
+        "type": "http",
+        "behavior": "domain",
+        "format": "text",
+        "interval": 86400,
         "url": "https://ruleset.skk.moe/Clash/domainset/cdn.txt",
         "path": "./ruleset/StaticResources.txt"
     },
     "CDNResources": {
-        "type": "http", "behavior": "classical", "format": "text", "interval": 86400,
+        "type": "http",
+        "behavior": "classical",
+        "format": "text",
+        "interval": 86400,
         "url": "https://ruleset.skk.moe/Clash/non_ip/cdn.txt",
         "path": "./ruleset/CDNResources.txt"
     },
     "TikTok": {
-        "type": "http", "behavior": "classical", "format": "text", "interval": 86400,
+        "type": "http",
+        "behavior": "classical",
+        "format": "text",
+        "interval": 86400,
         "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/TikTok.list",
         "path": "./ruleset/TikTok.list"
     },
     "EHentai": {
-        "type": "http", "behavior": "classical", "format": "text", "interval": 86400,
+        "type": "http",
+        "behavior": "classical",
+        "format": "text",
+        "interval": 86400,
         "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/EHentai.list",
         "path": "./ruleset/EHentai.list"
     },
     "SteamFix": {
-        "type": "http", "behavior": "classical", "format": "text", "interval": 86400,
+        "type": "http",
+        "behavior": "classical",
+        "format": "text",
+        "interval": 86400,
         "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/SteamFix.list",
         "path": "./ruleset/SteamFix.list"
     },
     "GoogleFCM": {
-        "type": "http", "behavior": "classical", "interval": 86400, "format": "text",
-        "path": "./ruleset/FirebaseCloudMessaging.list",
+        "type": "http",
+        "behavior": "classical",
+        "format": "text",
+        "interval": 86400,
         "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/FirebaseCloudMessaging.list",
+        "path": "./ruleset/FirebaseCloudMessaging.list"
     },
     "AdditionalFilter": {
-        "type": "http", "behavior": "classical", "format": "text", "interval": 86400,
+        "type": "http",
+        "behavior": "classical",
+        "format": "text",
+        "interval": 86400,
         "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/AdditionalFilter.list",
         "path": "./ruleset/AdditionalFilter.list"
     },
     "AdditionalCDNResources": {
-        "type": "http", "behavior": "classical", "format": "text", "interval": 86400,
+        "type": "http",
+        "behavior": "classical",
+        "format": "text",
+        "interval": 86400,
         "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/AdditionalCDNResources.list",
         "path": "./ruleset/AdditionalCDNResources.list"
     },
     "Crypto": {
-        "type": "http", "behavior": "classical", "format": "text", "interval": 86400,
+        "type": "http",
+        "behavior": "classical",
+        "format": "text",
+        "interval": 86400,
         "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/Crypto.list",
         "path": "./ruleset/Crypto.list"
     }
 }
 
-const rules = [
+const baseRules = [
     "RULE-SET,ADBlock,广告拦截",
     "RULE-SET,AdditionalFilter,广告拦截",
     "RULE-SET,SogouInput,搜狗输入法",
@@ -151,6 +260,15 @@ const rules = [
     "MATCH,选择节点"
 ];
 
+function buildRules({ quicEnabled }) {
+    const ruleList = [...baseRules];
+    if (quicEnabled) {
+        // 屏蔽 QUIC 流量，避免网络环境 UDP 速度不佳时影响体验
+        ruleList.unshift("AND,(DST-PORT,443),(NETWORK,UDP),REJECT");
+    }
+    return ruleList;
+}
+
 const snifferConfig = {
     "sniff": {
         "TLS": {
@@ -173,41 +291,46 @@ const snifferConfig = {
     ]
 };
 
-const dnsConfig = {
-    "enable": true,
-    "ipv6": ipv6Enabled,
-    "prefer-h3": true,
-    "enhanced-mode": "redir-host",
-    "default-nameserver": [
-        "119.29.29.29",
-        "223.5.5.5",
-    ],
-    "nameserver": [
-        "system",
-        "223.5.5.5",
-        "119.29.29.29",
-        "180.184.1.1",
-    ],
-    "fallback": [
-        "quic://dns0.eu",
-        "https://dns.cloudflare.com/dns-query",
-        "https://dns.sb/dns-query",
-        "tcp://208.67.222.222",
-        "tcp://8.26.56.2"
-    ],
-    "proxy-server-nameserver": [
-        "quic://223.5.5.5",
-        "tls://dot.pub",
-    ]
-};
+function buildDnsConfig({ mode, fakeIpFilter }) {
+    const config = {
+        "enable": true,
+        "ipv6": ipv6Enabled,
+        "prefer-h3": true,
+        "enhanced-mode": mode,
+        "default-nameserver": [
+            "119.29.29.29",
+            "223.5.5.5"
+        ],
+        "nameserver": [
+            "system",
+            "223.5.5.5",
+            "119.29.29.29",
+            "180.184.1.1"
+        ],
+        "fallback": [
+            "quic://dns0.eu",
+            "https://dns.cloudflare.com/dns-query",
+            "https://dns.sb/dns-query",
+            "tcp://208.67.222.222",
+            "tcp://8.26.56.2"
+        ],
+        "proxy-server-nameserver": [
+            "quic://223.5.5.5",
+            "tls://dot.pub"
+        ]
+    };
 
-const dnsConfig2 = {
-    // 提供使用 FakeIP 的 DNS 配置
-    "enable": true,
-    "ipv6": ipv6Enabled,
-    "prefer-h3": true,
-    "enhanced-mode": "fake-ip",
-    "fake-ip-filter": [
+    if (fakeIpFilter) {
+        config["fake-ip-filter"] = fakeIpFilter;
+    }
+
+    return config;
+}
+
+const dnsConfig = buildDnsConfig({ mode: "redir-host" });
+const dnsConfigFakeIp = buildDnsConfig({
+    mode: "fake-ip",
+    fakeIpFilter: [
         "geosite:private",
         "geosite:connectivity-check",
         "geosite:cn",
@@ -217,29 +340,8 @@ const dnsConfig2 = {
         "*.icloud.com",
         "*.stun.*.*",
         "*.stun.*.*.*"
-    ],
-    "default-nameserver": [
-        "119.29.29.29",
-        "223.5.5.5",
-    ],
-    "nameserver": [
-        "system",
-        "223.5.5.5",
-        "119.29.29.29",
-        "180.184.1.1",
-    ],
-    "fallback": [
-        "quic://dns0.eu",
-        "https://dns.cloudflare.com/dns-query",
-        "https://dns.sb/dns-query",
-        "tcp://208.67.222.222",
-        "tcp://8.26.56.2"
-    ],
-    "proxy-server-nameserver": [
-        "quic://223.5.5.5",
-        "tls://dot.pub",
     ]
-};
+});
 
 const geoxURL = {
     "geoip": "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat",
@@ -251,89 +353,74 @@ const geoxURL = {
 // 地区元数据
 const countriesMeta = {
     "香港": {
-    pattern: "(?i)香港|港|HK|hk|Hong Kong|HongKong|hongkong|🇭🇰",
+        pattern: "(?i)香港|港|HK|hk|Hong Kong|HongKong|hongkong|🇭🇰",
         icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png"
     },
     "澳门": {
-    pattern: "(?i)澳门|MO|Macau|🇲🇴",
+        pattern: "(?i)澳门|MO|Macau|🇲🇴",
         icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Macao.png"
     },
     "台湾": {
-    pattern: "(?i)台|新北|彰化|TW|Taiwan|🇹🇼",
+        pattern: "(?i)台|新北|彰化|TW|Taiwan|🇹🇼",
         icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png"
     },
     "新加坡": {
-    pattern: "(?i)新加坡|坡|狮城|SG|Singapore|🇸🇬",
+        pattern: "(?i)新加坡|坡|狮城|SG|Singapore|🇸🇬",
         icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png"
     },
     "日本": {
-    pattern: "(?i)日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan|🇯🇵",
+        pattern: "(?i)日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan|🇯🇵",
         icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png"
     },
     "韩国": {
-    pattern: "(?i)KR|Korea|KOR|首尔|韩|韓|🇰🇷",
+        pattern: "(?i)KR|Korea|KOR|首尔|韩|韓|🇰🇷",
         icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Korea.png"
     },
     "美国": {
-    pattern: "(?i)美国|美|US|United States|🇺🇸",
+        pattern: "(?i)美国|美|US|United States|🇺🇸",
         icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png"
     },
     "加拿大": {
-    pattern: "(?i)加拿大|Canada|CA|🇨🇦",
+        pattern: "(?i)加拿大|Canada|CA|🇨🇦",
         icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Canada.png"
     },
     "英国": {
-    pattern: "(?i)英国|United Kingdom|UK|伦敦|London|🇬🇧",
+        pattern: "(?i)英国|United Kingdom|UK|伦敦|London|🇬🇧",
         icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_Kingdom.png"
     },
     "澳大利亚": {
-    pattern: "(?i)澳洲|澳大利亚|AU|Australia|🇦🇺",
+        pattern: "(?i)澳洲|澳大利亚|AU|Australia|🇦🇺",
         icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Australia.png"
     },
     "德国": {
-    pattern: "(?i)德国|德|DE|Germany|🇩🇪",
+        pattern: "(?i)德国|德|DE|Germany|🇩🇪",
         icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Germany.png"
     },
     "法国": {
-    pattern: "(?i)法国|法|FR|France|🇫🇷",
+        pattern: "(?i)法国|法|FR|France|🇫🇷",
         icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/France.png"
     },
     "俄罗斯": {
-    pattern: "(?i)俄罗斯|俄|RU|Russia|🇷🇺",
+        pattern: "(?i)俄罗斯|俄|RU|Russia|🇷🇺",
         icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Russia.png"
     },
     "泰国": {
-    pattern: "(?i)泰国|泰|TH|Thailand|🇹🇭",
+        pattern: "(?i)泰国|泰|TH|Thailand|🇹🇭",
         icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Thailand.png"
     },
     "印度": {
-    pattern: "(?i)印度|IN|India|🇮🇳",
+        pattern: "(?i)印度|IN|India|🇮🇳",
         icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/India.png"
     },
     "马来西亚": {
-    pattern: "(?i)马来西亚|马来|MY|Malaysia|🇲🇾",
+        pattern: "(?i)马来西亚|马来|MY|Malaysia|🇲🇾",
         icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Malaysia.png"
     },
 };
 
-function parseBool(value) {
-    if (typeof value === "boolean") return value;
-    if (typeof value === "string") {
-        return value.toLowerCase() === "true" || value === "1";
-    }
-    return false;
-}
-
 function hasLowCost(config) {
-    // 检查是否有低倍率节点
-    const proxies = config["proxies"];
-    const lowCostRegex = new RegExp(/0\.[0-5]|低倍率|省流|大流量|实验性/, 'i');
-    for (const proxy of proxies) {
-        if (lowCostRegex.test(proxy.name)) {
-            return true;
-        }
-    }
-    return false;
+    const lowCostRegex = /0\.[0-5]|低倍率|省流|大流量|实验性/i;
+    return (config.proxies || []).some(proxy => lowCostRegex.test(proxy.name));
 }
 
 function parseCountries(config) {
@@ -378,44 +465,43 @@ function parseCountries(config) {
 }
 
 
-function buildCountryProxyGroups(countryList) {
-    // 获取实际存在的地区列表
-    const countryProxyGroups = [];
+function buildCountryProxyGroups({ countries, landing, loadBalance }) {
+    const groups = [];
+    const baseExcludeFilter = "0\\.[0-5]|低倍率|省流|大流量|实验性";
+    const landingExcludeFilter = "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地";
+    const groupType = loadBalance ? "load-balance" : "url-test";
 
-    // 为实际存在的地区创建节点组
-    for (const country of countryList) {
-        // 确保地区名称在预设的地区配置中存在
-        if (countriesMeta[country]) {
-            const groupName = `${country}节点`;
-            const pattern = countriesMeta[country].pattern;
+    for (const country of countries) {
+        const meta = countriesMeta[country];
+        if (!meta) continue;
 
-            const groupConfig = {
-                "name": groupName,
-                "icon": countriesMeta[country].icon,
-                "include-all": true,
-                "filter": pattern,
-                "exclude-filter": landing ? "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地|0\.[0-5]|低倍率|省流|大流量|实验性" : "0\.[0-5]|低倍率|省流|大流量|实验性",
-                "type": (loadBalance) ? "load-balance" : "url-test",
-            };
+        const groupConfig = {
+            "name": `${country}${NODE_SUFFIX}`,
+            "icon": meta.icon,
+            "include-all": true,
+            "filter": meta.pattern,
+            "exclude-filter": landing ? `${landingExcludeFilter}|${baseExcludeFilter}` : baseExcludeFilter,
+            "type": groupType
+        };
 
-            if (!loadBalance) {
-                Object.assign(groupConfig, {
-                    "url": "https://cp.cloudflare.com/generate_204",
-                    "interval": 60,
-                    "tolerance": 20,
-                    "lazy": false
-                });
-            }
-
-            countryProxyGroups.push(groupConfig);
+        if (!loadBalance) {
+            Object.assign(groupConfig, {
+                "url": "https://cp.cloudflare.com/generate_204",
+                "interval": 60,
+                "tolerance": 20,
+                "lazy": false
+            });
         }
+
+        groups.push(groupConfig);
     }
 
-    return countryProxyGroups;
+    return groups;
 }
 
 function buildProxyGroups({
-    countryList,
+    landing,
+    countries,
     countryProxyGroups,
     lowCost,
     defaultProxies,
@@ -424,13 +510,13 @@ function buildProxyGroups({
     defaultFallback
 }) {
     // 查看是否有特定地区的节点
-    const hasTW = countryList.includes("台湾");
-    const hasHK = countryList.includes("香港");
-    const hasUS = countryList.includes("美国");
+    const hasTW = countries.includes("台湾");
+    const hasHK = countries.includes("香港");
+    const hasUS = countries.includes("美国");
     // 排除落地节点、选择节点和故障转移以避免死循环
-    const frontProxySelector = [
-        ...defaultSelector.filter(name => name !== "落地节点" && name !== "故障转移")
-    ];
+    const frontProxySelector = landing
+        ? defaultSelector.filter(name => name !== "落地节点" && name !== "故障转移")
+        : [];
 
     return [
         {
@@ -591,26 +677,28 @@ function buildProxyGroups({
 }
 
 function main(config) {
-    config = { proxies: config.proxies };
+    const resultConfig = { proxies: config.proxies };
     // 解析地区与低倍率信息
-    const countryInfo = parseCountries(config); // [{ country, count }]
-    const lowCost = hasLowCost(config);
+    const countryInfo = parseCountries(resultConfig); // [{ country, count }]
+    const lowCost = hasLowCost(resultConfig);
+    const countryGroupNames = getCountryGroupNames(countryInfo);
+    const countries = stripNodeSuffix(countryGroupNames);
 
     // 构建基础数组
     const {
         defaultProxies,
         defaultProxiesDirect,
         defaultSelector,
-        defaultFallback,
-        countryGroupNames: targetCountryList
-    } = buildBaseLists({ landing, lowCost, countryInfo });
+        defaultFallback
+    } = buildBaseLists({ landing, lowCost, countryGroupNames });
 
     // 为地区构建对应的 url-test / load-balance 组
-    const countryProxyGroups = buildCountryProxyGroups(targetCountryList.map(n => n.replace(/节点$/, '')));
+    const countryProxyGroups = buildCountryProxyGroups({ countries, landing, loadBalance });
 
     // 生成代理组
     const proxyGroups = buildProxyGroups({
-        countryList: targetCountryList.map(n => n.replace(/节点$/, '')),
+        landing,
+        countries,
         countryProxyGroups,
         lowCost,
         defaultProxies,
@@ -618,8 +706,9 @@ function main(config) {
         defaultSelector,
         defaultFallback
     });
-    const globalProxies = proxyGroups.map(item => item.name);
     
+    // 完整书写 Global 代理组以确保兼容性
+    const globalProxies = proxyGroups.map(item => item.name);  
     proxyGroups.push(
         {
             "name": "GLOBAL",
@@ -630,7 +719,9 @@ function main(config) {
         }
     );
 
-    if (fullConfig) Object.assign(config, {
+    const finalRules = buildRules({ quicEnabled });
+
+    if (fullConfig) Object.assign(resultConfig, {
         "mixed-port": 7890,
         "redir-port": 7892,
         "tproxy-port": 7893,
@@ -650,15 +741,15 @@ function main(config) {
         }
     });
 
-    Object.assign(config, {
+    Object.assign(resultConfig, {
         "proxy-groups": proxyGroups,
         "rule-providers": ruleProviders,
-        "rules": rules,
+        "rules": finalRules,
         "sniffer": snifferConfig,
-        "dns": fakeIPEnabled ? dnsConfig2 : dnsConfig,
+        "dns": fakeIPEnabled ? dnsConfigFakeIp : dnsConfig,
         "geodata-mode": true,
         "geox-url": geoxURL,
     });
 
-    return config;
+    return resultConfig;
 }
