@@ -86,7 +86,7 @@ function stripNodeSuffix(groupNames) {
 }
 
 const PROXY_GROUPS = {
-    SELECT: "选择节点",
+    SELECT: "选择代理",
     MANUAL: "手动选择",
     FALLBACK: "故障转移",
     DIRECT: "直连",
