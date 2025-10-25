@@ -54,7 +54,7 @@ https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/conv
 *   `full`：生成完整配置（适合纯内核启动，默认 false）
 *   `keepalive`：启用 TCP Keep Alive（默认 false）[^fn2]
 *   `fakeip`：DNS 增强模式使用 `fake-ip` 而不是 `redir-host`（默认 false）
-*   `quic`：屏蔽 QUIC 流量（UDP 443，默认 false）
+*   `quic`：允许 QUIC 流量（UDP 443，默认 false）
 
 说明：所有参数均可通过 `$arguments` 传入，支持字符串 true/false 或 1/0。
 
