@@ -674,7 +674,7 @@ function buildProxyGroups({
             "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png",
             "type": "select",
             "proxies": [
-                "REJECT", PROXY_GROUPS.DIRECT
+                "REJECT-DROP", PROXY_GROUPS.DIRECT
             ]
         },
         (lowCost) ? {
