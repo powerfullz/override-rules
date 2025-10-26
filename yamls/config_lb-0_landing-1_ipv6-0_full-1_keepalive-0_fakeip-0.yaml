@@ -160,7 +160,7 @@ proxy-groups:
     icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png
     type: select
     proxies:
-      - REJECT
+      - REJECT-DROP
       - 直连
   - name: 低倍率节点
     icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lab.png
