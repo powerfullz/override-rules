@@ -318,7 +318,7 @@ rule-providers:
     url: https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/Crypto.list
     path: ./ruleset/Crypto.list
 rules:
-  - AND,(DST-PORT,443),(NETWORK,UDP),REJECT
+  - AND,((DST-PORT,443),(NETWORK,UDP)),REJECT
   - RULE-SET,ADBlock,广告拦截
   - RULE-SET,AdditionalFilter,广告拦截
   - RULE-SET,SogouInput,搜狗输入法
