@@ -277,7 +277,7 @@ function buildRules({ quicEnabled }) {
     const ruleList = [...baseRules];
     if (!quicEnabled) {
         // 屏蔽 QUIC 流量，避免网络环境 UDP 速度不佳时影响体验
-        ruleList.unshift("AND,(DST-PORT,443),(NETWORK,UDP),REJECT");
+        ruleList.unshift("AND,((DST-PORT,443),(NETWORK,UDP)),REJECT");
     }
     return ruleList;
 }
