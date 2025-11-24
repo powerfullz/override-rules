@@ -149,14 +149,6 @@ const ruleProviders = {
         "url": "https://adrules.top/adrules-mihomo.mrs",
         "path": "./ruleset/ADBlock.mrs"
     },
-    "TruthSocial": {
-        "type": "http",
-        "behavior": "classical",
-        "format": "text",
-        "interval": 86400,
-        "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/TruthSocial.list",
-        "path": "./ruleset/TruthSocial.list"
-    },
     "SogouInput": {
         "type": "http",
         "behavior": "classical",
