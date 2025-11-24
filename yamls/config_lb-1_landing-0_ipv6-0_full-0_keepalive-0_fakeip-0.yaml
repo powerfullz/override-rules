@@ -292,7 +292,7 @@ rules:
   - RULE-SET,TikTok,TikTok
   - RULE-SET,SteamFix,直连
   - RULE-SET,GoogleFCM,直连
-  - GEOSITE,GOOGLE-PLAY@CN,直连
+  - GEOSITE,GOOGLE-PLAY@CN,选择代理
   - GEOSITE,CATEGORY-AI-!CN,AI
   - GEOSITE,TELEGRAM,Telegram
   - GEOSITE,YOUTUBE,YouTube
