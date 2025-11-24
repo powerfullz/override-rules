@@ -236,6 +236,14 @@ const ruleProviders = {
         "interval": 86400,
         "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/Crypto.list",
         "path": "./ruleset/Crypto.list"
+    },
+    "GooglePlayCN": {
+        "type": "http",
+        "behavior": "classical",
+        "format": "text",
+        "interval": 86400,
+        "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/GooglePlayCN.list",
+        "path": "./ruleset/GooglePlayCN.list"
     }
 }
 
@@ -252,6 +260,7 @@ const baseRules = [
     `RULE-SET,TikTok,TikTok`,
     `RULE-SET,SteamFix,${PROXY_GROUPS.DIRECT}`,
     `RULE-SET,GoogleFCM,${PROXY_GROUPS.DIRECT}`,
+    `RULE-SET,GooglePlayCN,${PROXY_GROUPS.SELECT}`,
     `GEOSITE,GOOGLE-PLAY@CN,${PROXY_GROUPS.SELECT}`,
     "GEOSITE,CATEGORY-AI-!CN,AI",
     "GEOSITE,TELEGRAM,Telegram",

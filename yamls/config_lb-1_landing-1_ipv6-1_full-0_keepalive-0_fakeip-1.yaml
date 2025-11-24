@@ -301,6 +301,13 @@ rule-providers:
     interval: 86400
     url: https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/Crypto.list
     path: ./ruleset/Crypto.list
+  GooglePlayCN:
+    type: http
+    behavior: classical
+    format: text
+    interval: 86400
+    url: https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/GooglePlayCN.list
+    path: ./ruleset/GooglePlayCN.list
 rules:
   - AND,((DST-PORT,443),(NETWORK,UDP)),REJECT
   - RULE-SET,ADBlock,广告拦截
@@ -315,6 +322,7 @@ rules:
   - RULE-SET,TikTok,TikTok
   - RULE-SET,SteamFix,直连
   - RULE-SET,GoogleFCM,直连
+  - RULE-SET,GooglePlayCN,选择代理
   - GEOSITE,GOOGLE-PLAY@CN,选择代理
   - GEOSITE,CATEGORY-AI-!CN,AI
   - GEOSITE,TELEGRAM,Telegram
