@@ -299,7 +299,7 @@ rules:
   - RULE-SET,ADBlock,广告拦截
   - RULE-SET,AdditionalFilter,广告拦截
   - RULE-SET,SogouInput,搜狗输入法
-  - RULE-SET,TruthSocial,Truth Social
+  - DOMAIN-SUFFIX,truthsocial.com,Truth Social
   - RULE-SET,StaticResources,静态资源
   - RULE-SET,CDNResources,静态资源
   - RULE-SET,AdditionalCDNResources,静态资源
@@ -308,6 +308,7 @@ rules:
   - RULE-SET,TikTok,TikTok
   - RULE-SET,SteamFix,直连
   - RULE-SET,GoogleFCM,直连
+  - DOMAIN,services.googleapis.cn,选择代理
   - GEOSITE,GOOGLE-PLAY@CN,直连
   - GEOSITE,CATEGORY-AI-!CN,AI
   - GEOSITE,TELEGRAM,Telegram
