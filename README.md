@@ -15,19 +15,9 @@
 
 ### 使用方法
 
-> 💡 **中国大陆用户访问提示**
->
-> 如果您在中国大陆地区访问 `raw.githubusercontent.com` 域名时遇到困难，可以将其替换为我的镜像域名 `git.l3zc.com`。
->
-> **例如**：
-> *   **原始地址**: `https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/convert.js`
-> *   **镜像地址**: `https://git.l3zc.com/powerfullz/override-rules/raw/branch/main/convert.js`
->
-> 请注意路径部分 `refs/heads/main` 在镜像站上对应的是 `raw/branch/main`。下文所有来自本仓库的 `raw.githubusercontent.com` 链接均可按此规则替换。
-
 **Clash Party/Sparkle**
 
-1.  推荐直接使用 JS 动态覆写：`https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/convert.js`
+1.  推荐直接使用 JS 动态覆写：`https://gcore.jsdelivr.net/gh/powerfullz/override-rules@refs/heads/main/convert.min.js`
 2.  打开 Clash Party → 左侧「覆写」→ 粘贴上述链接导入。
 3.  打开「订阅管理」→ 目标订阅右上角三个点 → 「编辑信息」→ 选择该覆写脚本 → 保存。
 4.  Clash Party 不支持给脚本传入参数，如果需要传入参数，请使用集成的 Substore。
@@ -41,7 +31,7 @@
 2025/06/17 更新：新增 JavaScript 格式覆写，支持传入参数，更易于维护，已经成为首选方式。例如，有链式代理需求，使用如下覆写脚本链接即可：
 
 ```
-https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/convert.js#landing=true
+https://gcore.jsdelivr.net/gh/powerfullz/override-rules@refs/heads/main/convert.min.js#landing=true
 ```
 
 传入多个参数时，用`&`分隔，例如`landing=true&loadbalance=true`。
@@ -56,9 +46,15 @@ https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/conv
 *   `fakeip`：DNS 增强模式使用 `fake-ip` 而不是 `redir-host`（默认 false）
 *   `quic`：允许 QUIC 流量（UDP 443，默认 false）
 
-说明：所有参数均可通过 `$arguments` 传入，支持字符串 true/false 或 1/0。
+说明：支持字符串 true/false 或 1/0。
 
 [^fn2]: 无特殊需求不要启用，否则会造成[移动设备异常耗电问题](https://github.com/vernesong/OpenClash/issues/2614)。
+
+注意 JSDelivr 有缓存延迟，更新后可能需要等待几分钟至数小时不等才能获取最新版本。如果你急需最新版本，可以直接使用 GitHub 原始链接：
+
+```
+https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/convert.min.js
+```
 
 **Clash Verge 系**
 
@@ -70,10 +66,10 @@ https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/conv
 
 | 项目 | 链接 |
 | :--- | :--- |
-| GeoIP 数据库 | `https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat` |
-| GeoSite 数据库 | `https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat` |
-| MMDB 数据库 | `https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country.mmdb` |
-| ASN 数据库 | `https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb` |
+| GeoIP 数据库 | `https://gcore.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat` |
+| GeoSite 数据库 | `https://gcore.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat` |
+| MMDB 数据库 | `https://gcore.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country.mmdb` |
+| ASN 数据库 | `https://gcore.jsdelivr.net/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb` |
 
 ### 关于部分特殊代理组的说明
 
@@ -87,7 +83,9 @@ https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/conv
 
 ~~**Steam 修复**： 这代理组用于让 Steam 客户端调用国内 CDN 及 P2P 网络下载，节省大量流量。如果需要代理 Steam 所有的下载请求，将其设置为「节点选择」即可。~~
 
-Play 商店修复和 Steam 修复代理组已经默认直连，又省流量又快，Why not?
+~~Play 商店修复和 Steam 修复代理组已经默认直连，又省流量又快，Why not?~~
+
+Google Play 的国内 CDN 似乎已经失效，目前已经直接代理`services.googleapis.cn`，Steam 依然可以使用国内 CDN 和 P2P 下载。
 
 ### 关于链式代理的说明
 
