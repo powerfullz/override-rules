@@ -178,7 +178,7 @@ const ruleProviders = {
         "behavior": "classical",
         "format": "text",
         "interval": 86400,
-        "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/TikTok.list",
+        "url": "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/TikTok.list",
         "path": "./ruleset/TikTok.list"
     },
     "EHentai": {
@@ -186,7 +186,7 @@ const ruleProviders = {
         "behavior": "classical",
         "format": "text",
         "interval": 86400,
-        "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/EHentai.list",
+        "url": "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/EHentai.list",
         "path": "./ruleset/EHentai.list"
     },
     "SteamFix": {
@@ -194,7 +194,7 @@ const ruleProviders = {
         "behavior": "classical",
         "format": "text",
         "interval": 86400,
-        "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/SteamFix.list",
+        "url": "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/SteamFix.list",
         "path": "./ruleset/SteamFix.list"
     },
     "GoogleFCM": {
@@ -202,7 +202,7 @@ const ruleProviders = {
         "behavior": "classical",
         "format": "text",
         "interval": 86400,
-        "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/FirebaseCloudMessaging.list",
+        "url": "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/FirebaseCloudMessaging.list",
         "path": "./ruleset/FirebaseCloudMessaging.list"
     },
     "AdditionalFilter": {
@@ -210,7 +210,7 @@ const ruleProviders = {
         "behavior": "classical",
         "format": "text",
         "interval": 86400,
-        "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/AdditionalFilter.list",
+        "url": "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/AdditionalFilter.list",
         "path": "./ruleset/AdditionalFilter.list"
     },
     "AdditionalCDNResources": {
@@ -218,7 +218,7 @@ const ruleProviders = {
         "behavior": "classical",
         "format": "text",
         "interval": 86400,
-        "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/AdditionalCDNResources.list",
+        "url": "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/AdditionalCDNResources.list",
         "path": "./ruleset/AdditionalCDNResources.list"
     },
     "Crypto": {
@@ -226,7 +226,7 @@ const ruleProviders = {
         "behavior": "classical",
         "format": "text",
         "interval": 86400,
-        "url": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/Crypto.list",
+        "url": "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/Crypto.list",
         "path": "./ruleset/Crypto.list"
     }
 }
@@ -350,77 +350,77 @@ const dnsConfigFakeIp = buildDnsConfig({
 });
 
 const geoxURL = {
-    "geoip": "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat",
-    "geosite": "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat",
-    "mmdb": "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country.mmdb",
-    "asn": "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb"
+    "geoip": "https://gcore.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat",
+    "geosite": "https://gcore.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat",
+    "mmdb": "https://gcore.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country.mmdb",
+    "asn": "https://gcore.jsdelivr.net/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb"
 };
 
 // 地区元数据
 const countriesMeta = {
     "香港": {
         pattern: "(?i)香港|港|HK|hk|Hong Kong|HongKong|hongkong|🇭🇰",
-        icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png"
+        icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png"
     },
     "澳门": {
         pattern: "(?i)澳门|MO|Macau|🇲🇴",
-        icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Macao.png"
+        icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Macao.png"
     },
     "台湾": {
         pattern: "(?i)台|新北|彰化|TW|Taiwan|🇹🇼",
-        icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png"
+        icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png"
     },
     "新加坡": {
         pattern: "(?i)新加坡|坡|狮城|SG|Singapore|🇸🇬",
-        icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png"
+        icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png"
     },
     "日本": {
         pattern: "(?i)日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan|🇯🇵",
-        icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png"
+        icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png"
     },
     "韩国": {
         pattern: "(?i)KR|Korea|KOR|首尔|韩|韓|🇰🇷",
-        icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Korea.png"
+        icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Korea.png"
     },
     "美国": {
         pattern: "(?i)美国|美|US|United States|🇺🇸",
-        icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png"
+        icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png"
     },
     "加拿大": {
         pattern: "(?i)加拿大|Canada|CA|🇨🇦",
-        icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Canada.png"
+        icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Canada.png"
     },
     "英国": {
         pattern: "(?i)英国|United Kingdom|UK|伦敦|London|🇬🇧",
-        icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_Kingdom.png"
+        icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_Kingdom.png"
     },
     "澳大利亚": {
         pattern: "(?i)澳洲|澳大利亚|AU|Australia|🇦🇺",
-        icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Australia.png"
+        icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Australia.png"
     },
     "德国": {
         pattern: "(?i)德国|德|DE|Germany|🇩🇪",
-        icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Germany.png"
+        icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Germany.png"
     },
     "法国": {
         pattern: "(?i)法国|法|FR|France|🇫🇷",
-        icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/France.png"
+        icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/France.png"
     },
     "俄罗斯": {
         pattern: "(?i)俄罗斯|俄|RU|Russia|🇷🇺",
-        icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Russia.png"
+        icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Russia.png"
     },
     "泰国": {
         pattern: "(?i)泰国|泰|TH|Thailand|🇹🇭",
-        icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Thailand.png"
+        icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Thailand.png"
     },
     "印度": {
         pattern: "(?i)印度|IN|India|🇮🇳",
-        icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/India.png"
+        icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/India.png"
     },
     "马来西亚": {
         pattern: "(?i)马来西亚|马来|MY|Malaysia|🇲🇾",
-        icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Malaysia.png"
+        icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Malaysia.png"
     },
 };
 
@@ -527,19 +527,19 @@ function buildProxyGroups({
     return [
         {
             "name": PROXY_GROUPS.SELECT,
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png",
+            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png",
             "type": "select",
             "proxies": defaultSelector
         },
         {
             "name": PROXY_GROUPS.MANUAL,
-            "icon": "https://cdn.jsdelivr.net/gh/shindgewongxj/WHATSINStash@master/icon/select.png",
+            "icon": "https://gcore.jsdelivr.net/gh/shindgewongxj/WHATSINStash@master/icon/select.png",
             "include-all": true,
             "type": "select"
         },
         (landing) ? {
             "name": "前置代理",
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Area.png",
+            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Area.png",
             "type": "select",
             "include-all": true,
             "exclude-filter": "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地",
@@ -547,14 +547,14 @@ function buildProxyGroups({
         } : null,
         (landing) ? {
             "name": PROXY_GROUPS.LANDING,
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png",
+            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png",
             "type": "select",
             "include-all": true,
             "filter": "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地",
         } : null,
         {
             "name": PROXY_GROUPS.FALLBACK,
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Bypass.png",
+            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Bypass.png",
             "type": "fallback",
             "url": "https://cp.cloudflare.com/generate_204",
             "proxies": defaultFallback,
@@ -564,67 +564,67 @@ function buildProxyGroups({
         },
         {
             "name": "静态资源",
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cloudflare.png",
+            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cloudflare.png",
             "type": "select",
             "proxies": defaultProxies,
         },
         {
             "name": "AI",
-            "icon": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/icons/chatgpt.png",
+            "icon": "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/chatgpt.png",
             "type": "select",
             "proxies": defaultProxies
         },
         {
             "name": "Telegram",
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png",
+            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png",
             "type": "select",
             "proxies": defaultProxies
         },
         {
             "name": "YouTube",
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png",
+            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png",
             "type": "select",
             "proxies": defaultProxies
         },
         {
             "name": "Bilibili",
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/bilibili.png",
+            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/bilibili.png",
             "type": "select",
             "proxies": (hasTW && hasHK) ? [PROXY_GROUPS.DIRECT, "台湾节点", "香港节点"] : defaultProxiesDirect
         },
         {
             "name": "Netflix",
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netflix.png",
+            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netflix.png",
             "type": "select",
             "proxies": defaultProxies
         },
         {
             "name": "Spotify",
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png",
+            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png",
             "type": "select",
             "proxies": defaultProxies
         },
         {
             "name": "TikTok",
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/TikTok.png",
+            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/TikTok.png",
             "type": "select",
             "proxies": defaultProxies
         },
         {
             "name": "E-Hentai",
-            "icon": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Ehentai.png",
+            "icon": "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Ehentai.png",
             "type": "select",
             "proxies": defaultProxies
         },
         {
             "name": "PikPak",
-            "icon": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/icons/PikPak.png",
+            "icon": "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/PikPak.png",
             "type": "select",
             "proxies": defaultProxies
         },
         {
             "name": "Truth Social",
-            "icon": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/icons/TruthSocial.png",
+            "icon": "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/TruthSocial.png",
             "type": "select",
             "proxies": (hasUS) ? ["美国节点", PROXY_GROUPS.SELECT, PROXY_GROUPS.MANUAL] : defaultProxies
         },
@@ -642,13 +642,13 @@ function buildProxyGroups({
         },
         {
             "name": "SSH(22端口)",
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Server.png",
+            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Server.png",
             "type": "select",
             "proxies": defaultProxies
         },
         {
             "name": "搜狗输入法",
-            "icon": "https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Sougou.png",
+            "icon": "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Sougou.png",
             "type": "select",
             "proxies": [
                 PROXY_GROUPS.DIRECT, "REJECT"
@@ -656,7 +656,7 @@ function buildProxyGroups({
         },
         {
             "name": PROXY_GROUPS.DIRECT,
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Direct.png",
+            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Direct.png",
             "type": "select",
             "proxies": [
                 "DIRECT", PROXY_GROUPS.SELECT
@@ -664,7 +664,7 @@ function buildProxyGroups({
         },
         {
             "name": "广告拦截",
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png",
+            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png",
             "type": "select",
             "proxies": [
                 "REJECT", "REJECT-DROP",  PROXY_GROUPS.DIRECT
@@ -672,7 +672,7 @@ function buildProxyGroups({
         },
         (lowCost) ? {
             "name": PROXY_GROUPS.LOW_COST,
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lab.png",
+            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lab.png",
             "type": "url-test",
             "url": "https://cp.cloudflare.com/generate_204",
             "include-all": true,
@@ -718,7 +718,7 @@ function main(config) {
     proxyGroups.push(
         {
             "name": "GLOBAL",
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png",
+            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png",
             "include-all": true,
             "type": "select",
             "proxies": globalProxies
