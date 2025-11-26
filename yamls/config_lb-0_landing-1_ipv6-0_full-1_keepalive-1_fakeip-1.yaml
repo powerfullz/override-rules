@@ -16,7 +16,7 @@ profile:
   store-selected: true
 proxy-groups:
   - name: 选择代理
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png
     type: select
     proxies:
       - 故障转移
@@ -30,11 +30,11 @@ proxy-groups:
       - 手动选择
       - DIRECT
   - name: 手动选择
-    icon: https://cdn.jsdelivr.net/gh/shindgewongxj/WHATSINStash@master/icon/select.png
+    icon: https://gcore.jsdelivr.net/gh/shindgewongxj/WHATSINStash@master/icon/select.png
     include-all: true
     type: select
   - name: 前置代理
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Area.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Area.png
     type: select
     include-all: true
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
@@ -48,12 +48,12 @@ proxy-groups:
       - 手动选择
       - DIRECT
   - name: 落地节点
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png
     type: select
     include-all: true
     filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
   - name: 故障转移
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Bypass.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Bypass.png
     type: fallback
     url: https://cp.cloudflare.com/generate_204
     proxies:
@@ -70,7 +70,7 @@ proxy-groups:
     tolerance: 20
     lazy: false
   - name: 静态资源
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cloudflare.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cloudflare.png
     type: select
     proxies: &a1
       - 选择代理
@@ -83,46 +83,46 @@ proxy-groups:
       - 手动选择
       - 直连
   - name: AI
-    icon: https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/icons/chatgpt.png
+    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/chatgpt.png
     type: select
     proxies: *a1
   - name: Telegram
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png
     type: select
     proxies: *a1
   - name: YouTube
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png
     type: select
     proxies: *a1
   - name: Bilibili
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/bilibili.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/bilibili.png
     type: select
     proxies:
       - 直连
       - 台湾节点
       - 香港节点
   - name: Netflix
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netflix.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netflix.png
     type: select
     proxies: *a1
   - name: Spotify
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png
     type: select
     proxies: *a1
   - name: TikTok
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/TikTok.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/TikTok.png
     type: select
     proxies: *a1
   - name: E-Hentai
-    icon: https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Ehentai.png
+    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Ehentai.png
     type: select
     proxies: *a1
   - name: PikPak
-    icon: https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/icons/PikPak.png
+    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/PikPak.png
     type: select
     proxies: *a1
   - name: Truth Social
-    icon: https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/icons/TruthSocial.png
+    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/TruthSocial.png
     type: select
     proxies:
       - 美国节点
@@ -141,36 +141,36 @@ proxy-groups:
     type: select
     proxies: *a1
   - name: SSH(22端口)
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Server.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Server.png
     type: select
     proxies: *a1
   - name: 搜狗输入法
-    icon: https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Sougou.png
+    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Sougou.png
     type: select
     proxies:
       - 直连
       - REJECT
   - name: 直连
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Direct.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Direct.png
     type: select
     proxies:
       - DIRECT
       - 选择代理
   - name: 广告拦截
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png
     type: select
     proxies:
       - REJECT
       - REJECT-DROP
       - 直连
   - name: 低倍率节点
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lab.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lab.png
     type: url-test
     url: https://cp.cloudflare.com/generate_204
     include-all: true
     filter: (?i)0.[0-5]|低倍率|省流|大流量|实验性
   - name: 香港节点
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png
     include-all: true
     filter: (?i)香港|港|HK|hk|Hong Kong|HongKong|hongkong|🇭🇰
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地|0\.[0-5]|低倍率|省流|大流量|实验性
@@ -180,7 +180,7 @@ proxy-groups:
     tolerance: 20
     lazy: false
   - name: 台湾节点
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png
     include-all: true
     filter: (?i)台|新北|彰化|TW|Taiwan|🇹🇼
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地|0\.[0-5]|低倍率|省流|大流量|实验性
@@ -190,7 +190,7 @@ proxy-groups:
     tolerance: 20
     lazy: false
   - name: 新加坡节点
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png
     include-all: true
     filter: (?i)新加坡|坡|狮城|SG|Singapore|🇸🇬
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地|0\.[0-5]|低倍率|省流|大流量|实验性
@@ -200,7 +200,7 @@ proxy-groups:
     tolerance: 20
     lazy: false
   - name: 日本节点
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png
     include-all: true
     filter: (?i)日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan|🇯🇵
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地|0\.[0-5]|低倍率|省流|大流量|实验性
@@ -210,7 +210,7 @@ proxy-groups:
     tolerance: 20
     lazy: false
   - name: 美国节点
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png
     include-all: true
     filter: (?i)美国|美|US|United States|🇺🇸
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地|0\.[0-5]|低倍率|省流|大流量|实验性
@@ -220,7 +220,7 @@ proxy-groups:
     tolerance: 20
     lazy: false
   - name: GLOBAL
-    icon: https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png
     include-all: true
     type: select
     proxies:
@@ -286,49 +286,49 @@ rule-providers:
     behavior: classical
     format: text
     interval: 86400
-    url: https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/TikTok.list
+    url: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/TikTok.list
     path: ./ruleset/TikTok.list
   EHentai:
     type: http
     behavior: classical
     format: text
     interval: 86400
-    url: https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/EHentai.list
+    url: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/EHentai.list
     path: ./ruleset/EHentai.list
   SteamFix:
     type: http
     behavior: classical
     format: text
     interval: 86400
-    url: https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/SteamFix.list
+    url: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/SteamFix.list
     path: ./ruleset/SteamFix.list
   GoogleFCM:
     type: http
     behavior: classical
     format: text
     interval: 86400
-    url: https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/FirebaseCloudMessaging.list
+    url: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/FirebaseCloudMessaging.list
     path: ./ruleset/FirebaseCloudMessaging.list
   AdditionalFilter:
     type: http
     behavior: classical
     format: text
     interval: 86400
-    url: https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/AdditionalFilter.list
+    url: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/AdditionalFilter.list
     path: ./ruleset/AdditionalFilter.list
   AdditionalCDNResources:
     type: http
     behavior: classical
     format: text
     interval: 86400
-    url: https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/AdditionalCDNResources.list
+    url: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/AdditionalCDNResources.list
     path: ./ruleset/AdditionalCDNResources.list
   Crypto:
     type: http
     behavior: classical
     format: text
     interval: 86400
-    url: https://cdn.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/Crypto.list
+    url: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/Crypto.list
     path: ./ruleset/Crypto.list
 rules:
   - AND,((DST-PORT,443),(NETWORK,UDP)),REJECT
@@ -420,8 +420,8 @@ dns:
     - "*.stun.*.*.*"
 geodata-mode: true
 geox-url:
-  geoip: https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat
-  geosite: https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat
-  mmdb: https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country.mmdb
-  asn: https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb
+  geoip: https://gcore.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat
+  geosite: https://gcore.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat
+  mmdb: https://gcore.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country.mmdb
+  asn: https://gcore.jsdelivr.net/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb
 
