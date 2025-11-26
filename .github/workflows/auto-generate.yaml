@@ -49,5 +49,9 @@ jobs:
           # 格式: https://<token>@your-forgejo-domain.com/user/repo.git
           SYNC_URL=$(echo "$FORGEJO_REPO_URL" | sed "s|://|://$FORGEJO_PAT@|")
           
-          git push --prune "$SYNC_URL" "refs/remotes/origin/*:refs/heads/*" "+refs/tags/*:refs/tags/*"
+          # 移除本地的 origin/HEAD 引用，防止推送到远程的 refs/heads/HEAD
+          git update-ref -d refs/remotes/origin/HEAD
+
+          # 使用 + 强制推送，解决 non-fast-forward 问题
+          git push --prune "$SYNC_URL" "+refs/remotes/origin/*:refs/heads/*" "+refs/tags/*:refs/tags/*"
           echo "Sync completed."
