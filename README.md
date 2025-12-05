@@ -9,9 +9,17 @@
 *   针对 IP 规则添加 `no-resolve` 参数，避免不必要的本地 DNS 解析，提升上网速度
 *   JS 格式覆写现已实现节点国家动态识别与分组，自动为实际存在的各国家/地区节点生成对应代理组，节点变动时分组自动变化，省心省力。例如：你的订阅没有韩国的节点，则最终生成的配置中「韩国节点」这个代理组就不会出现。
 
-谨此声明：本覆写规则为本人自用，现特此公开分享于公共平台。在未有回馈意见的情况下，自然优先满足个人需求及修正自己发现的问题。如有高见，欢迎 PR。
+谨此声明：本覆写规则为本人自用，现特此公开分享于公共平台。在未有回馈意见的情况下，自然优先满足个人需求及修正自己发现的问题。如有高见，欢迎 Issue、PR。
 
 [点击访问 Forgejo 上的镜像](https://git.l3zc.com/powerfullz/override-rules)
+
+### AFF
+
+#### 星岛梦
+
+[注册链接](https://sdm01.thundermouse.cc/#/register?code=ZjtxtRJm)
+
+星岛梦是一家 2025 年 12 月刚开业的机场，机场主在测试的时候就来找我了，我因此有幸从早期测试阶段便开始关注，见证了它如何从最初的摸索，经过机场主熬夜修线路换落地，现在已经达到了不错的水准，希望机场主继续进步。性价比算上日常的打折还是挺划算的，大家可以去月付试试。
 
 ### 使用方法
 
@@ -34,6 +42,12 @@
 https://gcore.jsdelivr.net/gh/powerfullz/override-rules@refs/heads/main/convert.min.js#landing=true
 ```
 
+或者直接使用`raw.githubusercontent.com`原始链接：
+
+```
+https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/convert.min.js
+```
+
 传入多个参数时，用`&`分隔，例如`landing=true&loadbalance=true`。
 
 目前支持的参数：
@@ -45,16 +59,11 @@ https://gcore.jsdelivr.net/gh/powerfullz/override-rules@refs/heads/main/convert.
 *   `keepalive`：启用 TCP Keep Alive（默认 false）[^fn2]
 *   `fakeip`：DNS 增强模式使用 `fake-ip` 而不是 `redir-host`（默认 false）
 *   `quic`：允许 QUIC 流量（UDP 443，默认 false）
+*   `threshold`：国家节点数量小于该值时不显示分组 (默认 0)
 
 说明：支持字符串 true/false 或 1/0。
 
 [^fn2]: 无特殊需求不要启用，否则会造成[移动设备异常耗电问题](https://github.com/vernesong/OpenClash/issues/2614)。
-
-注意 JSDelivr 有缓存延迟，更新后可能需要等待几分钟至数小时不等才能获取最新版本。如果你急需最新版本，可以直接使用 GitHub 原始链接：
-
-```
-https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/convert.min.js
-```
 
 **Clash Verge 系**
 
