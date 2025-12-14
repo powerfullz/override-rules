@@ -1,8 +1,6 @@
 # Dependencies
 node_modules/
 
-# (若需要跟踪生成的 yamls 目录，请不要忽略它；已移除忽略规则)
-
 # Logs
 npm-debug.log*
 yarn-debug.log*
