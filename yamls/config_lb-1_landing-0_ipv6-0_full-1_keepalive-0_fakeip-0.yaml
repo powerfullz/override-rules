@@ -80,16 +80,24 @@ proxy-groups:
       - 直连
       - 台湾节点
       - 香港节点
+  - name: Bahamut
+    icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Bahamut.png
+    type: select
+    proxies:
+      - 台湾节点
+      - 选择代理
+      - 手动选择
+      - 直连
   - name: Netflix
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netflix.png
     type: select
     proxies: *a1
-  - name: Spotify
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png
-    type: select
-    proxies: *a1
   - name: TikTok
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/TikTok.png
+    type: select
+    proxies: *a1
+  - name: Spotify
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png
     type: select
     proxies: *a1
   - name: E-Hentai
@@ -107,14 +115,6 @@ proxy-groups:
       - 美国节点
       - 选择代理
       - 手动选择
-  - name: Bahamut
-    icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Bahamut.png
-    type: select
-    proxies:
-      - 台湾节点
-      - 选择代理
-      - 手动选择
-      - 直连
   - name: Crypto
     icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Cryptocurrency_3.png
     type: select
@@ -191,13 +191,13 @@ proxy-groups:
       - Telegram
       - YouTube
       - Bilibili
+      - Bahamut
       - Netflix
-      - Spotify
       - TikTok
+      - Spotify
       - E-Hentai
       - PikPak
       - Truth Social
-      - Bahamut
       - Crypto
       - SSH(22端口)
       - 搜狗输入法
