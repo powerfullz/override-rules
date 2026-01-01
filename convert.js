@@ -359,67 +359,67 @@ const geoxURL = {
 // 地区元数据
 const countriesMeta = {
     "香港": {
-        pattern: "(?i)香港|港|HK|hk|Hong Kong|HongKong|hongkong|🇭🇰",
+        pattern: "香港|港|HK|hk|Hong Kong|HongKong|hongkong|🇭🇰",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png"
     },
     "澳门": {
-        pattern: "(?i)澳门|MO|Macau|🇲🇴",
+        pattern: "澳门|MO|Macau|🇲🇴",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Macao.png"
     },
     "台湾": {
-        pattern: "(?i)台|新北|彰化|TW|Taiwan|🇹🇼",
+        pattern: "台|新北|彰化|TW|Taiwan|🇹🇼",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png"
     },
     "新加坡": {
-        pattern: "(?i)新加坡|坡|狮城|SG|Singapore|🇸🇬",
+        pattern: "新加坡|坡|狮城|SG|Singapore|🇸🇬",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png"
     },
     "日本": {
-        pattern: "(?i)日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan|🇯🇵",
+        pattern: "日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan|🇯🇵",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png"
     },
     "韩国": {
-        pattern: "(?i)KR|Korea|KOR|首尔|韩|韓|🇰🇷",
+        pattern: "KR|Korea|KOR|首尔|韩|韓|🇰🇷",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Korea.png"
     },
     "美国": {
-        pattern: "(?i)美国|美|US|United States|🇺🇸",
+        pattern: "美国|美|US|United States|🇺🇸",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png"
     },
     "加拿大": {
-        pattern: "(?i)加拿大|Canada|CA|🇨🇦",
+        pattern: "加拿大|Canada|CA|🇨🇦",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Canada.png"
     },
     "英国": {
-        pattern: "(?i)英国|United Kingdom|UK|伦敦|London|🇬🇧",
+        pattern: "英国|United Kingdom|UK|伦敦|London|🇬🇧",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_Kingdom.png"
     },
     "澳大利亚": {
-        pattern: "(?i)澳洲|澳大利亚|AU|Australia|🇦🇺",
+        pattern: "澳洲|澳大利亚|AU|Australia|🇦🇺",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Australia.png"
     },
     "德国": {
-        pattern: "(?i)德国|德|DE|Germany|🇩🇪",
+        pattern: "德国|德|DE|Germany|🇩🇪",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Germany.png"
     },
     "法国": {
-        pattern: "(?i)法国|法|FR|France|🇫🇷",
+        pattern: "法国|法|FR|France|🇫🇷",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/France.png"
     },
     "俄罗斯": {
-        pattern: "(?i)俄罗斯|俄|RU|Russia|🇷🇺",
+        pattern: "俄罗斯|俄|RU|Russia|🇷🇺",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Russia.png"
     },
     "泰国": {
-        pattern: "(?i)泰国|泰|TH|Thailand|🇹🇭",
+        pattern: "泰国|泰|TH|Thailand|🇹🇭",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Thailand.png"
     },
     "印度": {
-        pattern: "(?i)印度|IN|India|🇮🇳",
+        pattern: "印度|IN|India|🇮🇳",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/India.png"
     },
     "马来西亚": {
-        pattern: "(?i)马来西亚|马来|MY|Malaysia|🇲🇾",
+        pattern: "马来西亚|马来|MY|Malaysia|🇲🇾",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Malaysia.png"
     },
 };
@@ -436,13 +436,11 @@ function parseCountries(config) {
     // 用来累计各国节点数
     const countryCounts = Object.create(null);
 
-    // 构建地区正则表达式，去掉 (?i) 前缀
+    // 构建地区正则表达式：区分大小写（避免 node 里的 "de" 误匹配到 "DE" -> 德国）
     const compiledRegex = {};
     for (const [country, meta] of Object.entries(countriesMeta)) {
-        compiledRegex[country] = new RegExp(
-            meta.pattern.replace(/^\(\?i\)/, ''),
-            'i'
-        );
+        // 兼容旧配置：如果 pattern 仍以 (?i) 开头，这里会剥离掉以避免 JS RegExp 报错
+        compiledRegex[country] = new RegExp(meta.pattern.replace(/^\(\?i\)/, ''));
     }
 
     // 逐个节点进行匹配与统计
