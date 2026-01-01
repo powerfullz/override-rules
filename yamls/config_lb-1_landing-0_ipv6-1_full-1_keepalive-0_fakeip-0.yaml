@@ -151,31 +151,31 @@ proxy-groups:
   - name: 香港节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png
     include-all: true
-    filter: (?i)香港|港|HK|hk|Hong Kong|HongKong|hongkong|🇭🇰
+    filter: 香港|港|HK|hk|Hong Kong|HongKong|hongkong|🇭🇰
     exclude-filter: 0\.[0-5]|低倍率|省流|大流量|实验性
     type: load-balance
   - name: 台湾节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png
     include-all: true
-    filter: (?i)台|新北|彰化|TW|Taiwan|🇹🇼
+    filter: 台|新北|彰化|TW|Taiwan|🇹🇼
     exclude-filter: 0\.[0-5]|低倍率|省流|大流量|实验性
     type: load-balance
   - name: 新加坡节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png
     include-all: true
-    filter: (?i)新加坡|坡|狮城|SG|Singapore|🇸🇬
+    filter: 新加坡|坡|狮城|SG|Singapore|🇸🇬
     exclude-filter: 0\.[0-5]|低倍率|省流|大流量|实验性
     type: load-balance
   - name: 日本节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png
     include-all: true
-    filter: (?i)日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan|🇯🇵
+    filter: 日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan|🇯🇵
     exclude-filter: 0\.[0-5]|低倍率|省流|大流量|实验性
     type: load-balance
   - name: 美国节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png
     include-all: true
-    filter: (?i)美国|美|US|United States|🇺🇸
+    filter: 美国|美|US|United States|🇺🇸
     exclude-filter: 0\.[0-5]|低倍率|省流|大流量|实验性
     type: load-balance
   - name: GLOBAL
