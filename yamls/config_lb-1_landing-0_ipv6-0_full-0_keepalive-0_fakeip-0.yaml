@@ -49,8 +49,16 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/chatgpt.png
     type: select
     proxies: *a1
-  - name: Telegram
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png
+  - name: Crypto
+    icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Cryptocurrency_3.png
+    type: select
+    proxies: *a1
+  - name: Google
+    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Google.png
+    type: select
+    proxies: *a1
+  - name: Microsoft
+    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Microsoft_Copilot.png
     type: select
     proxies: *a1
   - name: YouTube
@@ -88,8 +96,8 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Ehentai.png
     type: select
     proxies: *a1
-  - name: PikPak
-    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/PikPak.png
+  - name: Telegram
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png
     type: select
     proxies: *a1
   - name: Truth Social
@@ -99,8 +107,12 @@ proxy-groups:
       - 美国节点
       - 选择代理
       - 手动选择
-  - name: Crypto
-    icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Cryptocurrency_3.png
+  - name: OneDrive
+    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Onedrive.png
+    type: select
+    proxies: *a1
+  - name: PikPak
+    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/PikPak.png
     type: select
     proxies: *a1
   - name: SSH(22端口)
@@ -172,7 +184,9 @@ proxy-groups:
       - 故障转移
       - 静态资源
       - AI
-      - Telegram
+      - Crypto
+      - Google
+      - Microsoft
       - YouTube
       - Bilibili
       - Bahamut
@@ -180,9 +194,10 @@ proxy-groups:
       - TikTok
       - Spotify
       - E-Hentai
-      - PikPak
+      - Telegram
       - Truth Social
-      - Crypto
+      - OneDrive
+      - PikPak
       - SSH(22端口)
       - 搜狗输入法
       - 直连
@@ -287,6 +302,9 @@ rules:
   - RULE-SET,GoogleFCM,直连
   - DOMAIN,services.googleapis.cn,选择代理
   - GEOSITE,GOOGLE-PLAY@CN,直连
+  - GEOSITE,GOOGLE,Google
+  - GEOSITE,ONEDRIVE,OneDrive
+  - GEOSITE,MICROSOFT,Microsoft
   - GEOSITE,CATEGORY-AI-!CN,AI
   - GEOSITE,TELEGRAM,Telegram
   - GEOSITE,YOUTUBE,YouTube
