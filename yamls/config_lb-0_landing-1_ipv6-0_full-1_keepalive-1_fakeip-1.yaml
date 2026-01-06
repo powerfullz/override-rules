@@ -361,12 +361,12 @@ rules:
   - RULE-SET,GoogleFCM,直连
   - DOMAIN,services.googleapis.cn,选择代理
   - GEOSITE,GOOGLE-PLAY@CN,直连
-  - GEOSITE,GOOGLE,Google
   - GEOSITE,ONEDRIVE,OneDrive
   - GEOSITE,MICROSOFT,Microsoft
   - GEOSITE,CATEGORY-AI-!CN,AI
   - GEOSITE,TELEGRAM,Telegram
   - GEOSITE,YOUTUBE,YouTube
+  - GEOSITE,GOOGLE,Google
   - GEOSITE,NETFLIX,Netflix
   - GEOSITE,SPOTIFY,Spotify
   - GEOSITE,BAHAMUT,Bahamut
