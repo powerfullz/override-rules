@@ -246,6 +246,9 @@ const baseRules = [
     `RULE-SET,GoogleFCM,${PROXY_GROUPS.DIRECT}`,
     `DOMAIN,services.googleapis.cn,${PROXY_GROUPS.SELECT}`,
     `GEOSITE,GOOGLE-PLAY@CN,${PROXY_GROUPS.DIRECT}`,
+    "GEOSITE,GOOGLE,Google",
+    "GEOSITE,ONEDRIVE,OneDrive",
+    "GEOSITE,MICROSOFT,Microsoft",
     "GEOSITE,CATEGORY-AI-!CN,AI",
     "GEOSITE,TELEGRAM,Telegram",
     "GEOSITE,YOUTUBE,YouTube",
@@ -573,8 +576,20 @@ function buildProxyGroups({
             "proxies": defaultProxies
         },
         {
-            "name": "Telegram",
-            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png",
+            "name": "Crypto",
+            "icon": "https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Cryptocurrency_3.png",
+            "type": "select",
+            "proxies": defaultProxies
+        },
+        {
+            "name": "Google",
+            "icon": "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Google.png",
+            "type": "select",
+            "proxies": defaultProxies
+        },
+        {
+            "name": "Microsoft",
+            "icon": "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Microsoft_Copilot.png",    
             "type": "select",
             "proxies": defaultProxies
         },
@@ -621,8 +636,8 @@ function buildProxyGroups({
             "proxies": defaultProxies
         },
         {
-            "name": "PikPak",
-            "icon": "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/PikPak.png",
+            "name": "Telegram",
+            "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png",
             "type": "select",
             "proxies": defaultProxies
         },
@@ -633,8 +648,14 @@ function buildProxyGroups({
             "proxies": (hasUS) ? ["美国节点", PROXY_GROUPS.SELECT, PROXY_GROUPS.MANUAL] : defaultProxies
         },
         {
-            "name": "Crypto",
-            "icon": "https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Cryptocurrency_3.png",
+            "name": "OneDrive",
+            "icon": "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Onedrive.png",
+            "type": "select",
+            "proxies": defaultProxies
+        },
+        {
+            "name": "PikPak",
+            "icon": "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/PikPak.png",
             "type": "select",
             "proxies": defaultProxies
         },
