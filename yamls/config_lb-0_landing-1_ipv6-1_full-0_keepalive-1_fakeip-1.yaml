@@ -71,7 +71,7 @@ proxy-groups:
     type: select
     proxies: *a1
   - name: Crypto
-    icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Cryptocurrency_3.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cryptocurrency_3.png
     type: select
     proxies: *a1
   - name: Google
@@ -94,7 +94,7 @@ proxy-groups:
       - 台湾节点
       - 香港节点
   - name: Bahamut
-    icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Bahamut.png
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Bahamut.png
     type: select
     proxies:
       - 台湾节点
