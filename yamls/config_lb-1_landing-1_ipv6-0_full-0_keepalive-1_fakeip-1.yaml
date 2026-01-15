@@ -324,10 +324,11 @@ rules:
   - RULE-SET,SteamFix,直连
   - RULE-SET,GoogleFCM,直连
   - DOMAIN,services.googleapis.cn,选择代理
+  - GEOSITE,CATEGORY-AI-!CN,AI
   - GEOSITE,GOOGLE-PLAY@CN,直连
+  - GEOSITE,MICROSOFT@CN,直连
   - GEOSITE,ONEDRIVE,OneDrive
   - GEOSITE,MICROSOFT,Microsoft
-  - GEOSITE,CATEGORY-AI-!CN,AI
   - GEOSITE,TELEGRAM,Telegram
   - GEOSITE,YOUTUBE,YouTube
   - GEOSITE,GOOGLE,Google
@@ -335,7 +336,6 @@ rules:
   - GEOSITE,SPOTIFY,Spotify
   - GEOSITE,BAHAMUT,Bahamut
   - GEOSITE,BILIBILI,Bilibili
-  - GEOSITE,MICROSOFT@CN,直连
   - GEOSITE,PIKPAK,PikPak
   - GEOSITE,GFW,选择代理
   - GEOSITE,CN,直连
