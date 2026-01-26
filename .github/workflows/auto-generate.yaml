@@ -50,8 +50,8 @@ jobs:
           SYNC_URL=$(echo "$FORGEJO_REPO_URL" | sed "s|://|://$FORGEJO_PAT@|")
           
           # 移除本地的 origin/HEAD 引用，防止推送到远程的 refs/heads/HEAD
-          git update-ref -d refs/remotes/origin/HEAD
+          git update-ref -d refs/remotes/origin/HEAD || true
 
-          # 使用 + 强制推送，解决 non-fast-forward 问题
-          git push --prune "$SYNC_URL" "+refs/remotes/origin/*:refs/heads/*" "+refs/tags/*:refs/tags/*"
+          # 使用本地分支引用同步到远程，避免误删默认分支
+          git push "$SYNC_URL" "refs/heads/*:refs/heads/*" "refs/tags/*:refs/tags/*" --force --prune
           echo "Sync completed."
