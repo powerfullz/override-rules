@@ -1,4 +1,4 @@
-/*
+/*!
 powerfullz 的 Substore 订阅转换脚本
 https://github.com/powerfullz/override-rules
 

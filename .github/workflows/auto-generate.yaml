@@ -31,7 +31,7 @@ jobs:
         run: npm run generate
 
       - name: Minify convert.js
-        run: npx --yes terser convert.js -o convert.min.js -c -m
+        run: npx --yes terser convert.js -o convert.min.js -c -m --comments "/^!/"
 
       - name: Commit changes
         id: auto-commit
