@@ -63,7 +63,7 @@ https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/conv
 *   `ipv6`：启用 IPv6 支持（默认 false）
 *   `full`：生成完整配置（适合纯内核启动，默认 false）
 *   `keepalive`：启用 TCP Keep Alive（默认 false）[^fn2]
-*   `fakeip`：DNS 增强模式使用 `fake-ip` 而不是 `redir-host`（默认 false）
+*   `fakeip`：DNS 增强模式使用 `fake-ip` 而不是 `redir-host`（开启后可能有助于解决 TUN 模式无法上网的问题，默认 false）
 *   `quic`：允许 QUIC 流量（UDP 443，默认 false）
 *   `threshold`：国家节点数量小于该值时不显示分组 (默认 0)
 
