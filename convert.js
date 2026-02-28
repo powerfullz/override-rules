@@ -451,6 +451,12 @@ function hasLowCost(config) {
     return (config.proxies || []).some(proxy => LOW_COST_REGEX.test(proxy.name));
 }
 
+function parseLowCost(config) {
+    return (config.proxies || [])
+        .filter(proxy => LOW_COST_REGEX.test(proxy.name))
+        .map(proxy => proxy.name);
+}
+
 function parseCountries(config) {
     const proxies = config.proxies || [];
     const ispRegex = /家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地/i;   // 需要排除的关键字
@@ -553,6 +559,7 @@ function buildProxyGroups({
     countries,
     countryProxyGroups,
     lowCost,
+    lowCostNodes,
     defaultProxies,
     defaultProxiesDirect,
     defaultSelector,
@@ -736,8 +743,9 @@ function buildProxyGroups({
             "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lab.png",
             "type": "url-test",
             "url": "https://cp.cloudflare.com/generate_204",
-            "include-all": true,
-            "filter": "(?i)0\.[0-5]|低倍率|省流|大流量|实验性"
+            ...(lowCostNodes
+                ? { "proxies": lowCostNodes }
+                : { "include-all": true, "filter": "(?i)0\\.[0-5]|低倍率|省流|大流量|实验性" })
         } : null,
         ...countryProxyGroups
     ].filter(Boolean); // 过滤掉 null 值
@@ -748,6 +756,7 @@ function main(config) {
     // 解析地区与低倍率信息
     const countryInfo = parseCountries(resultConfig); // [{ country, count }]
     const lowCost = hasLowCost(resultConfig);
+    const lowCostNodes = !regexFilter ? parseLowCost(resultConfig) : null;
     const countryGroupNames = getCountryGroupNames(countryInfo, countryThreshold);
     const countries = stripNodeSuffix(countryGroupNames);
 
@@ -768,6 +777,7 @@ function main(config) {
         countries,
         countryProxyGroups,
         lowCost,
+        lowCostNodes,
         defaultProxies,
         defaultProxiesDirect,
         defaultSelector,
