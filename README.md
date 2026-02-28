@@ -7,7 +7,7 @@
 *   移除冗余规则集
 *   引入 [Loyalsoldier/v2ray-rules-dat](https://github.com/Loyalsoldier/v2ray-rules-dat) GeoSite/GeoIP
 *   针对 IP 规则添加 `no-resolve` 参数，避免不必要的本地 DNS 解析，提升上网速度
-*   JS 格式覆写现已实现节点国家动态识别与分组，自动为实际存在的各国家/地区节点生成对应代理组，节点变动时分组自动变化，省心省力。例如：你的订阅没有韩国的节点，则最终生成的配置中「韩国节点」这个代理组就不会出现。
+*   JS 格式覆写在执行时读取真实节点列表，自动识别国家/地区并将节点名称直接枚举写入各代理组，仅生成订阅中实际存在的分组。例如订阅中不含韩国节点时，「韩国节点」代理组将不会出现在最终配置中。
 
 谨此声明：本覆写规则为本人自用，现特此公开分享于公共平台。在未有回馈意见的情况下，自然优先满足个人需求及修正自己发现的问题。如有高见，欢迎 Issue、PR。
 
@@ -65,11 +65,10 @@ https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/conv
 *   `keepalive`：启用 TCP Keep Alive（默认 false）[^fn2]
 *   `fakeip`：DNS 增强模式使用 `fake-ip` 而不是 `redir-host`（开启后可能有助于解决 TUN 模式无法上网的问题，默认 false）
 *   `quic`：允许 QUIC 流量（UDP 443，默认 false）
-*   `threshold`：国家节点数量小于该值时不显示分组 (默认 0)
+*   `regex`：各国家代理组改用 `include-all` + 正则过滤模式，由 Mihomo 内核在运行时按正则动态筛选节点，而非在脚本执行时枚举节点名称（默认 false）
+*   `threshold`：国家节点数量小于该值时不显示分组（默认 0）
 
-> 注：各国家代理组现已固定使用 `include-all` + 正则过滤模式（即原 `regex=true` 行为），不再提供此参数。
-
-说明：支持字符串 true/false 或 1/0。
+说明：支持字符串 true/false 或 1/0。注：预生成的 YAML 格式覆写（`yamls/` 目录）固定使用正则模式，不受此参数影响。
 
 [^fn2]: 无特殊需求不要启用，否则会造成[移动设备异常耗电问题](https://github.com/vernesong/OpenClash/issues/2614)。
 
