@@ -11,6 +11,7 @@ https://github.com/powerfullz/override-rules
 - fakeip: DNS 使用 FakeIP 模式（默认 false，false 为 RedirHost）
 - quic: 允许 QUIC 流量（UDP 443，默认 false）
 - threshold: 国家节点数量小于该值时不显示分组 (默认 0)
+- explicit: 将匹配到的节点名称直接写入各国家代理组的 proxies，而非使用正则过滤（默认 false）
 */
 
 const NODE_SUFFIX = "节点";
@@ -48,7 +49,8 @@ function buildFeatureFlags(args) {
         full: "fullConfig",
         keepalive: "keepAliveEnabled",
         fakeip: "fakeIPEnabled",
-        quic: "quicEnabled"
+        quic: "quicEnabled",
+        explicit: "explicitNodes"
     };
 
     const flags = Object.entries(spec).reduce((acc, [sourceKey, targetKey]) => {
@@ -71,13 +73,24 @@ const {
     keepAliveEnabled,
     fakeIPEnabled,
     quicEnabled,
+    explicitNodes,
     countryThreshold
 } = buildFeatureFlags(rawArgs);
 
 function getCountryGroupNames(countryInfo, minCount) {
-    return countryInfo
-        .filter(item => item.count >= minCount)
-        .map(item => item.country + NODE_SUFFIX);
+    const filtered = countryInfo.filter(item => item.count >= minCount);
+
+    // 按 COUNTRY_SORT_ORDER 排序：列表内的国家按优先级升序，列表外的国家保留原有相对顺序排在末尾
+    filtered.sort((a, b) => {
+        const ai = COUNTRY_SORT_ORDER.indexOf(a.country);
+        const bi = COUNTRY_SORT_ORDER.indexOf(b.country);
+        if (ai === -1 && bi === -1) return 0;   // 两者都不在列表中，保持原顺序
+        if (ai === -1) return 1;                 // a 不在列表中，排到 b 后面
+        if (bi === -1) return -1;                // b 不在列表中，排到 a 后面
+        return ai - bi;                          // 按列表索引升序
+    });
+
+    return filtered.map(item => item.country + NODE_SUFFIX);
 }
 
 function stripNodeSuffix(groupNames) {
@@ -427,6 +440,9 @@ const countriesMeta = {
     },
 };
 
+// 国家代理组的排列优先顺序：港、台、新、日、美、欧（英、德、法），其余国家排在末尾
+const COUNTRY_SORT_ORDER = ["香港", "台湾", "新加坡", "日本", "美国", "英国", "德国", "法国"];
+
 function hasLowCost(config) {
     const lowCostRegex = /0\.[0-5]|低倍率|省流|大流量|实验性/i;
     return (config.proxies || []).some(proxy => lowCostRegex.test(proxy.name));
@@ -436,8 +452,9 @@ function parseCountries(config) {
     const proxies = config.proxies || [];
     const ispRegex = /家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地/i;   // 需要排除的关键字
 
-    // 用来累计各国节点数
+    // 用来累计各国节点数，以及收集节点名称列表
     const countryCounts = Object.create(null);
+    const countryNodes = Object.create(null);  // { country: [nodeName, ...] }
 
     // 构建地区正则表达式：区分大小写（避免 node 里的 "de" 误匹配到 "DE" -> 德国）
     const compiledRegex = {};
@@ -457,6 +474,8 @@ function parseCountries(config) {
         for (const [country, regex] of Object.entries(compiledRegex)) {
             if (regex.test(name)) {
                 countryCounts[country] = (countryCounts[country] || 0) + 1;
+                if (!countryNodes[country]) countryNodes[country] = [];
+                countryNodes[country].push(name);
                 break;    // 避免一个节点同时累计到多个地区
             }
         }
@@ -465,31 +484,50 @@ function parseCountries(config) {
     // 将结果对象转成数组形式
     const result = [];
     for (const [country, count] of Object.entries(countryCounts)) {
-        result.push({ country, count });
+        result.push({ country, count, nodes: countryNodes[country] || [] });
     }
 
-    return result;   // [{ country: 'Japan', count: 12 }, ...]
+    return result;   // [{ country: 'Japan', count: 12, nodes: ['日本01', '日本02', ...] }, ...]
 }
 
 
-function buildCountryProxyGroups({ countries, landing, loadBalance }) {
+function buildCountryProxyGroups({ countries, landing, loadBalance, explicitNodes, countryInfo }) {
     const groups = [];
     const baseExcludeFilter = "0\\.[0-5]|低倍率|省流|大流量|实验性";
     const landingExcludeFilter = "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地";
     const groupType = loadBalance ? "load-balance" : "url-test";
 
+    // explicit 模式下按国家建立节点名索引，方便快速查找
+    const nodesByCountry = explicitNodes
+        ? Object.fromEntries(countryInfo.map(item => [item.country, item.nodes]))
+        : null;
+
     for (const country of countries) {
         const meta = countriesMeta[country];
         if (!meta) continue;
 
-        const groupConfig = {
-            "name": `${country}${NODE_SUFFIX}`,
-            "icon": meta.icon,
-            "include-all": true,
-            "filter": meta.pattern,
-            "exclude-filter": landing ? `${landingExcludeFilter}|${baseExcludeFilter}` : baseExcludeFilter,
-            "type": groupType
-        };
+        let groupConfig;
+
+        if (explicitNodes) {
+            // explicit 模式：直接枚举匹配到的节点名称，无需正则过滤
+            const nodeNames = nodesByCountry[country] || [];
+            groupConfig = {
+                "name": `${country}${NODE_SUFFIX}`,
+                "icon": meta.icon,
+                "type": groupType,
+                "proxies": nodeNames
+            };
+        } else {
+            // 默认模式：用正则从所有节点中动态筛选
+            groupConfig = {
+                "name": `${country}${NODE_SUFFIX}`,
+                "icon": meta.icon,
+                "include-all": true,
+                "filter": meta.pattern,
+                "exclude-filter": landing ? `${landingExcludeFilter}|${baseExcludeFilter}` : baseExcludeFilter,
+                "type": groupType
+            };
+        }
 
         if (!loadBalance) {
             Object.assign(groupConfig, {
@@ -718,7 +756,7 @@ function main(config) {
     } = buildBaseLists({ landing, lowCost, countryGroupNames });
 
     // 为地区构建对应的 url-test / load-balance 组
-    const countryProxyGroups = buildCountryProxyGroups({ countries, landing, loadBalance });
+    const countryProxyGroups = buildCountryProxyGroups({ countries, landing, loadBalance, explicitNodes, countryInfo });
 
     // 生成代理组
     const proxyGroups = buildProxyGroups({
