@@ -20,7 +20,8 @@ const GENERATOR_DIR = __dirname;
 const CONVERT_FILE = path.join(BASE_DIR, "convert.js");
 const FAKE_PROXIES_FILE = path.join(GENERATOR_DIR, "fake_proxies.json");
 const OUTPUT_DIR = path.join(BASE_DIR, "yamls");
-const FLAGS = ["loadbalance", "landing", "ipv6", "full", "keepalive", "fakeip", "regex", "quic"];
+const FLAGS = ["loadbalance", "landing", "ipv6", "full", "keepalive", "fakeip", "quic"];
+// regex 恒为 true，不参与组合枚举
 
 // 读取 fake proxies
 function loadFakeConfig() {
@@ -54,7 +55,7 @@ function generateArgCombos() {
 function runConvert(baseConfig, args) {
     const code = fs.readFileSync(CONVERT_FILE, "utf-8");
     const sandbox = {
-        $arguments: { ...args },
+        $arguments: { ...args, regex: true }, // regex 固定为 true
         console,
         // 为安全不提供 require / module
     };
@@ -86,7 +87,6 @@ function getShortName(flag) {
         full: "full",
         keepalive: "keepalive",
         fakeip: "fakeip",
-        regex: "regex",
         quic: "quic",
     };
     return shortNames[flag] || flag;
@@ -99,13 +99,13 @@ function ensureDir(dir) {
 function main() {
     const baseConfig = loadFakeConfig();
     ensureDir(OUTPUT_DIR);
-    // 清理旧文件，避免残留无效组合
-    // 根据 FLAGS 数组动态生成正则表达式
+    // 清理旧文件：删除所有 config_*.yaml 中不符合当前格式的文件（包括任意旧版本格式）
+    // 根据 FLAGS 数组动态生成当前格式的正则表达式
     const flagPatterns = FLAGS.map((flag) => `${getShortName(flag)}-\\d`);
     const cleanupRegex = new RegExp(`^config_${flagPatterns.join("_")}\\.yaml$`);
 
     for (const f of fs.readdirSync(OUTPUT_DIR)) {
-        if (cleanupRegex.test(f)) {
+        if (/^config_.*\.yaml$/.test(f) && !cleanupRegex.test(f)) {
             try {
                 fs.unlinkSync(path.join(OUTPUT_DIR, f));
             } catch (_) {
