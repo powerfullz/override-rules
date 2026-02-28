@@ -11,6 +11,7 @@ https://github.com/powerfullz/override-rules
 - fakeip: DNS 使用 FakeIP 模式（默认 false，false 为 RedirHost）
 - quic: 允许 QUIC 流量（UDP 443，默认 false）
 - threshold: 国家节点数量小于该值时不显示分组 (默认 0)
+- regex: 使用正则过滤模式（include-all + filter）写入各国家代理组，而非直接枚举节点名称（默认 false）
 */
 
 const NODE_SUFFIX = "节点";
@@ -48,7 +49,8 @@ function buildFeatureFlags(args) {
         full: "fullConfig",
         keepalive: "keepAliveEnabled",
         fakeip: "fakeIPEnabled",
-        quic: "quicEnabled"
+        quic: "quicEnabled",
+        regex: "regexFilter"
     };
 
     const flags = Object.entries(spec).reduce((acc, [sourceKey, targetKey]) => {
@@ -56,7 +58,9 @@ function buildFeatureFlags(args) {
         return acc;
     }, {});
 
-    // 单独处理数字参数
+    /**
+     * `threshold` 是数字参数，不经过 parseBool，需单独处理。
+     */
     flags.countryThreshold = parseNumber(args.threshold, 0);
 
     return flags;
@@ -71,13 +75,24 @@ const {
     keepAliveEnabled,
     fakeIPEnabled,
     quicEnabled,
+    regexFilter,
     countryThreshold
 } = buildFeatureFlags(rawArgs);
 
 function getCountryGroupNames(countryInfo, minCount) {
-    return countryInfo
-        .filter(item => item.count >= minCount)
-        .map(item => item.country + NODE_SUFFIX);
+    const filtered = countryInfo.filter(item => item.nodes.length >= minCount);
+
+    /**
+     * 按 `countriesMeta` 中的 `weight` 字段升序排列；
+     * 未配置 `weight` 的地区排在末尾（视为 Infinity）。
+     */
+    filtered.sort((a, b) => {
+        const wa = countriesMeta[a.country]?.weight ?? Infinity;
+        const wb = countriesMeta[b.country]?.weight ?? Infinity;
+        return wa - wb;
+    });
+
+    return filtered.map(item => item.country + NODE_SUFFIX);
 }
 
 function stripNodeSuffix(groupNames) {
@@ -94,13 +109,18 @@ const PROXY_GROUPS = {
     LOW_COST: "低倍率节点",
 };
 
-// 辅助函数，用于根据条件构建数组，自动过滤掉无效值（如 false, null）
+/**
+ * 接受任意数量的元素（包括嵌套数组），展平后过滤掉所有假值（false、null、undefined 等），
+ * 用于以声明式风格构建代理列表，让条件项直接写 `condition && value` 即可。
+ */
 const buildList = (...elements) => elements.flat().filter(Boolean);
 
-function buildBaseLists({ landing, lowCost, countryGroupNames }) {
-    // 使用辅助函数和常量，以声明方式构建各个代理列表
+function buildBaseLists({ landing, lowCostNodes, countryGroupNames }) {
+    const lowCost = lowCostNodes.length > 0 || regexFilter;
 
-    // “选择节点”组的候选列表
+    /**
+     * "选择代理"组的顶层候选列表：故障转移 → 落地节点（可选）→ 各国家组 → 低倍率（可选）→ 手动 → 直连。
+     */
     const defaultSelector = buildList(
         PROXY_GROUPS.FALLBACK,
         landing && PROXY_GROUPS.LANDING,
@@ -110,7 +130,9 @@ function buildBaseLists({ landing, lowCost, countryGroupNames }) {
         "DIRECT"
     );
 
-    // 默认的代理列表，用于大多数策略组
+    /**
+     * 大多数策略组的通用候选列表：以"选择代理"为首选，再跟各国家组、低倍率、手动、直连。
+     */
     const defaultProxies = buildList(
         PROXY_GROUPS.SELECT,
         countryGroupNames,
@@ -119,7 +141,9 @@ function buildBaseLists({ landing, lowCost, countryGroupNames }) {
         PROXY_GROUPS.DIRECT
     );
 
-    // “直连”优先的代理列表
+    /**
+     * 直连优先的候选列表，用于 Bilibili 等国内服务：直连排首位，其余顺序与 defaultProxies 一致。
+     */
     const defaultProxiesDirect = buildList(
         PROXY_GROUPS.DIRECT,
         countryGroupNames,
@@ -128,7 +152,10 @@ function buildBaseLists({ landing, lowCost, countryGroupNames }) {
         PROXY_GROUPS.MANUAL
     );
 
-    // “故障转移”组的代理列表
+    /**
+     * "故障转移"组的候选列表：落地节点（可选）→ 各国家组 → 低倍率（可选）→ 手动 → 直连。
+     * 不包含"选择代理"自身，避免循环引用。
+     */
     const defaultFallback = buildList(
         landing && PROXY_GROUPS.LANDING,
         countryGroupNames,
@@ -272,7 +299,10 @@ const baseRules = [
 function buildRules({ quicEnabled }) {
     const ruleList = [...baseRules];
     if (!quicEnabled) {
-        // 屏蔽 QUIC 流量，避免网络环境 UDP 速度不佳时影响体验
+        /**
+         * 屏蔽 UDP 443（QUIC）流量。
+         * 部分网络环境下 UDP 性能不稳定，禁用 QUIC 可强制回退到 TCP，改善整体体验。
+         */
         ruleList.unshift("AND,((DST-PORT,443),(NETWORK,UDP)),REJECT");
     }
     return ruleList;
@@ -359,9 +389,13 @@ const geoxURL = {
     "asn": "https://gcore.jsdelivr.net/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb"
 };
 
-// 地区元数据
+/**
+ * 各地区的元数据：`weight` 决定在代理组列表中的排列顺序（值越小越靠前，未设置则排末尾）；
+ * `pattern` 是用于匹配节点名称的正则字符串；`icon` 为策略组图标 URL。
+ */
 const countriesMeta = {
     "香港": {
+        weight: 10,
         pattern: "香港|港|HK|hk|Hong Kong|HongKong|hongkong|🇭🇰",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png"
     },
@@ -370,14 +404,17 @@ const countriesMeta = {
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Macao.png"
     },
     "台湾": {
+        weight: 20,
         pattern: "台|新北|彰化|TW|Taiwan|🇹🇼",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png"
     },
     "新加坡": {
+        weight: 30,
         pattern: "新加坡|坡|狮城|SG|Singapore|🇸🇬",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png"
     },
     "日本": {
+        weight: 40,
         pattern: "日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan|🇯🇵",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png"
     },
@@ -386,6 +423,7 @@ const countriesMeta = {
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Korea.png"
     },
     "美国": {
+        weight: 50,
         pattern: "美国|美|US|United States|🇺🇸",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png"
     },
@@ -394,6 +432,7 @@ const countriesMeta = {
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Canada.png"
     },
     "英国": {
+        weight: 60,
         pattern: "英国|United Kingdom|UK|伦敦|London|🇬🇧",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_Kingdom.png"
     },
@@ -402,10 +441,12 @@ const countriesMeta = {
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Australia.png"
     },
     "德国": {
+        weight: 70,
         pattern: "德国|德|DE|Germany|🇩🇪",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Germany.png"
     },
     "法国": {
+        weight: 80,
         pattern: "法国|法|FR|France|🇫🇷",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/France.png"
     },
@@ -427,69 +468,121 @@ const countriesMeta = {
     },
 };
 
-function hasLowCost(config) {
-    const lowCostRegex = /0\.[0-5]|低倍率|省流|大流量|实验性/i;
-    return (config.proxies || []).some(proxy => lowCostRegex.test(proxy.name));
+const LOW_COST_REGEX = /0\.[0-5]|低倍率|省流|大流量|实验性/i;
+const LANDING_REGEX = /家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地/i;
+/**
+ * `LANDING_PATTERN` 与 `LANDING_REGEX` 描述同一规则，但格式不同：
+ * - `LANDING_REGEX`：JS `RegExp` 对象，供脚本内部过滤节点时使用（用 `/i` flag 表示不区分大小写）。
+ * - `LANDING_PATTERN`：字符串，写入 YAML 的 `filter` / `exclude-filter` 字段，
+ *   其中 `(?i)` 前缀是 Clash/Mihomo 的不区分大小写语法。
+ */
+const LANDING_PATTERN = "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地";
+
+function parseLowCost(config) {
+    return (config.proxies || [])
+        .filter(proxy => LOW_COST_REGEX.test(proxy.name))
+        .map(proxy => proxy.name);
 }
 
+function parseLandingNodes(config) {
+    return (config.proxies || [])
+        .filter(proxy => LANDING_REGEX.test(proxy.name))
+        .map(proxy => proxy.name);
+}
+
+/**
+ * 遍历订阅中的所有节点，按 `countriesMeta` 中定义的地区进行归类。
+ *
+ * 归类规则：
+ * - 名称匹配 `LANDING_REGEX` 的落地节点和匹配 `LOW_COST_REGEX` 的低倍率节点不参与统计。
+ * - 每个节点只归入第一个匹配到的地区，避免重复计入。
+ * - 地区正则来自 `countriesMeta[country].pattern`；若旧配置中 pattern 携带 `(?i)` 前缀，
+ *   会在编译前自动剥离（JS RegExp 不支持该语法）。
+ *
+ * @param {object} config - 订阅配置对象，包含 `proxies` 数组。
+ * @returns {{ country: string, nodes: string[] }[]} - 每个元素对应一个地区及其节点名称列表。
+ */
 function parseCountries(config) {
     const proxies = config.proxies || [];
-    const ispRegex = /家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地/i;   // 需要排除的关键字
 
-    // 用来累计各国节点数
-    const countryCounts = Object.create(null);
+    const countryNodes = Object.create(null);
 
-    // 构建地区正则表达式：区分大小写（避免 node 里的 "de" 误匹配到 "DE" -> 德国）
     const compiledRegex = {};
     for (const [country, meta] of Object.entries(countriesMeta)) {
-        // 兼容旧配置：如果 pattern 仍以 (?i) 开头，这里会剥离掉以避免 JS RegExp 报错
         compiledRegex[country] = new RegExp(meta.pattern.replace(/^\(\?i\)/, ''));
     }
 
-    // 逐个节点进行匹配与统计
     for (const proxy of proxies) {
         const name = proxy.name || '';
 
-        // 过滤掉不想统计的 ISP 节点
-        if (ispRegex.test(name)) continue;
+        if (LANDING_REGEX.test(name)) continue;
+        if (LOW_COST_REGEX.test(name)) continue;
 
-        // 找到第一个匹配到的地区就计数并终止本轮
         for (const [country, regex] of Object.entries(compiledRegex)) {
             if (regex.test(name)) {
-                countryCounts[country] = (countryCounts[country] || 0) + 1;
-                break;    // 避免一个节点同时累计到多个地区
+                if (!countryNodes[country]) countryNodes[country] = [];
+                countryNodes[country].push(name);
+                break;
             }
         }
     }
 
-    // 将结果对象转成数组形式
     const result = [];
-    for (const [country, count] of Object.entries(countryCounts)) {
-        result.push({ country, count });
+    for (const [country, nodes] of Object.entries(countryNodes)) {
+        result.push({ country, nodes });
     }
 
-    return result;   // [{ country: 'Japan', count: 12 }, ...]
+    return result;
 }
 
 
-function buildCountryProxyGroups({ countries, landing, loadBalance }) {
+function buildCountryProxyGroups({ countries, landing, loadBalance, regexFilter, countryInfo }) {
     const groups = [];
     const baseExcludeFilter = "0\\.[0-5]|低倍率|省流|大流量|实验性";
-    const landingExcludeFilter = "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地";
+    const landingExcludeFilter = LANDING_PATTERN;
     const groupType = loadBalance ? "load-balance" : "url-test";
+
+    /**
+     * 枚举模式（`regexFilter=false`）下预先建立"地区 → 节点名列表"的索引，
+     * 避免在循环内反复遍历 `countryInfo`。
+     * regex 模式不需要此索引，置为 null 节省开销。
+     */
+    const nodesByCountry = !regexFilter
+        ? Object.fromEntries(countryInfo.map(item => [item.country, item.nodes]))
+        : null;
 
     for (const country of countries) {
         const meta = countriesMeta[country];
         if (!meta) continue;
 
-        const groupConfig = {
-            "name": `${country}${NODE_SUFFIX}`,
-            "icon": meta.icon,
-            "include-all": true,
-            "filter": meta.pattern,
-            "exclude-filter": landing ? `${landingExcludeFilter}|${baseExcludeFilter}` : baseExcludeFilter,
-            "type": groupType
-        };
+        let groupConfig;
+
+        if (!regexFilter) {
+            /**
+             * 枚举模式：直接列出已归类到该地区的节点名称，无需运行时正则过滤。
+             */
+            const nodeNames = nodesByCountry[country] || [];
+            groupConfig = {
+                "name": `${country}${NODE_SUFFIX}`,
+                "icon": meta.icon,
+                "type": groupType,
+                "proxies": nodeNames
+            };
+        } else {
+            /**
+             * regex 模式：通过 `include-all` + `filter` 让内核在运行时动态筛选节点，
+             * 同时用 `exclude-filter` 排除低倍率节点；若启用了落地功能，
+             * 还需一并排除落地节点，防止其混入普通地区组。
+             */
+            groupConfig = {
+                "name": `${country}${NODE_SUFFIX}`,
+                "icon": meta.icon,
+                "include-all": true,
+                "filter": meta.pattern,
+                "exclude-filter": landing ? `${landingExcludeFilter}|${baseExcludeFilter}` : baseExcludeFilter,
+                "type": groupType
+            };
+        }
 
         if (!loadBalance) {
             Object.assign(groupConfig, {
@@ -510,17 +603,26 @@ function buildProxyGroups({
     landing,
     countries,
     countryProxyGroups,
-    lowCost,
+    lowCostNodes,
+    landingNodes,
     defaultProxies,
     defaultProxiesDirect,
     defaultSelector,
     defaultFallback
 }) {
-    // 查看是否有特定地区的节点
+    /**
+     * 预先判断是否存在特定地区的节点，用于为 Bilibili、Bahamut、Truth Social 等
+     * 有地区偏好的策略组提供更精准的候选列表。
+     */
     const hasTW = countries.includes("台湾");
     const hasHK = countries.includes("香港");
     const hasUS = countries.includes("美国");
-    // 排除落地节点、选择节点和故障转移以避免死循环
+
+    /**
+     * "前置代理"组的候选列表：从 `defaultSelector` 中移除"落地节点"和"故障转移"，
+     * 避免前置代理与落地节点形成循环引用，以及与故障转移组相互嵌套。
+     * 仅在 `landing=true` 时使用；否则置为空数组。
+     */
     const frontProxySelector = landing
         ? defaultSelector.filter(name => name !== PROXY_GROUPS.LANDING && name !== PROXY_GROUPS.FALLBACK)
         : [];
@@ -542,16 +644,26 @@ function buildProxyGroups({
             "name": "前置代理",
             "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Area.png",
             "type": "select",
-            "include-all": true,
-            "exclude-filter": "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地",
-            "proxies": frontProxySelector
+            /**
+             * regex 模式：`include-all` 拉取所有节点，`exclude-filter` 排除落地节点，
+             * 同时在 `proxies` 里附加手动指定的候选组名列表（各国家组等）。
+             * 枚举模式：直接列出候选组名（落地节点已在构建 `frontProxySelector` 时过滤）。
+             */
+            ...(regexFilter
+                ? { "include-all": true, "exclude-filter": LANDING_PATTERN, "proxies": frontProxySelector }
+                : { "proxies": frontProxySelector })
         } : null,
         (landing) ? {
             "name": PROXY_GROUPS.LANDING,
             "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png",
             "type": "select",
-            "include-all": true,
-            "filter": "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地",
+            /**
+             * regex 模式：`include-all` + `filter` 动态筛选落地节点。
+             * 枚举模式：直接列出已识别的落地节点名称。
+             */
+            ...(regexFilter
+                ? { "include-all": true, "filter": LANDING_PATTERN }
+                : { "proxies": landingNodes }),
         } : null,
         {
             "name": PROXY_GROUPS.FALLBACK,
@@ -689,51 +801,67 @@ function buildProxyGroups({
                 "REJECT", "REJECT-DROP",  PROXY_GROUPS.DIRECT
             ]
         },
-        (lowCost) ? {
+        (lowCostNodes.length > 0 || regexFilter) ? {
             "name": PROXY_GROUPS.LOW_COST,
             "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lab.png",
             "type": "url-test",
             "url": "https://cp.cloudflare.com/generate_204",
-            "include-all": true,
-            "filter": "(?i)0\.[0-5]|低倍率|省流|大流量|实验性"
+            ...(!regexFilter
+                ? { "proxies": lowCostNodes }
+                : { "include-all": true, "filter": "(?i)0\\.[0-5]|低倍率|省流|大流量|实验性" })
         } : null,
         ...countryProxyGroups
-    ].filter(Boolean); // 过滤掉 null 值
+    ].filter(Boolean);
 }
 
 function main(config) {
     const resultConfig = { proxies: config.proxies };
-    // 解析地区与低倍率信息
-    const countryInfo = parseCountries(resultConfig); // [{ country, count }]
-    const lowCost = hasLowCost(resultConfig);
+
+    /**
+     * 解析订阅中的节点，分别得到：地区归类信息、低倍率节点名列表、落地节点名列表，
+     * 以及经过阈值过滤和权重排序后的国家组名列表与地区名列表。
+     */
+    const countryInfo = parseCountries(resultConfig);
+    const lowCostNodes = parseLowCost(resultConfig);
+    const landingNodes = landing ? parseLandingNodes(resultConfig) : [];
     const countryGroupNames = getCountryGroupNames(countryInfo, countryThreshold);
     const countries = stripNodeSuffix(countryGroupNames);
 
-    // 构建基础数组
+    /**
+     * 构建各类通用候选列表，供后续策略组复用。
+     */
     const {
         defaultProxies,
         defaultProxiesDirect,
         defaultSelector,
         defaultFallback
-    } = buildBaseLists({ landing, lowCost, countryGroupNames });
+    } = buildBaseLists({ landing, lowCostNodes, countryGroupNames });
 
-    // 为地区构建对应的 url-test / load-balance 组
-    const countryProxyGroups = buildCountryProxyGroups({ countries, landing, loadBalance });
+    /**
+     * 为每个地区生成对应的 `url-test` 或 `load-balance` 自动测速组。
+     */
+    const countryProxyGroups = buildCountryProxyGroups({ countries, landing, loadBalance, regexFilter, countryInfo });
 
-    // 生成代理组
+    /**
+     * 组装所有策略组（功能组 + 地区组）。
+     */
     const proxyGroups = buildProxyGroups({
         landing,
         countries,
         countryProxyGroups,
-        lowCost,
+        lowCostNodes,
+        landingNodes,
         defaultProxies,
         defaultProxiesDirect,
         defaultSelector,
         defaultFallback
     });
-    
-    // 完整书写 Global 代理组以确保兼容性
-    const globalProxies = proxyGroups.map(item => item.name);  
+
+    /**
+     * GLOBAL 组需要枚举所有已生成的策略组名称，因此在其他组构建完成后追加，
+     * 同时保留 `include-all` 以确保与各内核的兼容性。
+     */
+    const globalProxies = proxyGroups.map(item => item.name);
     proxyGroups.push(
         {
             "name": "GLOBAL",
