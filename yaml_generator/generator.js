@@ -20,7 +20,7 @@ const GENERATOR_DIR = __dirname;
 const CONVERT_FILE = path.join(BASE_DIR, 'convert.js');
 const FAKE_PROXIES_FILE = path.join(GENERATOR_DIR, 'fake_proxies.json');
 const OUTPUT_DIR = path.join(BASE_DIR, 'yamls');
-const FLAGS = ['loadbalance', 'landing', 'ipv6', 'full', 'keepalive', 'fakeip'];
+const FLAGS = ['loadbalance', 'landing', 'ipv6', 'full', 'keepalive', 'fakeip', 'regex', 'quic'];
 
 // 读取 fake proxies
 function loadFakeConfig() {
@@ -85,7 +85,9 @@ function getShortName(flag) {
         'ipv6': 'ipv6',
         'full': 'full',
         'keepalive': 'keepalive',
-        'fakeip': 'fakeip'
+        'fakeip': 'fakeip',
+        'regex': 'regex',
+        'quic': 'quic'
     };
     return shortNames[flag] || flag;
 }

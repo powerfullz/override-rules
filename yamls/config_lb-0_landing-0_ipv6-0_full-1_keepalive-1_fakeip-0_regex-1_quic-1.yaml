@@ -1,0 +1,411 @@
+mixed-port: 7890
+redir-port: 7892
+tproxy-port: 7893
+routing-mark: 7894
+allow-lan: true
+ipv6: false
+mode: rule
+unified-delay: true
+tcp-concurrent: true
+find-process-mode: off
+log-level: info
+geodata-loader: standard
+external-controller: :9999
+disable-keep-alive: false
+profile:
+  store-selected: true
+proxy-groups:
+  - name: 选择代理
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png
+    type: select
+    proxies:
+      - 故障转移
+      - 香港节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 美国节点
+      - 低倍率节点
+      - 手动选择
+      - DIRECT
+  - name: 手动选择
+    icon: https://gcore.jsdelivr.net/gh/shindgewongxj/WHATSINStash@master/icon/select.png
+    include-all: true
+    type: select
+  - name: 故障转移
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Bypass.png
+    type: fallback
+    url: https://cp.cloudflare.com/generate_204
+    proxies:
+      - 香港节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 美国节点
+      - 低倍率节点
+      - 手动选择
+      - DIRECT
+    interval: 180
+    tolerance: 20
+    lazy: false
+  - name: 静态资源
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cloudflare.png
+    type: select
+    proxies: &a1
+      - 选择代理
+      - 香港节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 美国节点
+      - 低倍率节点
+      - 手动选择
+      - 直连
+  - name: AI
+    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/chatgpt.png
+    type: select
+    proxies: *a1
+  - name: Crypto
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cryptocurrency_3.png
+    type: select
+    proxies: *a1
+  - name: Google
+    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Google.png
+    type: select
+    proxies: *a1
+  - name: Microsoft
+    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Microsoft_Copilot.png
+    type: select
+    proxies: *a1
+  - name: YouTube
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png
+    type: select
+    proxies: *a1
+  - name: Bilibili
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/bilibili.png
+    type: select
+    proxies:
+      - 直连
+      - 台湾节点
+      - 香港节点
+  - name: Bahamut
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Bahamut.png
+    type: select
+    proxies:
+      - 台湾节点
+      - 选择代理
+      - 手动选择
+      - 直连
+  - name: Netflix
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netflix.png
+    type: select
+    proxies: *a1
+  - name: TikTok
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/TikTok.png
+    type: select
+    proxies: *a1
+  - name: Spotify
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png
+    type: select
+    proxies: *a1
+  - name: E-Hentai
+    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Ehentai.png
+    type: select
+    proxies: *a1
+  - name: Telegram
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png
+    type: select
+    proxies: *a1
+  - name: Truth Social
+    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/TruthSocial.png
+    type: select
+    proxies:
+      - 美国节点
+      - 选择代理
+      - 手动选择
+  - name: OneDrive
+    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Onedrive.png
+    type: select
+    proxies: *a1
+  - name: PikPak
+    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/PikPak.png
+    type: select
+    proxies: *a1
+  - name: SSH(22端口)
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Server.png
+    type: select
+    proxies: *a1
+  - name: 搜狗输入法
+    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Sougou.png
+    type: select
+    proxies:
+      - 直连
+      - REJECT
+  - name: 直连
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Direct.png
+    type: select
+    proxies:
+      - DIRECT
+      - 选择代理
+  - name: 广告拦截
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png
+    type: select
+    proxies:
+      - REJECT
+      - REJECT-DROP
+      - 直连
+  - name: 低倍率节点
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lab.png
+    type: url-test
+    url: https://cp.cloudflare.com/generate_204
+    include-all: true
+    filter: (?i)0\.[0-5]|低倍率|省流|大流量|实验性
+  - name: 香港节点
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png
+    include-all: true
+    filter: 香港|港|HK|hk|Hong Kong|HongKong|hongkong|🇭🇰
+    exclude-filter: 0\.[0-5]|低倍率|省流|大流量|实验性
+    type: url-test
+    url: https://cp.cloudflare.com/generate_204
+    interval: 60
+    tolerance: 20
+    lazy: false
+  - name: 台湾节点
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png
+    include-all: true
+    filter: 台|新北|彰化|TW|Taiwan|🇹🇼
+    exclude-filter: 0\.[0-5]|低倍率|省流|大流量|实验性
+    type: url-test
+    url: https://cp.cloudflare.com/generate_204
+    interval: 60
+    tolerance: 20
+    lazy: false
+  - name: 新加坡节点
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png
+    include-all: true
+    filter: 新加坡|坡|狮城|SG|Singapore|🇸🇬
+    exclude-filter: 0\.[0-5]|低倍率|省流|大流量|实验性
+    type: url-test
+    url: https://cp.cloudflare.com/generate_204
+    interval: 60
+    tolerance: 20
+    lazy: false
+  - name: 日本节点
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png
+    include-all: true
+    filter: 日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan|🇯🇵
+    exclude-filter: 0\.[0-5]|低倍率|省流|大流量|实验性
+    type: url-test
+    url: https://cp.cloudflare.com/generate_204
+    interval: 60
+    tolerance: 20
+    lazy: false
+  - name: 美国节点
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png
+    include-all: true
+    filter: 美国|美|US|United States|🇺🇸
+    exclude-filter: 0\.[0-5]|低倍率|省流|大流量|实验性
+    type: url-test
+    url: https://cp.cloudflare.com/generate_204
+    interval: 60
+    tolerance: 20
+    lazy: false
+  - name: GLOBAL
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png
+    include-all: true
+    type: select
+    proxies:
+      - 选择代理
+      - 手动选择
+      - 故障转移
+      - 静态资源
+      - AI
+      - Crypto
+      - Google
+      - Microsoft
+      - YouTube
+      - Bilibili
+      - Bahamut
+      - Netflix
+      - TikTok
+      - Spotify
+      - E-Hentai
+      - Telegram
+      - Truth Social
+      - OneDrive
+      - PikPak
+      - SSH(22端口)
+      - 搜狗输入法
+      - 直连
+      - 广告拦截
+      - 低倍率节点
+      - 香港节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 美国节点
+rule-providers:
+  ADBlock:
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://adrules.top/adrules-mihomo.mrs
+    path: ./ruleset/ADBlock.mrs
+  SogouInput:
+    type: http
+    behavior: classical
+    format: text
+    interval: 86400
+    url: https://ruleset.skk.moe/Clash/non_ip/sogouinput.txt
+    path: ./ruleset/SogouInput.txt
+  StaticResources:
+    type: http
+    behavior: domain
+    format: text
+    interval: 86400
+    url: https://ruleset.skk.moe/Clash/domainset/cdn.txt
+    path: ./ruleset/StaticResources.txt
+  CDNResources:
+    type: http
+    behavior: classical
+    format: text
+    interval: 86400
+    url: https://ruleset.skk.moe/Clash/non_ip/cdn.txt
+    path: ./ruleset/CDNResources.txt
+  TikTok:
+    type: http
+    behavior: classical
+    format: text
+    interval: 86400
+    url: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/TikTok.list
+    path: ./ruleset/TikTok.list
+  EHentai:
+    type: http
+    behavior: classical
+    format: text
+    interval: 86400
+    url: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/EHentai.list
+    path: ./ruleset/EHentai.list
+  SteamFix:
+    type: http
+    behavior: classical
+    format: text
+    interval: 86400
+    url: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/SteamFix.list
+    path: ./ruleset/SteamFix.list
+  GoogleFCM:
+    type: http
+    behavior: classical
+    format: text
+    interval: 86400
+    url: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/FirebaseCloudMessaging.list
+    path: ./ruleset/FirebaseCloudMessaging.list
+  AdditionalFilter:
+    type: http
+    behavior: classical
+    format: text
+    interval: 86400
+    url: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/AdditionalFilter.list
+    path: ./ruleset/AdditionalFilter.list
+  AdditionalCDNResources:
+    type: http
+    behavior: classical
+    format: text
+    interval: 86400
+    url: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/AdditionalCDNResources.list
+    path: ./ruleset/AdditionalCDNResources.list
+  Crypto:
+    type: http
+    behavior: classical
+    format: text
+    interval: 86400
+    url: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/ruleset/Crypto.list
+    path: ./ruleset/Crypto.list
+rules:
+  - RULE-SET,ADBlock,广告拦截
+  - RULE-SET,AdditionalFilter,广告拦截
+  - RULE-SET,SogouInput,搜狗输入法
+  - DOMAIN-SUFFIX,truthsocial.com,Truth Social
+  - RULE-SET,StaticResources,静态资源
+  - RULE-SET,CDNResources,静态资源
+  - RULE-SET,AdditionalCDNResources,静态资源
+  - RULE-SET,Crypto,Crypto
+  - RULE-SET,EHentai,E-Hentai
+  - RULE-SET,TikTok,TikTok
+  - RULE-SET,SteamFix,直连
+  - RULE-SET,GoogleFCM,直连
+  - DOMAIN,services.googleapis.cn,选择代理
+  - GEOSITE,CATEGORY-AI-!CN,AI
+  - GEOSITE,GOOGLE-PLAY@CN,直连
+  - GEOSITE,MICROSOFT@CN,直连
+  - GEOSITE,ONEDRIVE,OneDrive
+  - GEOSITE,MICROSOFT,Microsoft
+  - GEOSITE,TELEGRAM,Telegram
+  - GEOSITE,YOUTUBE,YouTube
+  - GEOSITE,GOOGLE,Google
+  - GEOSITE,NETFLIX,Netflix
+  - GEOSITE,SPOTIFY,Spotify
+  - GEOSITE,BAHAMUT,Bahamut
+  - GEOSITE,BILIBILI,Bilibili
+  - GEOSITE,PIKPAK,PikPak
+  - GEOSITE,GFW,选择代理
+  - GEOSITE,CN,直连
+  - GEOSITE,PRIVATE,直连
+  - GEOIP,NETFLIX,Netflix,no-resolve
+  - GEOIP,TELEGRAM,Telegram,no-resolve
+  - GEOIP,CN,直连
+  - GEOIP,PRIVATE,直连
+  - DST-PORT,22,SSH(22端口)
+  - MATCH,选择代理
+sniffer:
+  sniff:
+    TLS:
+      ports:
+        - 443
+        - 8443
+    HTTP:
+      ports:
+        - 80
+        - 8080
+        - 8880
+    QUIC:
+      ports:
+        - 443
+        - 8443
+  override-destination: false
+  enable: true
+  force-dns-mapping: true
+  skip-domain:
+    - Mijia Cloud
+    - dlg.io.mi.com
+    - +.push.apple.com
+dns:
+  enable: true
+  ipv6: false
+  prefer-h3: true
+  enhanced-mode: redir-host
+  default-nameserver:
+    - 119.29.29.29
+    - 223.5.5.5
+  nameserver:
+    - system
+    - 223.5.5.5
+    - 119.29.29.29
+    - 180.184.1.1
+  fallback:
+    - quic://dns0.eu
+    - https://dns.cloudflare.com/dns-query
+    - https://dns.sb/dns-query
+    - tcp://208.67.222.222
+    - tcp://8.26.56.2
+  proxy-server-nameserver:
+    - https://dns.alidns.com/dns-query
+    - tls://dot.pub
+geodata-mode: true
+geox-url:
+  geoip: https://gcore.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat
+  geosite: https://gcore.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat
+  mmdb: https://gcore.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country.mmdb
+  asn: https://gcore.jsdelivr.net/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb
+

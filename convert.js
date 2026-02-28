@@ -107,7 +107,8 @@ const PROXY_GROUPS = {
 // 辅助函数，用于根据条件构建数组，自动过滤掉无效值（如 false, null）
 const buildList = (...elements) => elements.flat().filter(Boolean);
 
-function buildBaseLists({ landing, lowCost, countryGroupNames }) {
+function buildBaseLists({ landing, lowCostNodes, countryGroupNames }) {
+    const lowCost = lowCostNodes.length > 0 || regexFilter;
     // 使用辅助函数和常量，以声明方式构建各个代理列表
 
     // “选择节点”组的候选列表
@@ -446,10 +447,9 @@ const countriesMeta = {
 };
 
 const LOW_COST_REGEX = /0\.[0-5]|低倍率|省流|大流量|实验性/i;
-
-function hasLowCost(config) {
-    return (config.proxies || []).some(proxy => LOW_COST_REGEX.test(proxy.name));
-}
+const LANDING_REGEX = /家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地/i;
+// 用于 YAML filter/exclude-filter 字段（Clash/Mihomo 的 (?i) 前缀表示不区分大小写）
+const LANDING_PATTERN = "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地";
 
 function parseLowCost(config) {
     return (config.proxies || [])
@@ -457,9 +457,15 @@ function parseLowCost(config) {
         .map(proxy => proxy.name);
 }
 
+function parseLandingNodes(config) {
+    return (config.proxies || [])
+        .filter(proxy => LANDING_REGEX.test(proxy.name))
+        .map(proxy => proxy.name);
+}
+
 function parseCountries(config) {
     const proxies = config.proxies || [];
-    const ispRegex = /家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地/i;   // 需要排除的关键字
+    const ispRegex = LANDING_REGEX;   // 需要排除的关键字
 
     // 用来累计各国节点数，以及收集节点名称列表
     const countryCounts = Object.create(null);
@@ -504,7 +510,7 @@ function parseCountries(config) {
 function buildCountryProxyGroups({ countries, landing, loadBalance, regexFilter, countryInfo }) {
     const groups = [];
     const baseExcludeFilter = "0\\.[0-5]|低倍率|省流|大流量|实验性";
-    const landingExcludeFilter = "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地";
+    const landingExcludeFilter = LANDING_PATTERN;
     const groupType = loadBalance ? "load-balance" : "url-test";
 
     // 默认模式（枚举节点）下按国家建立节点名索引，方便快速查找
@@ -558,8 +564,8 @@ function buildProxyGroups({
     landing,
     countries,
     countryProxyGroups,
-    lowCost,
     lowCostNodes,
+    landingNodes,
     defaultProxies,
     defaultProxiesDirect,
     defaultSelector,
@@ -591,16 +597,19 @@ function buildProxyGroups({
             "name": "前置代理",
             "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Area.png",
             "type": "select",
-            "include-all": true,
-            "exclude-filter": "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地",
-            "proxies": frontProxySelector
+            ...(regexFilter
+                // regex 模式：从所有节点中动态过滤，排除落地节点，并附加手动指定的候选列表
+                ? { "include-all": true, "exclude-filter": LANDING_PATTERN, "proxies": frontProxySelector }
+                // 枚举模式：只列出非落地节点的候选组名（落地节点已被 frontProxySelector 过滤掉）
+                : { "proxies": frontProxySelector })
         } : null,
         (landing) ? {
             "name": PROXY_GROUPS.LANDING,
             "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png",
             "type": "select",
-            "include-all": true,
-            "filter": "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地",
+            ...(regexFilter
+                ? { "include-all": true, "filter": LANDING_PATTERN }
+                : { "proxies": landingNodes }),
         } : null,
         {
             "name": PROXY_GROUPS.FALLBACK,
@@ -738,12 +747,12 @@ function buildProxyGroups({
                 "REJECT", "REJECT-DROP",  PROXY_GROUPS.DIRECT
             ]
         },
-        (lowCost) ? {
+        (lowCostNodes.length > 0 || regexFilter) ? {
             "name": PROXY_GROUPS.LOW_COST,
             "icon": "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lab.png",
             "type": "url-test",
             "url": "https://cp.cloudflare.com/generate_204",
-            ...(lowCostNodes
+            ...(!regexFilter
                 ? { "proxies": lowCostNodes }
                 : { "include-all": true, "filter": "(?i)0\\.[0-5]|低倍率|省流|大流量|实验性" })
         } : null,
@@ -755,8 +764,8 @@ function main(config) {
     const resultConfig = { proxies: config.proxies };
     // 解析地区与低倍率信息
     const countryInfo = parseCountries(resultConfig); // [{ country, count }]
-    const lowCost = hasLowCost(resultConfig);
-    const lowCostNodes = !regexFilter ? parseLowCost(resultConfig) : null;
+    const lowCostNodes = parseLowCost(resultConfig);
+    const landingNodes = landing ? parseLandingNodes(resultConfig) : [];
     const countryGroupNames = getCountryGroupNames(countryInfo, countryThreshold);
     const countries = stripNodeSuffix(countryGroupNames);
 
@@ -766,7 +775,7 @@ function main(config) {
         defaultProxiesDirect,
         defaultSelector,
         defaultFallback
-    } = buildBaseLists({ landing, lowCost, countryGroupNames });
+    } = buildBaseLists({ landing, lowCostNodes, countryGroupNames });
 
     // 为地区构建对应的 url-test / load-balance 组
     const countryProxyGroups = buildCountryProxyGroups({ countries, landing, loadBalance, regexFilter, countryInfo });
@@ -776,8 +785,8 @@ function main(config) {
         landing,
         countries,
         countryProxyGroups,
-        lowCost,
         lowCostNodes,
+        landingNodes,
         defaultProxies,
         defaultProxiesDirect,
         defaultSelector,
