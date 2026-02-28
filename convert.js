@@ -445,9 +445,10 @@ const countriesMeta = {
     },
 };
 
+const LOW_COST_REGEX = /0\.[0-5]|低倍率|省流|大流量|实验性/i;
+
 function hasLowCost(config) {
-    const lowCostRegex = /0\.[0-5]|低倍率|省流|大流量|实验性/i;
-    return (config.proxies || []).some(proxy => lowCostRegex.test(proxy.name));
+    return (config.proxies || []).some(proxy => LOW_COST_REGEX.test(proxy.name));
 }
 
 function parseCountries(config) {
@@ -469,8 +470,9 @@ function parseCountries(config) {
     for (const proxy of proxies) {
         const name = proxy.name || '';
 
-        // 过滤掉不想统计的 ISP 节点
+        // 过滤掉不想统计的节点类型
         if (ispRegex.test(name)) continue;
+        if (LOW_COST_REGEX.test(name)) continue;
 
         // 找到第一个匹配到的地区就计数并终止本轮
         for (const [country, regex] of Object.entries(compiledRegex)) {
