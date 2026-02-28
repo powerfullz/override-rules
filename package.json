@@ -6,9 +6,19 @@
   "license": "MIT",
   "type": "commonjs",
   "scripts": {
-    "generate": "node yaml_generator/generator.js"
+    "generate": "node yaml_generator/generator.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "yaml": "^2.5.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.2",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.1"
   }
 }

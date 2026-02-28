@@ -1,0 +1,14 @@
+# 自动生成的文件
+yamls/
+convert.min.js
+
+# 依赖
+node_modules/
+
+# 其他
+*.yaml
+*.yml
+*.list
+*.json
+*.md
+*.sh
