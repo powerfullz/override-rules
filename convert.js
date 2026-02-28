@@ -11,7 +11,7 @@ https://github.com/powerfullz/override-rules
 - fakeip: DNS 使用 FakeIP 模式（默认 false，false 为 RedirHost）
 - quic: 允许 QUIC 流量（UDP 443，默认 false）
 - threshold: 国家节点数量小于该值时不显示分组 (默认 0)
-- explicit: 将匹配到的节点名称直接写入各国家代理组的 proxies，而非使用正则过滤（默认 false）
+- regex: 使用正则过滤模式（include-all + filter）写入各国家代理组，而非直接枚举节点名称（默认 false）
 */
 
 const NODE_SUFFIX = "节点";
@@ -50,7 +50,7 @@ function buildFeatureFlags(args) {
         keepalive: "keepAliveEnabled",
         fakeip: "fakeIPEnabled",
         quic: "quicEnabled",
-        explicit: "explicitNodes"
+        regex: "regexFilter"
     };
 
     const flags = Object.entries(spec).reduce((acc, [sourceKey, targetKey]) => {
@@ -73,21 +73,18 @@ const {
     keepAliveEnabled,
     fakeIPEnabled,
     quicEnabled,
-    explicitNodes,
+    regexFilter,
     countryThreshold
 } = buildFeatureFlags(rawArgs);
 
 function getCountryGroupNames(countryInfo, minCount) {
     const filtered = countryInfo.filter(item => item.count >= minCount);
 
-    // 按 COUNTRY_SORT_ORDER 排序：列表内的国家按优先级升序，列表外的国家保留原有相对顺序排在末尾
+    // 按 countriesMeta 中的 weight 排序：weight 越小越靠前，未设置的排末尾
     filtered.sort((a, b) => {
-        const ai = COUNTRY_SORT_ORDER.indexOf(a.country);
-        const bi = COUNTRY_SORT_ORDER.indexOf(b.country);
-        if (ai === -1 && bi === -1) return 0;   // 两者都不在列表中，保持原顺序
-        if (ai === -1) return 1;                 // a 不在列表中，排到 b 后面
-        if (bi === -1) return -1;                // b 不在列表中，排到 a 后面
-        return ai - bi;                          // 按列表索引升序
+        const wa = countriesMeta[a.country]?.weight ?? Infinity;
+        const wb = countriesMeta[b.country]?.weight ?? Infinity;
+        return wa - wb;
     });
 
     return filtered.map(item => item.country + NODE_SUFFIX);
@@ -372,9 +369,10 @@ const geoxURL = {
     "asn": "https://gcore.jsdelivr.net/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb"
 };
 
-// 地区元数据
+// 地区元数据；weight 越小越靠前，未设置的排末尾
 const countriesMeta = {
     "香港": {
+        weight: 10,
         pattern: "香港|港|HK|hk|Hong Kong|HongKong|hongkong|🇭🇰",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png"
     },
@@ -383,14 +381,17 @@ const countriesMeta = {
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Macao.png"
     },
     "台湾": {
+        weight: 20,
         pattern: "台|新北|彰化|TW|Taiwan|🇹🇼",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png"
     },
     "新加坡": {
+        weight: 30,
         pattern: "新加坡|坡|狮城|SG|Singapore|🇸🇬",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png"
     },
     "日本": {
+        weight: 40,
         pattern: "日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan|🇯🇵",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png"
     },
@@ -399,6 +400,7 @@ const countriesMeta = {
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Korea.png"
     },
     "美国": {
+        weight: 50,
         pattern: "美国|美|US|United States|🇺🇸",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png"
     },
@@ -407,6 +409,7 @@ const countriesMeta = {
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Canada.png"
     },
     "英国": {
+        weight: 60,
         pattern: "英国|United Kingdom|UK|伦敦|London|🇬🇧",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_Kingdom.png"
     },
@@ -415,10 +418,12 @@ const countriesMeta = {
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Australia.png"
     },
     "德国": {
+        weight: 70,
         pattern: "德国|德|DE|Germany|🇩🇪",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Germany.png"
     },
     "法国": {
+        weight: 80,
         pattern: "法国|法|FR|France|🇫🇷",
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/France.png"
     },
@@ -439,9 +444,6 @@ const countriesMeta = {
         icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Malaysia.png"
     },
 };
-
-// 国家代理组的排列优先顺序：港、台、新、日、美、欧（英、德、法），其余国家排在末尾
-const COUNTRY_SORT_ORDER = ["香港", "台湾", "新加坡", "日本", "美国", "英国", "德国", "法国"];
 
 function hasLowCost(config) {
     const lowCostRegex = /0\.[0-5]|低倍率|省流|大流量|实验性/i;
@@ -491,14 +493,14 @@ function parseCountries(config) {
 }
 
 
-function buildCountryProxyGroups({ countries, landing, loadBalance, explicitNodes, countryInfo }) {
+function buildCountryProxyGroups({ countries, landing, loadBalance, regexFilter, countryInfo }) {
     const groups = [];
     const baseExcludeFilter = "0\\.[0-5]|低倍率|省流|大流量|实验性";
     const landingExcludeFilter = "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地";
     const groupType = loadBalance ? "load-balance" : "url-test";
 
-    // explicit 模式下按国家建立节点名索引，方便快速查找
-    const nodesByCountry = explicitNodes
+    // 默认模式（枚举节点）下按国家建立节点名索引，方便快速查找
+    const nodesByCountry = !regexFilter
         ? Object.fromEntries(countryInfo.map(item => [item.country, item.nodes]))
         : null;
 
@@ -508,8 +510,8 @@ function buildCountryProxyGroups({ countries, landing, loadBalance, explicitNode
 
         let groupConfig;
 
-        if (explicitNodes) {
-            // explicit 模式：直接枚举匹配到的节点名称，无需正则过滤
+        if (!regexFilter) {
+            // 默认模式：直接枚举匹配到的节点名称，无需正则过滤
             const nodeNames = nodesByCountry[country] || [];
             groupConfig = {
                 "name": `${country}${NODE_SUFFIX}`,
@@ -518,7 +520,7 @@ function buildCountryProxyGroups({ countries, landing, loadBalance, explicitNode
                 "proxies": nodeNames
             };
         } else {
-            // 默认模式：用正则从所有节点中动态筛选
+            // regex 模式：用正则从所有节点中动态筛选
             groupConfig = {
                 "name": `${country}${NODE_SUFFIX}`,
                 "icon": meta.icon,
@@ -756,7 +758,7 @@ function main(config) {
     } = buildBaseLists({ landing, lowCost, countryGroupNames });
 
     // 为地区构建对应的 url-test / load-balance 组
-    const countryProxyGroups = buildCountryProxyGroups({ countries, landing, loadBalance, explicitNodes, countryInfo });
+    const countryProxyGroups = buildCountryProxyGroups({ countries, landing, loadBalance, regexFilter, countryInfo });
 
     // 生成代理组
     const proxyGroups = buildProxyGroups({
