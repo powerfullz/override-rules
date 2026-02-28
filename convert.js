@@ -78,7 +78,7 @@ const {
 } = buildFeatureFlags(rawArgs);
 
 function getCountryGroupNames(countryInfo, minCount) {
-    const filtered = countryInfo.filter(item => item.count >= minCount);
+    const filtered = countryInfo.filter(item => item.nodes.length >= minCount);
 
     // 按 countriesMeta 中的 weight 排序：weight 越小越靠前，未设置的排末尾
     filtered.sort((a, b) => {
@@ -467,8 +467,7 @@ function parseCountries(config) {
     const proxies = config.proxies || [];
     const ispRegex = LANDING_REGEX;   // 需要排除的关键字
 
-    // 用来累计各国节点数，以及收集节点名称列表
-    const countryCounts = Object.create(null);
+    // 用来收集各国节点名称列表
     const countryNodes = Object.create(null);  // { country: [nodeName, ...] }
 
     // 构建地区正则表达式：区分大小写（避免 node 里的 "de" 误匹配到 "DE" -> 德国）
@@ -486,10 +485,9 @@ function parseCountries(config) {
         if (ispRegex.test(name)) continue;
         if (LOW_COST_REGEX.test(name)) continue;
 
-        // 找到第一个匹配到的地区就计数并终止本轮
+        // 找到第一个匹配到的地区就收集并终止本轮
         for (const [country, regex] of Object.entries(compiledRegex)) {
             if (regex.test(name)) {
-                countryCounts[country] = (countryCounts[country] || 0) + 1;
                 if (!countryNodes[country]) countryNodes[country] = [];
                 countryNodes[country].push(name);
                 break;    // 避免一个节点同时累计到多个地区
@@ -499,11 +497,11 @@ function parseCountries(config) {
 
     // 将结果对象转成数组形式
     const result = [];
-    for (const [country, count] of Object.entries(countryCounts)) {
-        result.push({ country, count, nodes: countryNodes[country] || [] });
+    for (const [country, nodes] of Object.entries(countryNodes)) {
+        result.push({ country, nodes });
     }
 
-    return result;   // [{ country: 'Japan', count: 12, nodes: ['日本01', '日本02', ...] }, ...]
+    return result;   // [{ country: '日本', nodes: ['日本01', '日本02', ...] }, ...]
 }
 
 
@@ -763,7 +761,7 @@ function buildProxyGroups({
 function main(config) {
     const resultConfig = { proxies: config.proxies };
     // 解析地区与低倍率信息
-    const countryInfo = parseCountries(resultConfig); // [{ country, count }]
+    const countryInfo = parseCountries(resultConfig); // [{ country, nodes }]
     const lowCostNodes = parseLowCost(resultConfig);
     const landingNodes = landing ? parseLandingNodes(resultConfig) : [];
     const countryGroupNames = getCountryGroupNames(countryInfo, countryThreshold);
