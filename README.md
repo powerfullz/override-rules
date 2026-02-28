@@ -65,8 +65,9 @@ https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/conv
 *   `keepalive`：启用 TCP Keep Alive（默认 false）[^fn2]
 *   `fakeip`：DNS 增强模式使用 `fake-ip` 而不是 `redir-host`（开启后可能有助于解决 TUN 模式无法上网的问题，默认 false）
 *   `quic`：允许 QUIC 流量（UDP 443，默认 false）
-*   `regex`：各国家代理组改用 `include-all` + 正则过滤模式写入节点，而非直接枚举节点名称（默认 false）
 *   `threshold`：国家节点数量小于该值时不显示分组 (默认 0)
+
+> 注：各国家代理组现已固定使用 `include-all` + 正则过滤模式（即原 `regex=true` 行为），不再提供此参数。
 
 说明：支持字符串 true/false 或 1/0。
 
@@ -125,19 +126,19 @@ proxies:
 文件命名规则：
 
 ```
-config_lb-{0|1}_landing-{0|1}_ipv6-{0|1}_full-{0|1}_keepalive-{0|1}_fakeip-{0|1}_quic-{0|1}_regex-{0|1}.yaml
+config_lb-{0|1}_landing-{0|1}_ipv6-{0|1}_full-{0|1}_keepalive-{0|1}_fakeip-{0|1}_quic-{0|1}.yaml
 ```
 
 示例（开启 full，其余关闭）：
 
 ```
-https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/yamls/config_lb-0_landing-0_ipv6-0_full-1_keepalive-0_fakeip-0_quic-0_regex-0.yaml
+https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/yamls/config_lb-0_landing-0_ipv6-0_full-1_keepalive-0_fakeip-0_quic-0.yaml
 ```
 
 如果使用镜像：
 
 ```
-https://git.l3zc.com/powerfullz/override-rules/raw/branch/main/yamls/config_lb-0_landing-0_ipv6-0_full-1_keepalive-0_fakeip-0_quic-0_regex-0.yaml
+https://git.l3zc.com/powerfullz/override-rules/raw/branch/main/yamls/config_lb-0_landing-0_ipv6-0_full-1_keepalive-0_fakeip-0_quic-0.yaml
 ```
 
 CI 只是套用一份假的`fake_proxies.json`来生成覆写，所以不可能实现 JS 覆写自动根据节点匹配生成对应代理组的功能，只能做出取舍放入常用地区的节点。如果你有条件使用 Substore，并且想要动态识别国家和传参的灵活性，还是推荐使用 JS 覆写。
