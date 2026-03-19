@@ -881,6 +881,7 @@ function main(config) {
             "tproxy-port": 7893,
             "routing-mark": 7894,
             "allow-lan": true,
+            "bind-address": "*",
             ipv6: ipv6Enabled,
             mode: "rule",
             "unified-delay": true,
