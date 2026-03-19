@@ -13,6 +13,7 @@ DOMAIN,dl.google.com
 DOMAIN,builds.dotnet.microsoft.com
 DOMAIN,downloadmirror.intel.com
 DOMAIN,pkgs.tailscale.com
+DOMAIN,dl.tailscale.com
 
 # Brave
 DOMAIN,updates-cdn.bravesoftware.com
