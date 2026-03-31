@@ -173,7 +173,7 @@ const ruleProviders = {
         behavior: "domain",
         format: "mrs",
         interval: 86400,
-        url: "https://adrules.top/adrules-mihomo.mrs",
+        url: "https://gcore.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs",
         path: "./ruleset/ADBlock.mrs",
     },
     SogouInput: {

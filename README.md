@@ -1,15 +1,15 @@
-## powerfullz 的覆写规则仓库
+## powerfullz 的 Mihomo/Substore 覆写规则
 
-此处存放我用于 Mihomo/Substore 的覆写规则（**不建议用于 Stash**），Inspired by [mihomo-party-org/override-hub](https://github.com/mihomo-party-org/override-hub) 内的 ACL4SSR，具有以下优点：
+本仓库为 Mihomo/Substore 设计，提供高效、灵活的覆写规则（**不建议用于 Stash**）。核心特色如下：
 
-*   集成 [SukkaW/Surge](https://github.com/SukkaW/Surge) 和 [Cats-Team/AdRules](https://github.com/Cats-Team/AdRules) 规则
-*   新增 Truth Social、E-Hentai、TikTok、加密货币等分流规则
-*   移除冗余规则集
-*   引入 [Loyalsoldier/v2ray-rules-dat](https://github.com/Loyalsoldier/v2ray-rules-dat) GeoSite/GeoIP
-*   针对 IP 规则添加 `no-resolve` 参数，避免不必要的本地 DNS 解析，提升上网速度
-*   JS 格式覆写在执行时读取真实节点列表，自动识别国家/地区并将节点名称直接枚举写入各代理组，仅生成订阅中实际存在的分组。例如订阅中不含韩国节点时，「韩国节点」代理组将不会出现在最终配置中。
+* 集成 [SukkaW/Surge](https://github.com/SukkaW/Surge) 与 [217heidai/adblockfilters](https://github.com/217heidai/adblockfilters) 等优质规则，兼容性强，覆盖面广。
+* 针对 Truth Social、E-Hentai、TikTok、加密货币等场景，新增专用分流规则，满足多样化需求。
+* 精简冗余，结构清晰，维护便捷。
+* 深度融合 [Loyalsoldier/v2ray-rules-dat](https://github.com/Loyalsoldier/v2ray-rules-dat) GeoSite/GeoIP，分流更精准。
+* IP 规则默认添加 `no-resolve`，有效减少本地 DNS 解析，提升速度与隐私。
+* 独家 JS 动态覆写：自动识别节点国家/地区，仅生成实际存在的分组，节点名称实时枚举，配置更智能。
 
-谨此声明：本覆写规则为本人自用，现特此公开分享于公共平台。在未有回馈意见的情况下，自然优先满足个人需求及修正自己发现的问题。如有高见，欢迎 Issue、PR。
+> 本项目为本人自用，欢迎交流建议（Issue/PR）。如无特殊反馈，将优先满足个人需求与体验优化。
 
 [点击访问 Forgejo 上的镜像](https://git.l3zc.com/powerfullz/override-rules)
 
