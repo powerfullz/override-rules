@@ -7,7 +7,7 @@
 * 精简冗余，结构清晰，维护便捷。
 * 深度融合 [Loyalsoldier/v2ray-rules-dat](https://github.com/Loyalsoldier/v2ray-rules-dat) GeoSite/GeoIP，分流更精准。
 * IP 规则默认添加 `no-resolve`，有效减少本地 DNS 解析，提升速度与隐私。
-* 独家 JS 动态覆写：自动识别节点国家/地区，仅生成实际存在的分组，节点名称实时枚举，配置更智能。
+* 动态覆写：自动识别节点国家/地区，仅生成实际存在的分组，节点名称实时枚举，配置更智能。
 
 > 本项目为本人自用，欢迎交流建议（Issue/PR）。如无特殊反馈，将优先满足个人需求与体验优化。
 
