@@ -1,12 +1,9 @@
 # 一些我个人收集的，符合「静态资源」代理组用途的域名
 DOMAIN,production.cloudflare.docker.com
 DOMAIN,dl.flathub.org
-DOMAIN-SUFFIX,gvt1.com
-DOMAIN-SUFFIX,gvt3.com
 DOMAIN-SUFFIX,data.microsoft.com
 DOMAIN,assets.ppy.sh
 DOMAIN,autoupdate.termius.com
-DOMAIN-REGEX,downloads[1-9].broadcom.com
 DOMAIN,update.ayugram.one
 DOMAIN,sh.nfs.pub
 DOMAIN,download.calibre-ebook.com
@@ -30,3 +27,8 @@ DOMAIN-SUFFIX,pscdn.co
 
 # Geekbench
 DOMAIN,cdn.geekbench.com
+
+# REGEX
+DOMAIN-REGEX,^gvt\d\.com$
+DOMAIN-REGEX,^downloads\d+\.broadcom\.com$
+DOMAIN-REGEX,^cdn\d{2}\.foxitsoftware\.com$
