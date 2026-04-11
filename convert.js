@@ -269,16 +269,15 @@ const baseRules = [
     `RULE-SET,Crypto,Crypto`,
     `RULE-SET,EHentai,E-Hentai`,
     `RULE-SET,TikTok,TikTok`,
+    "GEOSITE,YOUTUBE,YouTube",
+    "GEOSITE,TELEGRAM,Telegram",
     `RULE-SET,SteamFix,${PROXY_GROUPS.DIRECT}`,
     `RULE-SET,GoogleFCM,${PROXY_GROUPS.DIRECT}`,
-    `DOMAIN,services.googleapis.cn,${PROXY_GROUPS.SELECT}`,
     "GEOSITE,CATEGORY-AI-!CN,AI",
     `GEOSITE,GOOGLE-PLAY@CN,${PROXY_GROUPS.DIRECT}`,
     `GEOSITE,MICROSOFT@CN,${PROXY_GROUPS.DIRECT}`,
-    "GEOSITE,ONEDRIVE,OneDrive",
+    "GEOSITE,APPLE,Apple",
     "GEOSITE,MICROSOFT,Microsoft",
-    "GEOSITE,TELEGRAM,Telegram",
-    "GEOSITE,YOUTUBE,YouTube",
     "GEOSITE,GOOGLE,Google",
     "GEOSITE,NETFLIX,Netflix",
     "GEOSITE,SPOTIFY,Spotify",
@@ -678,14 +677,20 @@ function buildProxyGroups({
             proxies: defaultProxies,
         },
         {
-            name: "AI",
+            name: "AI服务",
             icon: "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/chatgpt.png",
             type: "select",
             proxies: defaultProxies,
         },
         {
-            name: "Crypto",
+            name: "加密货币",
             icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cryptocurrency_3.png",
+            type: "select",
+            proxies: defaultProxies,
+        },
+        {
+            name: "Apple",
+            icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple.png",
             type: "select",
             proxies: defaultProxies,
         },
@@ -696,7 +701,7 @@ function buildProxyGroups({
             proxies: defaultProxies,
         },
         {
-            name: "Microsoft",
+            name: "微软服务",
             icon: "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Microsoft_Copilot.png",
             type: "select",
             proxies: defaultProxies,
@@ -708,7 +713,7 @@ function buildProxyGroups({
             proxies: defaultProxies,
         },
         {
-            name: "Bilibili",
+            name: "哔哩哔哩",
             icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/bilibili.png",
             type: "select",
             proxies:
@@ -717,7 +722,7 @@ function buildProxyGroups({
                     : defaultProxiesDirect,
         },
         {
-            name: "Bahamut",
+            name: "巴哈姆特",
             icon: "https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Bahamut.png",
             type: "select",
             proxies: hasTW
@@ -755,7 +760,7 @@ function buildProxyGroups({
             proxies: defaultProxies,
         },
         {
-            name: "Truth Social",
+            name: "真相社交",
             icon: "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/TruthSocial.png",
             type: "select",
             proxies: hasUS
@@ -763,13 +768,7 @@ function buildProxyGroups({
                 : defaultProxies,
         },
         {
-            name: "OneDrive",
-            icon: "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Onedrive.png",
-            type: "select",
-            proxies: defaultProxies,
-        },
-        {
-            name: "PikPak",
+            name: "PikPak网盘",
             icon: "https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/PikPak.png",
             type: "select",
             proxies: defaultProxies,

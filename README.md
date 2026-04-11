@@ -101,9 +101,7 @@ https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/conv
 
 ~~**Steam 修复**： 这代理组用于让 Steam 客户端调用国内 CDN 及 P2P 网络下载，节省大量流量。如果需要代理 Steam 所有的下载请求，将其设置为「节点选择」即可。~~
 
-~~Play 商店修复和 Steam 修复代理组已经默认直连，又省流量又快，Why not?~~
-
-Google Play 的国内 CDN 似乎已经失效，目前已经直接代理`services.googleapis.cn`，Steam 依然可以使用国内 CDN 和 P2P 下载。
+Play 商店修复和 Steam 修复代理组已经默认直连，又省流量又快，Why not?
 
 ### 关于链式代理的说明
 
