@@ -314,11 +314,11 @@ rules:
   - RULE-SET,ADBlock,广告拦截
   - RULE-SET,AdditionalFilter,广告拦截
   - RULE-SET,SogouInput,搜狗输入法
-  - DOMAIN-SUFFIX,truthsocial.com,Truth Social
+  - DOMAIN-SUFFIX,truthsocial.com,真相社交
   - RULE-SET,StaticResources,静态资源
   - RULE-SET,CDNResources,静态资源
   - RULE-SET,AdditionalCDNResources,静态资源
-  - RULE-SET,Crypto,Crypto
+  - RULE-SET,Crypto,加密货币
   - RULE-SET,EHentai,E-Hentai
   - RULE-SET,TikTok,TikTok
   - GEOSITE,YOUTUBE,YouTube
@@ -329,13 +329,13 @@ rules:
   - GEOSITE,GOOGLE-PLAY@CN,直连
   - GEOSITE,MICROSOFT@CN,直连
   - GEOSITE,APPLE,Apple
-  - GEOSITE,MICROSOFT,Microsoft
+  - GEOSITE,MICROSOFT,微软服务
   - GEOSITE,GOOGLE,Google
   - GEOSITE,NETFLIX,Netflix
   - GEOSITE,SPOTIFY,Spotify
-  - GEOSITE,BAHAMUT,Bahamut
-  - GEOSITE,BILIBILI,Bilibili
-  - GEOSITE,PIKPAK,PikPak
+  - GEOSITE,BAHAMUT,巴哈姆特
+  - GEOSITE,BILIBILI,哔哩哔哩
+  - GEOSITE,PIKPAK,PikPak网盘
   - GEOSITE,GFW,选择代理
   - GEOSITE,CN,直连
   - GEOSITE,PRIVATE,直连
