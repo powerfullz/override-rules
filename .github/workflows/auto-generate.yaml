@@ -42,17 +42,3 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "CI: Auto Generate Files"
-
-      - name: Push to Forgejo Mirror
-        env:
-          FORGEJO_PAT: ${{ secrets.FORGEJO_PAT }}
-          FORGEJO_REPO_URL: ${{ secrets.FORGEJO_REPO_URL }}
-        run: |
-          echo "Syncing to Forgejo..."
-
-          SYNC_URL=$(echo "$FORGEJO_REPO_URL" | sed "s|://|://$FORGEJO_PAT@|")
-          
-          git update-ref -d refs/remotes/origin/HEAD || true
-
-          git push "$SYNC_URL" "refs/heads/*:refs/heads/*" "refs/tags/*:refs/tags/*" --force --prune
-          echo "Sync completed."
