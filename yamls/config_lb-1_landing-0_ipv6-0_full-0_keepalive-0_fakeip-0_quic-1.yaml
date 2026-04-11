@@ -45,19 +45,23 @@ proxy-groups:
       - 低倍率节点
       - 手动选择
       - 直连
-  - name: AI
+  - name: AI服务
     icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/chatgpt.png
     type: select
     proxies: *a1
-  - name: Crypto
+  - name: 加密货币
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cryptocurrency_3.png
+    type: select
+    proxies: *a1
+  - name: Apple
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple.png
     type: select
     proxies: *a1
   - name: Google
     icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Google.png
     type: select
     proxies: *a1
-  - name: Microsoft
+  - name: 微软服务
     icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Microsoft_Copilot.png
     type: select
     proxies: *a1
@@ -65,14 +69,14 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png
     type: select
     proxies: *a1
-  - name: Bilibili
+  - name: 哔哩哔哩
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/bilibili.png
     type: select
     proxies:
       - 直连
       - 台湾节点
       - 香港节点
-  - name: Bahamut
+  - name: 巴哈姆特
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Bahamut.png
     type: select
     proxies:
@@ -100,18 +104,14 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png
     type: select
     proxies: *a1
-  - name: Truth Social
+  - name: 真相社交
     icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/TruthSocial.png
     type: select
     proxies:
       - 美国节点
       - 选择代理
       - 手动选择
-  - name: OneDrive
-    icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Onedrive.png
-    type: select
-    proxies: *a1
-  - name: PikPak
+  - name: PikPak网盘
     icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/PikPak.png
     type: select
     proxies: *a1
@@ -183,21 +183,21 @@ proxy-groups:
       - 手动选择
       - 故障转移
       - 静态资源
-      - AI
-      - Crypto
+      - AI服务
+      - 加密货币
+      - Apple
       - Google
-      - Microsoft
+      - 微软服务
       - YouTube
-      - Bilibili
-      - Bahamut
+      - 哔哩哔哩
+      - 巴哈姆特
       - Netflix
       - TikTok
       - Spotify
       - E-Hentai
       - Telegram
-      - Truth Social
-      - OneDrive
-      - PikPak
+      - 真相社交
+      - PikPak网盘
       - SSH(22端口)
       - 搜狗输入法
       - 直连
@@ -297,16 +297,15 @@ rules:
   - RULE-SET,Crypto,Crypto
   - RULE-SET,EHentai,E-Hentai
   - RULE-SET,TikTok,TikTok
+  - GEOSITE,YOUTUBE,YouTube
+  - GEOSITE,TELEGRAM,Telegram
   - RULE-SET,SteamFix,直连
   - RULE-SET,GoogleFCM,直连
-  - DOMAIN,services.googleapis.cn,选择代理
   - GEOSITE,CATEGORY-AI-!CN,AI
   - GEOSITE,GOOGLE-PLAY@CN,直连
   - GEOSITE,MICROSOFT@CN,直连
-  - GEOSITE,ONEDRIVE,OneDrive
+  - GEOSITE,APPLE,Apple
   - GEOSITE,MICROSOFT,Microsoft
-  - GEOSITE,TELEGRAM,Telegram
-  - GEOSITE,YOUTUBE,YouTube
   - GEOSITE,GOOGLE,Google
   - GEOSITE,NETFLIX,Netflix
   - GEOSITE,SPOTIFY,Spotify
