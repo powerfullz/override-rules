@@ -33,7 +33,7 @@
 
 **Clash Party/Sparkle**
 
-1.  推荐直接使用 JS 动态覆写：`https://gcore.jsdelivr.net/gh/powerfullz/override-rules@refs/heads/main/convert.min.js`
+1.  推荐直接使用 JS 动态覆写：`https://gcore.jsdelivr.net/gh/powerfullz/override-rules@1/convert.min.js`
 2.  打开 Clash Party → 左侧「覆写」→ 粘贴上述链接导入。
 3.  打开「订阅管理」→ 目标订阅右上角三个点 → 「编辑信息」→ 选择该覆写脚本 → 保存。
 4.  Clash Party 不支持给脚本传入参数，如果需要传入参数，请使用集成的 Substore。
@@ -47,7 +47,7 @@
 2025/06/17 更新：新增 JavaScript 格式覆写，支持传入参数，更易于维护，已经成为首选方式。例如，有链式代理需求，使用如下覆写脚本链接即可：
 
 ```
-https://gcore.jsdelivr.net/gh/powerfullz/override-rules@refs/heads/main/convert.min.js#landing=true
+https://gcore.jsdelivr.net/gh/powerfullz/override-rules@1/convert.min.js#landing=true
 ```
 
 或者直接使用`raw.githubusercontent.com`原始链接：
