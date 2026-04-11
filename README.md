@@ -50,7 +50,7 @@
 https://gcore.jsdelivr.net/gh/powerfullz/override-rules@1/convert.min.js#landing=true
 ```
 
-或者直接使用`raw.githubusercontent.com`原始链接：
+如果你想要第一时间体验我新加入的 ~~Bug~~ 功能，可以直接使用`raw.githubusercontent.com`原始链接：
 
 ```
 https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/main/convert.min.js
