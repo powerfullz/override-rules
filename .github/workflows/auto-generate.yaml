@@ -1,4 +1,4 @@
-name: Generate Everything We Need And Push to Forgejo
+name: Generate YAML Files and Minify convert.js
 
 on:
   push:
