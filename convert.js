@@ -17,6 +17,17 @@ https://github.com/powerfullz/override-rules
 const NODE_SUFFIX = "节点";
 const CDN_URL = "https://gcore.jsdelivr.net";
 
+const LOW_COST_FILTER = "0\\.[0-5]|低倍率|省流|实验性";
+const LOW_COST_REGEX = new RegExp(LOW_COST_FILTER, "i");
+const LANDING_REGEX = /家宽|家庭宽带|商宽|商业宽带|星链|Starlink|落地/i;
+/**
+ * `LANDING_PATTERN` 与 `LANDING_REGEX` 描述同一规则，但格式不同：
+ * - `LANDING_REGEX`：JS `RegExp` 对象，供脚本内部过滤节点时使用（用 `/i` flag 表示不区分大小写）。
+ * - `LANDING_PATTERN`：字符串，写入 YAML 的 `filter` / `exclude-filter` 字段，
+ *   其中 `(?i)` 前缀是 Clash/Mihomo 的不区分大小写语法。
+ */
+const LANDING_PATTERN = "(?i)家宽|家庭宽带|商宽|商业宽带|星链|Starlink|落地";
+
 function parseBool(value) {
     if (typeof value === "boolean") return value;
     if (typeof value === "string") {
@@ -453,16 +464,6 @@ const countriesMeta = {
     },
 };
 
-const LOW_COST_REGEX = /0\.[0-5]|低倍率|省流|大流量|实验性/i;
-const LANDING_REGEX = /家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地/i;
-/**
- * `LANDING_PATTERN` 与 `LANDING_REGEX` 描述同一规则，但格式不同：
- * - `LANDING_REGEX`：JS `RegExp` 对象，供脚本内部过滤节点时使用（用 `/i` flag 表示不区分大小写）。
- * - `LANDING_PATTERN`：字符串，写入 YAML 的 `filter` / `exclude-filter` 字段，
- *   其中 `(?i)` 前缀是 Clash/Mihomo 的不区分大小写语法。
- */
-const LANDING_PATTERN = "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地";
-
 function parseLowCost(config) {
     return (config.proxies || [])
         .filter((proxy) => LOW_COST_REGEX.test(proxy.name))
@@ -522,8 +523,6 @@ function parseCountries(config) {
 
 function buildCountryProxyGroups({ countries, landing, loadBalance, regexFilter, countryInfo }) {
     const groups = [];
-    const baseExcludeFilter = "0\\.[0-5]|低倍率|省流|大流量|实验性";
-    const landingExcludeFilter = LANDING_PATTERN;
     const groupType = loadBalance ? "load-balance" : "url-test";
 
     /**
@@ -564,8 +563,8 @@ function buildCountryProxyGroups({ countries, landing, loadBalance, regexFilter,
                 "include-all": true,
                 filter: meta.pattern,
                 "exclude-filter": landing
-                    ? `${landingExcludeFilter}|${baseExcludeFilter}`
-                    : baseExcludeFilter,
+                    ? `${LANDING_PATTERN}|${LOW_COST_FILTER}`
+                    : LOW_COST_FILTER,
                 type: groupType,
             };
         }
