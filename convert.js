@@ -132,11 +132,11 @@ function buildBaseLists({ landing, lowCostNodes, countryGroupNames }) {
     const lowCost = lowCostNodes.length > 0 || regexFilter;
 
     /**
-     * "选择代理"组的顶层候选列表：故障转移 → 自动选择 → 落地节点（可选）→ 各国家组 → 低倍率（可选）→ 手动 → 直连。
+     * "选择代理"组的顶层候选列表：自动选择 → 故障转移 → 落地节点（可选）→ 各国家组 → 低倍率（可选）→ 手动 → 直连。
      */
     const defaultSelector = buildList(
-        PROXY_GROUPS.FALLBACK,
         PROXY_GROUPS.AUTO,
+        PROXY_GROUPS.FALLBACK,
         landing && PROXY_GROUPS.LANDING,
         countryGroupNames,
         lowCost && PROXY_GROUPS.LOW_COST,
