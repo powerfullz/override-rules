@@ -17,18 +17,26 @@ https://github.com/powerfullz/override-rules
 const NODE_SUFFIX = "节点";
 const CDN_URL = "https://gcore.jsdelivr.net";
 
-const LOW_COST_FILTER = "0\\.[0-5]|低倍率|省流|实验性";
-const LOW_COST_REGEX = new RegExp(LOW_COST_FILTER, "i");
-const LANDING_REGEX = /家宽|家庭宽带|商宽|商业宽带|星链|Starlink|落地/i;
 /**
  * `LANDING_PATTERN` 与 `LANDING_REGEX` 描述同一规则，但格式不同：
  * - `LANDING_REGEX`：JS `RegExp` 对象，供脚本内部过滤节点时使用（用 `/i` flag 表示不区分大小写）。
  * - `LANDING_PATTERN`：字符串，写入 YAML 的 `filter` / `exclude-filter` 字段，
  *   其中 `(?i)` 前缀是 Clash/Mihomo 的不区分大小写语法。
  */
+const LOW_COST_FILTER = "0\\.[0-5]|低倍率|省流|实验性";
+const LOW_COST_REGEX = new RegExp(LOW_COST_FILTER, "i");
+const LANDING_REGEX = /家宽|家庭宽带|商宽|商业宽带|星链|Starlink|落地/i;
 const LANDING_PATTERN = "(?i)家宽|家庭宽带|商宽|商业宽带|星链|Starlink|落地";
 
-const rawArgs = typeof $arguments !== "undefined" ? $arguments : {};
+const rawArgs = (() => {
+    try {
+        return $arguments;
+    } catch {
+        console.log("[powerfullz 的覆写脚本] 未检测到传入参数，使用默认参数。", {});
+        return {};
+    }
+})();
+
 const {
     loadBalance,
     landing,
