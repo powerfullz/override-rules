@@ -3,8 +3,8 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png
     type: select
     proxies:
-      - 故障转移
       - 自动选择
+      - 故障转移
       - 落地节点
       - 香港节点
       - 台湾节点
