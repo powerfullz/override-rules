@@ -1,6 +1,6 @@
 ## powerfullz 的 Mihomo/Substore 覆写规则
 
-[![](https://data.jsdelivr.com/v1/package/gh/powerfullz/override-rules/badge)](https://www.jsdelivr.com/package/gh/powerfullz/override-rules)
+[![](https://data.jsdelivr.com/v1/package/gh/powerfullz/override-rules/badge?style=rounded)](https://www.jsdelivr.com/package/gh/powerfullz/override-rules)
 
 本仓库为 Mihomo/Substore 设计，提供高效、灵活的覆写规则（**不建议用于 Stash**）。核心特色如下：
 
