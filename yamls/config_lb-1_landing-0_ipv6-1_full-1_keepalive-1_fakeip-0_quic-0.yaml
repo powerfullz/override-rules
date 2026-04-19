@@ -21,6 +21,7 @@ proxy-groups:
     type: select
     proxies:
       - 故障转移
+      - 自动选择
       - 香港节点
       - 台湾节点
       - 新加坡节点
@@ -33,22 +34,6 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/shindgewongxj/WHATSINStash@master/icon/select.png
     include-all: true
     type: select
-  - name: 故障转移
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Bypass.png
-    type: fallback
-    url: https://cp.cloudflare.com/generate_204
-    proxies:
-      - 香港节点
-      - 台湾节点
-      - 新加坡节点
-      - 日本节点
-      - 美国节点
-      - 低倍率节点
-      - 手动选择
-      - DIRECT
-    interval: 180
-    tolerance: 20
-    lazy: false
   - name: 静态资源
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cloudflare.png
     type: select
@@ -70,20 +55,16 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cryptocurrency_3.png
     type: select
     proxies: *a1
-  - name: Apple
+  - name: 苹果服务
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple.png
     type: select
     proxies: *a1
-  - name: Google
+  - name: 谷歌服务
     icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Google.png
     type: select
     proxies: *a1
   - name: 微软服务
     icon: https://gcore.jsdelivr.net/gh/powerfullz/override-rules@master/icons/Microsoft_Copilot.png
-    type: select
-    proxies: *a1
-  - name: YouTube
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png
     type: select
     proxies: *a1
   - name: 哔哩哔哩
@@ -101,6 +82,10 @@ proxy-groups:
       - 选择代理
       - 手动选择
       - 直连
+  - name: YouTube
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png
+    type: select
+    proxies: *a1
   - name: Netflix
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netflix.png
     type: select
@@ -161,6 +146,30 @@ proxy-groups:
     url: https://cp.cloudflare.com/generate_204
     include-all: true
     filter: (?i)0\.[0-5]|低倍率|省流|大流量|实验性
+  - name: 自动选择
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png
+    type: url-test
+    url: https://cp.cloudflare.com/generate_204
+    proxies: &a2
+      - 香港节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 美国节点
+      - 低倍率节点
+      - 手动选择
+      - DIRECT
+    interval: 60
+    tolerance: 20
+    lazy: false
+  - name: 故障转移
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Available_1.png
+    type: fallback
+    url: https://cp.cloudflare.com/generate_204
+    proxies: *a2
+    interval: 60
+    tolerance: 20
+    lazy: false
   - name: 香港节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png
     include-all: true
@@ -198,16 +207,15 @@ proxy-groups:
     proxies:
       - 选择代理
       - 手动选择
-      - 故障转移
       - 静态资源
       - AI服务
       - 加密货币
-      - Apple
-      - Google
+      - 苹果服务
+      - 谷歌服务
       - 微软服务
-      - YouTube
       - 哔哩哔哩
       - 巴哈姆特
+      - YouTube
       - Netflix
       - TikTok
       - Spotify
@@ -220,6 +228,8 @@ proxy-groups:
       - 直连
       - 广告拦截
       - 低倍率节点
+      - 自动选择
+      - 故障转移
       - 香港节点
       - 台湾节点
       - 新加坡节点
