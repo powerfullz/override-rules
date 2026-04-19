@@ -115,6 +115,7 @@ function stripNodeSuffix(groupNames) {
 const PROXY_GROUPS = {
     SELECT: "选择代理",
     MANUAL: "手动选择",
+    AUTO: "自动选择",
     FALLBACK: "故障转移",
     DIRECT: "直连",
     LANDING: "落地节点",
@@ -131,10 +132,11 @@ function buildBaseLists({ landing, lowCostNodes, countryGroupNames }) {
     const lowCost = lowCostNodes.length > 0 || regexFilter;
 
     /**
-     * "选择代理"组的顶层候选列表：故障转移 → 落地节点（可选）→ 各国家组 → 低倍率（可选）→ 手动 → 直连。
+     * "选择代理"组的顶层候选列表：故障转移 → 自动选择 → 落地节点（可选）→ 各国家组 → 低倍率（可选）→ 手动 → 直连。
      */
     const defaultSelector = buildList(
         PROXY_GROUPS.FALLBACK,
+        PROXY_GROUPS.AUTO,
         landing && PROXY_GROUPS.LANDING,
         countryGroupNames,
         lowCost && PROXY_GROUPS.LOW_COST,
@@ -165,7 +167,7 @@ function buildBaseLists({ landing, lowCostNodes, countryGroupNames }) {
     );
 
     /**
-     * "故障转移"组的候选列表：落地节点（可选）→ 各国家组 → 低倍率（可选）→ 手动 → 直连。
+     * "故障转移"和"自动选择"组的候选列表：落地节点（可选）→ 各国家组 → 低倍率（可选）→ 手动 → 直连。
      * 不包含"选择代理"自身，避免循环引用。
      */
     const defaultFallback = buildList(
@@ -661,16 +663,6 @@ function buildProxyGroups({
               }
             : null,
         {
-            name: PROXY_GROUPS.FALLBACK,
-            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Bypass.png`,
-            type: "fallback",
-            url: "https://cp.cloudflare.com/generate_204",
-            proxies: defaultFallback,
-            interval: 180,
-            tolerance: 20,
-            lazy: false,
-        },
-        {
             name: "静态资源",
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Cloudflare.png`,
             type: "select",
@@ -689,13 +681,13 @@ function buildProxyGroups({
             proxies: defaultProxies,
         },
         {
-            name: "Apple",
+            name: "苹果服务",
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Apple.png`,
             type: "select",
             proxies: defaultProxies,
         },
         {
-            name: "Google",
+            name: "谷歌服务",
             icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/Google.png`,
             type: "select",
             proxies: defaultProxies,
@@ -703,12 +695,6 @@ function buildProxyGroups({
         {
             name: "微软服务",
             icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/Microsoft_Copilot.png`,
-            type: "select",
-            proxies: defaultProxies,
-        },
-        {
-            name: "YouTube",
-            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/YouTube.png`,
             type: "select",
             proxies: defaultProxies,
         },
@@ -728,6 +714,12 @@ function buildProxyGroups({
             proxies: hasTW
                 ? ["台湾节点", PROXY_GROUPS.SELECT, PROXY_GROUPS.MANUAL, PROXY_GROUPS.DIRECT]
                 : defaultProxies,
+        },
+        {
+            name: "YouTube",
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/YouTube.png`,
+            type: "select",
+            proxies: defaultProxies,
         },
         {
             name: "Netflix",
@@ -808,6 +800,26 @@ function buildProxyGroups({
                       : { "include-all": true, filter: "(?i)0\\.[0-5]|低倍率|省流|大流量|实验性" }),
               }
             : null,
+        {
+            name: PROXY_GROUPS.AUTO,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Auto.png`,
+            type: "url-test",
+            url: "https://cp.cloudflare.com/generate_204",
+            proxies: defaultFallback,
+            interval: 60,
+            tolerance: 20,
+            lazy: false,
+        },
+        {
+            name: PROXY_GROUPS.FALLBACK,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Available_1.png`,
+            type: "fallback",
+            url: "https://cp.cloudflare.com/generate_204",
+            proxies: defaultFallback,
+            interval: 60,
+            tolerance: 20,
+            lazy: false,
+        },
         ...countryProxyGroups,
     ].filter(Boolean);
 }
