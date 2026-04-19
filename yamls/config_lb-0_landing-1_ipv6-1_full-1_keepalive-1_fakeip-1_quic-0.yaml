@@ -369,16 +369,16 @@ rules:
   - RULE-SET,Crypto,加密货币
   - RULE-SET,EHentai,E-Hentai
   - RULE-SET,TikTok,TikTok
-  - GEOSITE,YOUTUBE,YouTube
-  - GEOSITE,TELEGRAM,Telegram
   - RULE-SET,SteamFix,直连
   - RULE-SET,GoogleFCM,直连
+  - GEOSITE,YOUTUBE,YouTube
+  - GEOSITE,TELEGRAM,Telegram
   - GEOSITE,CATEGORY-AI-!CN,AI服务
   - GEOSITE,GOOGLE-PLAY@CN,直连
   - GEOSITE,MICROSOFT@CN,直连
-  - GEOSITE,APPLE,Apple
+  - GEOSITE,APPLE,苹果服务
   - GEOSITE,MICROSOFT,微软服务
-  - GEOSITE,GOOGLE,Google
+  - GEOSITE,GOOGLE,谷歌服务
   - GEOSITE,NETFLIX,Netflix
   - GEOSITE,SPOTIFY,Spotify
   - GEOSITE,BAHAMUT,巴哈姆特
