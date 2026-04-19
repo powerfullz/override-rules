@@ -422,10 +422,12 @@ function buildBaseLists({ landing, lowCostNodes, countryGroupNames }) {
     );
 
     /**
-     * 大多数策略组的通用候选列表：以"选择代理"为首选，再跟各国家组、低倍率、手动、直连。
+     * 大多数策略组的通用候选列表：以"选择代理"为首选，再跟落地节点（可选）、各国家组、低倍率、手动、直连。
+     * 将"落地节点"前置，方便 AI / 静态资源 等功能组直接下钻选择具体落地节点，无需绕道"手动选择"。
      */
     const defaultProxies = buildList(
         PROXY_GROUPS.SELECT,
+        landing && PROXY_GROUPS.LANDING,
         countryGroupNames,
         lowCost && PROXY_GROUPS.LOW_COST,
         PROXY_GROUPS.MANUAL,
@@ -621,6 +623,7 @@ function buildProxyGroups({
     countryProxyGroups,
     lowCostNodes,
     landingNodes,
+    nonLandingProxyNames,
     defaultProxies,
     defaultProxiesDirect,
     defaultSelector,
@@ -633,17 +636,6 @@ function buildProxyGroups({
     const hasTW = countries.includes("台湾");
     const hasHK = countries.includes("香港");
     const hasUS = countries.includes("美国");
-
-    /**
-     * "前置代理"组的候选列表：从 `defaultSelector` 中移除"落地节点"和"故障转移"，
-     * 避免前置代理与落地节点形成循环引用，以及与故障转移组相互嵌套。
-     * 仅在 `landing=true` 时使用；否则置为空数组。
-     */
-    const frontProxySelector = landing
-        ? defaultSelector.filter(
-              (name) => name !== PROXY_GROUPS.LANDING && name !== PROXY_GROUPS.FALLBACK
-          )
-        : [];
 
     return [
         {
@@ -664,17 +656,14 @@ function buildProxyGroups({
                   icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Area.png`,
                   type: "select",
                   /**
-                   * regex 模式：`include-all` 拉取所有节点，`exclude-filter` 排除落地节点，
-                   * 同时在 `proxies` 里附加手动指定的候选组名列表（各国家组等）。
-                   * 枚举模式：直接列出候选组名（落地节点已在构建 `frontProxySelector` 时过滤）。
+                   * 用作落地节点 `dialer-proxy` 目标的中转组，必须避免任何可能
+                   * 在 Stash 静态 loop 检测中回指落地节点的引用，因此：
+                   *   - 不使用 `include-all`（防止展开后含落地节点）
+                   *   - 不引用任何组（手动选择 / 自动选择 / 国家组等均含 include-all，规避一切风险）
+                   *   - 由脚本在生成时枚举所有非落地节点名，形成扁平列表
+                   * 末尾保留 `DIRECT` 作为"临时绕过中转"的逃生出口。
                    */
-                  ...(regexFilter
-                      ? {
-                            "include-all": true,
-                            "exclude-filter": LANDING_PATTERN,
-                            proxies: frontProxySelector,
-                        }
-                      : { proxies: frontProxySelector }),
+                  proxies: [...nonLandingProxyNames, "DIRECT"],
               }
             : null,
         landing
@@ -868,6 +857,16 @@ function main(config) {
     const countries = stripNodeSuffix(countryGroupNames);
 
     /**
+     * 提取所有非落地节点名，供"前置代理"组作为 `dialer-proxy` 目标使用。
+     * 在脚本层枚举而非运行时 include-all，以彻底规避 Stash 的静态 loop 检测。
+     */
+    const nonLandingProxyNames = landing
+        ? (resultConfig.proxies || [])
+              .map((proxy) => proxy.name)
+              .filter((name) => name && !LANDING_REGEX.test(name))
+        : [];
+
+    /**
      * 构建各类通用候选列表，供后续策略组复用。
      */
     const { defaultProxies, defaultProxiesDirect, defaultSelector, defaultFallback } =
@@ -893,6 +892,7 @@ function main(config) {
         countryProxyGroups,
         lowCostNodes,
         landingNodes,
+        nonLandingProxyNames,
         defaultProxies,
         defaultProxiesDirect,
         defaultSelector,
@@ -902,15 +902,24 @@ function main(config) {
     /**
      * GLOBAL 组需要枚举所有已生成的策略组名称，因此在其他组构建完成后追加，
      * 同时保留 `include-all` 以确保与各内核的兼容性。
+     *
+     * 例外：如果订阅中存在带 `dialer-proxy` 的节点（典型场景是链式代理的落地节点），
+     * 则跳过生成 GLOBAL 组。原因是 Stash 将 `GLOBAL` 视为保留名并做特殊展开，
+     * 只要 config 里定义了自定义 GLOBAL 组，无论是否使用 `include-all`，
+     * Stash 都会判定含 `dialer-proxy` 的节点形成循环引用而拒绝加载。
+     * 省略 GLOBAL 后，Stash/Mihomo 内核仍提供内置的 GLOBAL，功能不受影响。
      */
-    const globalProxies = proxyGroups.map((item) => item.name);
-    proxyGroups.push({
-        name: PROXY_GROUPS.GLOBAL,
-        icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Global.png`,
-        "include-all": true,
-        type: "select",
-        proxies: globalProxies,
-    });
+    const hasDialerProxy = (resultConfig.proxies || []).some((proxy) => proxy["dialer-proxy"]);
+    if (!hasDialerProxy) {
+        const globalProxies = proxyGroups.map((item) => item.name);
+        proxyGroups.push({
+            name: PROXY_GROUPS.GLOBAL,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Global.png`,
+            "include-all": true,
+            type: "select",
+            proxies: globalProxies,
+        });
+    }
 
     const finalRules = buildRules({ quicEnabled });
 
