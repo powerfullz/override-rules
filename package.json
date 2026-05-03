@@ -28,7 +28,7 @@
     "@typescript/native-preview": "^7.0.0-dev.20260426.1",
     "conventional-changelog-cli": "^5.0.0",
     "esbuild": "^0.28.0",
-    "eslint": "^10.0.2",
+    "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
