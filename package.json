@@ -20,7 +20,7 @@
     "postversion": "git push --follow-tags"
   },
   "dependencies": {
-    "yaml": "^2.5.0"
+    "yaml": "^2.8.4"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
