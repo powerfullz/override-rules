@@ -201,7 +201,7 @@ export function buildProxyGroups({
         },
         {
             name: PROXY_GROUPS.TELEGRAM,
-            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Telegram_X.png`,
+            icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/Telegram.png`,
             type: "select",
             proxies: defaultProxies,
         },
