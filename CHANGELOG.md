@@ -1,3 +1,14 @@
+## [2.1.1](https://github.com/powerfullz/override-rules/compare/src-v2.1.0...src-v2.1.1) (2026-05-06)
+
+
+### Bug Fixes
+
+* make AI category more prioritized ([71c10c1](https://github.com/powerfullz/override-rules/commit/71c10c154c61cc2db2420c7346cb8daa82e4a572))
+
+
+### Features
+
+* improve telegram icon ([a1fa360](https://github.com/powerfullz/override-rules/commit/a1fa360fcc18f8de5d40f82e38273808a4f0c67e))
 # [2.1.0](https://github.com/powerfullz/override-rules/compare/src-v2.0.16...src-v2.1.0) (2026-04-26)
 
 
