@@ -31,7 +31,7 @@
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
-    "lint-staged": "^16.4.0",
+    "lint-staged": "^17.0.4",
     "prettier": "^3.8.1",
     "tsx": "^4.20.6",
     "typescript": "^6.0.3",
