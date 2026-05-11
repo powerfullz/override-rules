@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^25.6.0",
+    "@types/node": "^25.6.2",
     "@typescript/native-preview": "^7.0.0-dev.20260503.1",
     "conventional-changelog-cli": "^5.0.0",
     "esbuild": "^0.28.0",
