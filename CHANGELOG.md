@@ -1,3 +1,4 @@
+# [2.2.0](https://github.com/powerfullz/override-rules/compare/src-v2.1.1...src-v2.2.0) (2026-05-13)
 ## [2.1.1](https://github.com/powerfullz/override-rules/compare/src-v2.1.0...src-v2.1.1) (2026-05-06)
 
 
