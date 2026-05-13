@@ -1,5 +1,3 @@
-// ─── ScriptArgs ───────────────────────────────────────────────────────────────
-
 export interface ScriptArgs {
     loadbalance?: string;
     landing?: string;
@@ -10,9 +8,8 @@ export interface ScriptArgs {
     quic?: string;
     regex?: string;
     threshold?: string;
+    tun?: string;
 }
-
-// ─── FeatureFlags ─────────────────────────────────────────────────────────────
 
 export interface FeatureFlags {
     loadBalance: boolean;
@@ -24,9 +21,8 @@ export interface FeatureFlags {
     quicEnabled: boolean;
     regexFilter: boolean;
     countryThreshold: number;
+    tunEnabled: boolean;
 }
-
-// ─── ProxyNode ────────────────────────────────────────────────────────────────
 
 export interface ProxyNode {
     name: string;
@@ -35,8 +31,6 @@ export interface ProxyNode {
     port?: number;
     [key: string]: unknown;
 }
-
-// ─── ProxyGroup Discriminated Union ──────────────────────────────────────────
 
 export type ProxyGroupType = "select" | "url-test" | "load-balance" | "fallback";
 
@@ -83,8 +77,6 @@ export type ProxyGroup =
     | LoadBalanceProxyGroup
     | FallbackProxyGroup;
 
-// ─── DNS & Sniffer ────────────────────────────────────────────────────────────
-
 export interface SnifferProtocolConfig {
     ports: number[];
 }
@@ -101,6 +93,15 @@ export interface SnifferConfig {
     "skip-domain": string[];
 }
 
+export interface TunConfig {
+    enable: boolean;
+    stack: "gvisor" | "system" | "mixed";
+    device: string;
+    "route-exclude-address": string[];
+    "dns-hijack": string[];
+    mtu: number;
+}
+
 export interface DnsConfig {
     enable: boolean;
     ipv6: boolean;
@@ -112,8 +113,6 @@ export interface DnsConfig {
     "proxy-server-nameserver": string[];
     "fake-ip-filter"?: string[];
 }
-
-// ─── RuleProvider ─────────────────────────────────────────────────────────────
 
 export type RuleProviderType = "http" | "file";
 export type RuleProviderBehavior = "domain" | "classical" | "ipcidr";
@@ -127,8 +126,6 @@ export interface RuleProvider {
     url: string;
     path: string;
 }
-
-// ─── ClashConfig ──────────────────────────────────────────────────────────────
 
 export interface GeoxUrl {
     geoip?: string;
@@ -149,6 +146,7 @@ export interface ClashConfig {
     "rule-providers"?: Record<string, RuleProvider>;
     dns?: DnsConfig;
     sniffer?: SnifferConfig;
+    tun?: TunConfig;
     "geodata-mode"?: boolean;
     "geox-url"?: GeoxUrl;
     "mixed-port"?: number;
@@ -168,8 +166,6 @@ export interface ClashConfig {
     "disable-keep-alive"?: boolean;
     profile?: ClashProfile;
 }
-
-// ─── Country / Node helpers ───────────────────────────────────────────────────
 
 export interface CountryMeta {
     weight?: number;

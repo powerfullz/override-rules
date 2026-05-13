@@ -30,6 +30,7 @@ import {
 import { buildRules } from "./rules";
 import { ruleProviders } from "./rule_providers";
 import { buildDns, snifferConfig } from "./dns";
+import { buildTunConfig } from "./tun";
 import { buildBaseLists } from "./selectors";
 import type { ClashConfig, ScriptArgs } from "./types";
 
@@ -61,6 +62,7 @@ const {
     fakeIPEnabled,
     quicEnabled,
     regexFilter,
+    tunEnabled,
     countryThreshold,
 } = buildFeatureFlags(rawArgs);
 
@@ -146,6 +148,7 @@ function main(config: ClashConfig): ClashConfig {
         rules: finalRules,
         sniffer: snifferConfig,
         dns: buildDns({ fakeIPEnabled, ipv6Enabled }),
+        tun: buildTunConfig(tunEnabled),
         "geodata-mode": true,
         "geox-url": geoxURL,
     };

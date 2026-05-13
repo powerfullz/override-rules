@@ -10,6 +10,7 @@ const FEATURE_FLAG_DEFAULTS = {
     fakeIPEnabled: true,
     quicEnabled: false,
     regexFilter: false,
+    tunEnabled: false,
 } as const;
 
 /**
@@ -28,11 +29,11 @@ export function buildFeatureFlags(args: ScriptArgs): FeatureFlags {
     flags.ipv6Enabled = parseBool(args.ipv6);
     flags.fullConfig = parseBool(args.full);
     flags.keepAliveEnabled = parseBool(args.keepalive);
-    flags.fakeIPEnabled =
-        args.fakeip !== undefined ? parseBool(args.fakeip) : FEATURE_FLAG_DEFAULTS.fakeIPEnabled;
+    flags.fakeIPEnabled = parseBool(args.fakeip);
     flags.quicEnabled = parseBool(args.quic);
     flags.regexFilter = parseBool(args.regex);
     flags.countryThreshold = parseNumber(args.threshold, 0);
+    flags.tunEnabled = parseBool(args.tun);
 
     return flags;
 }
