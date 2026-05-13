@@ -14,8 +14,7 @@ https://github.com/powerfullz/override-rules
 - threshold: 地区节点数量小于该值时不显示分组 (默认 0)
 - regex: 使用正则过滤模式（include-all + filter）写入各地区代理组，而非直接枚举节点名称（默认 false）
 
-源码说明：
-- 源码已迁移至 `src/*.ts` 文件，使用 TypeScript 编写，编译后输出到 `dist/*.js`。
+源码已迁移至 `src/*.ts`。
 */
 
 import { CDN_URL, PROXY_GROUPS } from "./constants";
