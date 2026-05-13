@@ -3,9 +3,11 @@ import type { CaseInsensitiveNodeMatcher } from "./types";
 /**
  * 解析布尔值，支持 boolean、"true" 和 "1"。
  * @param value - 待解析的原始值，可以是任意类型
- * @returns 解析后的布尔值；当 value 为 `true`、`"true"` 或 `"1"` 时返回 `true`，否则返回 `false`
+ * @param defaultValue - 当 `value` 为 `undefined` 时返回的默认值，默认为 `false`
+ * @returns 解析后的布尔值；当 value 为 `true`、`"true"` 或 `"1"` 时返回 `true`，当 value 为 `undefined` 时返回 `defaultValue`，否则返回 `false`
  */
-export function parseBool(value: unknown): boolean {
+export function parseBool(value: unknown, defaultValue = false): boolean {
+    if (typeof value === "undefined") return defaultValue;
     if (typeof value === "boolean") return value;
     if (typeof value === "string") {
         return value.toLowerCase() === "true" || value === "1";
