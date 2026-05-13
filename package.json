@@ -16,7 +16,7 @@
     "format:check": "prettier --check .",
     "prepare": "husky",
     "preversion": "npm run lint && npm run typecheck",
-    "version": "conventional-changelog -p angular -t src-v -i CHANGELOG.md -s && git add CHANGELOG.md",
+    "version": "node scripts/changelog.mjs && git add CHANGELOG.md",
     "postversion": "git push --follow-tags"
   },
   "dependencies": {
@@ -26,10 +26,10 @@
     "@eslint/js": "^10.0.1",
     "@types/node": "^25.6.2",
     "@typescript/native-preview": "^7.0.0-dev.20260510.1",
-    "conventional-changelog-cli": "^5.0.0",
     "esbuild": "^0.28.0",
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
+    "git-cliff": "^2.13.1",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.4",
     "prettier": "^3.8.1",

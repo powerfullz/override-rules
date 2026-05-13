@@ -1,0 +1,42 @@
+[changelog]
+header = "# Changelog\n\n"
+body = """
+## [{{ version | trim_start_matches(pat="src-v") }}](https://github.com/powerfullz/override-rules/compare/{{ previous.version }}...{{ version }}) ({{ timestamp | date(format="%Y-%m-%d") }})
+{% for group, commits in commits | group_by(attribute="group") %}
+
+### {{ group | upper_first }}
+
+{% for commit in commits -%}
+- {{ commit.message | upper_first }} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/powerfullz/override-rules/commit/{{ commit.id }}))
+{% endfor -%}
+{% endfor %}
+"""
+trim = true
+
+[git]
+conventional_commits = true
+filter_unconventional = false
+filter_commits = false
+tag_pattern = "src-v[0-9].*"
+sort_commits = "newest"
+
+commit_parsers = [
+    { message = "^Merge", skip = true },
+    { message = "^\\d+\\.\\d+\\.\\d+", skip = true },
+    { message = "^feat", group = "Features" },
+    { message = "^fix", group = "Bug Fixes" },
+    { message = "^perf", group = "Performance" },
+    { message = "^refactor", group = "Refactoring" },
+    { message = "^docs", group = "Documentation" },
+    { message = "^style", group = "Styling" },
+    { message = "^test", group = "Testing" },
+    { message = "^chore", group = "Chores" },
+    { message = "^ci", group = "CI" },
+    { message = "^build", group = "Build" },
+    { message = "^revert", group = "Reverts" },
+    { message = ".*", group = "Other" },
+]
+
+link_parsers = [
+    { pattern = "#(\\d+)", href = "https://github.com/powerfullz/override-rules/issues/$1" },
+]
