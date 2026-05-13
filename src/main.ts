@@ -6,6 +6,7 @@ https://github.com/powerfullz/override-rules
 - loadbalance: 启用负载均衡（url-test/load-balance，默认 false）
 - landing: 启用落地节点功能（如机场家宽/星链/落地分组，默认 false）
 - ipv6: 启用 IPv6 支持（默认 false）
+- tun: 启用 TUN 模式（默认 false）
 - full: 输出完整配置（适合纯内核启动，默认 false）
 - keepalive: 启用 tcp-keep-alive（默认 false）
 - fakeip: DNS 使用 FakeIP 模式（默认 true，false 为 RedirHost）
