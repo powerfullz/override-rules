@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.1](https://github.com/powerfullz/override-rules/compare/src-v2.3.0...src-v2.3.1) (2026-05-13)
+
+
+### Chores
+
+- Simplify source code tip ([c07d7c1](https://github.com/powerfullz/override-rules/commit/c07d7c1417f359427f07676f0c652a10852487a3))
+- Update banner ([9d26e30](https://github.com/powerfullz/override-rules/commit/9d26e30ba8cb14c5cb0b5d395c71f1f2736ff2db))
 ## [2.3.0](https://github.com/powerfullz/override-rules/compare/src-v2.2.0...src-v2.3.0) (2026-05-13)
 
 
