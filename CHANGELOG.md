@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.3.2](https://github.com/powerfullz/override-rules/compare/src-v2.3.1...src-v2.3.2) (2026-05-13)
+
+
+### Refactoring
+
+- Simplify buildFeatureFlags assignment and update fakeip documentation ([e1a454f](https://github.com/powerfullz/override-rules/commit/e1a454fc65ceabbe1a1da575dc85f37ad4ee5aa2))
 ## [2.3.1](https://github.com/powerfullz/override-rules/compare/src-v2.3.0...src-v2.3.1) (2026-05-13)
 
 
