@@ -121,30 +121,26 @@ function main(config: ClashConfig): ClashConfig {
 
     const finalRules = buildRules({ quicEnabled });
 
-    const fullConfigFields: Partial<ClashConfig> = fullConfig
-        ? {
-              "mixed-port": 7890,
-              "redir-port": 7892,
-              "tproxy-port": 7893,
-              "routing-mark": 7894,
-              "allow-lan": true,
-              "bind-address": "*",
-              ipv6: ipv6Enabled,
-              mode: "rule",
-              "unified-delay": true,
-              "tcp-concurrent": true,
-              "find-process-mode": "off",
-              "log-level": "info",
-              "geodata-loader": "standard",
-              "external-controller": ":9999",
-              "disable-keep-alive": !keepAliveEnabled,
-              profile: { "store-selected": true },
-          }
-        : {};
-
     return {
         proxies: config.proxies,
-        ...fullConfigFields,
+        ...(fullConfig && {
+            "mixed-port": 7890,
+            "redir-port": 7892,
+            "tproxy-port": 7893,
+            "routing-mark": 7894,
+            "allow-lan": true,
+            "bind-address": "*",
+            ipv6: ipv6Enabled,
+            mode: "rule",
+            "unified-delay": true,
+            "tcp-concurrent": true,
+            "find-process-mode": "off",
+            "log-level": "info",
+            "geodata-loader": "standard",
+            "external-controller": ":9999",
+            "disable-keep-alive": !keepAliveEnabled,
+            profile: { "store-selected": true },
+        }),
         "proxy-groups": proxyGroups,
         "rule-providers": ruleProviders,
         rules: finalRules,
