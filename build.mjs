@@ -5,7 +5,7 @@ const mainCode = fs.readFileSync("src/main.ts", "utf8");
 const bannerMatch = mainCode.match(/\/\*![\s\S]*?\*\//);
 const bannerText = bannerMatch ? bannerMatch[0] : "";
 
-const commonOptions: esbuild.BuildOptions = {
+const commonOptions = {
     entryPoints: ["src/main.ts"],
     bundle: true,
     platform: "neutral",

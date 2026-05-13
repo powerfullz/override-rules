@@ -7,7 +7,7 @@
   "type": "commonjs",
   "scripts": {
     "typecheck": "tsgo --noEmit",
-    "build": "npm run typecheck && tsx build.ts",
+    "build": "npm run typecheck && node build.mjs",
     "generate": "tsx yaml_generator/generator.ts",
     "artifacts": "npm run build && npm run generate",
     "lint": "eslint .",
