@@ -12,6 +12,7 @@ import type {
     CountryInfoItem,
     ProxyGroup,
 } from "./types";
+import { isNotNull } from "./utils";
 
 /**
  * 为每个地区生成对应的代理组配置。
@@ -31,7 +32,6 @@ export function buildCountryProxyGroups({
     countryInfo,
 }: BuildCountryProxyGroupsInput): ProxyGroup[] {
     const groups: ProxyGroup[] = [];
-    const groupType = loadBalance ? "load-balance" : "url-test";
 
     const nodesByCountry: Record<string, string[]> | null = !regexFilter
         ? Object.fromEntries(countryInfo.map((item: CountryInfoItem) => [item.country, item.nodes]))
@@ -41,25 +41,52 @@ export function buildCountryProxyGroups({
         const meta = countriesMeta[country];
         if (!meta) continue;
 
-        const groupConfig: ProxyGroup = {
+        const baseFields = {
             name: `${country}${NODE_SUFFIX}`,
             icon: meta.icon,
-            type: groupType,
             url: "https://cp.cloudflare.com/generate_204",
             interval: 60,
             tolerance: 20,
-            ...(loadBalance ? { strategy: "sticky-sessions" } : {}),
         };
 
-        if (!regexFilter) {
-            const nodeNames = nodesByCountry?.[country] || [];
-            groupConfig["proxies"] = nodeNames;
+        let groupConfig: ProxyGroup;
+
+        if (loadBalance) {
+            if (!regexFilter) {
+                const nodeNames = nodesByCountry?.[country] ?? [];
+                groupConfig = {
+                    ...baseFields,
+                    type: "load-balance",
+                    strategy: "sticky-sessions",
+                    proxies: nodeNames,
+                };
+            } else {
+                groupConfig = {
+                    ...baseFields,
+                    type: "load-balance",
+                    strategy: "sticky-sessions",
+                    "include-all": true,
+                    filter: meta.pattern,
+                    ...(landing ? { "exclude-filter": LANDING_NODE_MATCHER.pattern } : {}),
+                };
+            }
         } else {
-            Object.assign(groupConfig, {
-                "include-all": true,
-                filter: meta.pattern,
-            });
-            if (landing) groupConfig["exclude-filter"] = LANDING_NODE_MATCHER.pattern;
+            if (!regexFilter) {
+                const nodeNames = nodesByCountry?.[country] ?? [];
+                groupConfig = {
+                    ...baseFields,
+                    type: "url-test",
+                    proxies: nodeNames,
+                };
+            } else {
+                groupConfig = {
+                    ...baseFields,
+                    type: "url-test",
+                    "include-all": true,
+                    filter: meta.pattern,
+                    ...(landing ? { "exclude-filter": LANDING_NODE_MATCHER.pattern } : {}),
+                };
+            }
         }
 
         groups.push(groupConfig);
@@ -295,5 +322,5 @@ export function buildProxyGroups({
         ...countryProxyGroups,
     ];
 
-    return groups.filter(Boolean) as ProxyGroup[];
+    return groups.filter(isNotNull);
 }

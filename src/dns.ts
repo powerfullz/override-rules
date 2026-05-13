@@ -1,3 +1,5 @@
+import type { DnsConfig, SnifferConfig } from "./types";
+
 /**
  * 默认的 fake-ip 过滤域名列表。
  * 这些域名不会被 fake-ip 机制代理。
@@ -16,9 +18,8 @@ const FAKE_IP_FILTER = [
 
 /**
  * 嗅探器配置。
- * @type {object}
  */
-export const snifferConfig = {
+export const snifferConfig: SnifferConfig = {
     sniff: {
         TLS: {
             ports: [443, 8443],
@@ -51,14 +52,10 @@ interface BuildDnsConfigInput {
  * @param {('redir-host'|'fake-ip')} params.mode - DNS 增强模式
  * @param {boolean} params.ipv6Enabled - 是否启用 IPv6
  * @param {string[]=} params.fakeIpFilter - fake-ip 过滤域名列表（可选）
- * @returns {Record<string, unknown>} DNS 配置对象
+ * @returns {DnsConfig} DNS 配置对象
  */
-function buildDnsConfig({
-    mode,
-    ipv6Enabled,
-    fakeIpFilter,
-}: BuildDnsConfigInput): Record<string, unknown> {
-    const config: Record<string, unknown> = {
+function buildDnsConfig({ mode, ipv6Enabled, fakeIpFilter }: BuildDnsConfigInput): DnsConfig {
+    const config: DnsConfig = {
         enable: true,
         ipv6: ipv6Enabled,
         "prefer-h3": true,
@@ -95,9 +92,9 @@ export interface BuildDnsInput {
  * @param {BuildDnsInput} params - 构建参数
  * @param {boolean} params.fakeIPEnabled - 是否启用 fake-ip 模式
  * @param {boolean} params.ipv6Enabled - 是否启用 IPv6
- * @returns {Record<string, unknown>} DNS 配置对象
+ * @returns {DnsConfig} DNS 配置对象
  */
-export function buildDns({ fakeIPEnabled, ipv6Enabled }: BuildDnsInput): Record<string, unknown> {
+export function buildDns({ fakeIPEnabled, ipv6Enabled }: BuildDnsInput): DnsConfig {
     if (fakeIPEnabled) {
         return buildDnsConfig({ mode: "fake-ip", ipv6Enabled, fakeIpFilter: FAKE_IP_FILTER });
     }

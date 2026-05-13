@@ -23,7 +23,7 @@ import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 import YAML from "yaml";
 
-import type { ClashConfig, ScriptArgs } from "../src/types";
+import type { ClashConfig } from "../src/types";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -38,7 +38,7 @@ const FLAGS = ["loadbalance", "landing", "ipv6", "full", "keepalive", "fakeip", 
 
 type FlagName = (typeof FLAGS)[number];
 type FlagArgs = Record<FlagName, boolean>;
-type GeneratorScriptArgs = ScriptArgs & FlagArgs & { regex: true };
+type GeneratorScriptArgs = { [K in FlagName]: boolean } & { regex: true };
 
 interface VmSandbox extends Record<string, unknown> {
     $arguments: GeneratorScriptArgs;

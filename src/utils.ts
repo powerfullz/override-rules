@@ -50,3 +50,12 @@ export function createCaseInsensitiveNodeMatcher(source: string): CaseInsensitiv
         pattern: `(?i)${source}`,
     };
 }
+
+/**
+ * 类型谓词：过滤掉 null 值，用于替代 `.filter(Boolean) as T[]` 模式。
+ * @param v - 待检查的值
+ * @returns 若值不为 null 则返回 true
+ */
+export function isNotNull<T>(v: T | null): v is T {
+    return v !== null;
+}

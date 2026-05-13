@@ -1,6 +1,7 @@
 import { CDN_URL } from "./constants";
+import type { RuleProvider } from "./types";
 
-export const ruleProviders = {
+export const ruleProviders: Record<string, RuleProvider> = {
     ADBlock: {
         type: "http",
         behavior: "domain",

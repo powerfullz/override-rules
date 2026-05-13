@@ -124,37 +124,31 @@ function main(config: ClashConfig): ClashConfig {
     const finalRules = buildRules({ quicEnabled });
 
     if (fullConfig) {
-        Object.assign(resultConfig, {
-            "mixed-port": 7890,
-            "redir-port": 7892,
-            "tproxy-port": 7893,
-            "routing-mark": 7894,
-            "allow-lan": true,
-            "bind-address": "*",
-            ipv6: ipv6Enabled,
-            mode: "rule",
-            "unified-delay": true,
-            "tcp-concurrent": true,
-            "find-process-mode": "off",
-            "log-level": "info",
-            "geodata-loader": "standard",
-            "external-controller": ":9999",
-            "disable-keep-alive": !keepAliveEnabled,
-            profile: {
-                "store-selected": true,
-            },
-        });
+        resultConfig["mixed-port"] = 7890;
+        resultConfig["redir-port"] = 7892;
+        resultConfig["tproxy-port"] = 7893;
+        resultConfig["routing-mark"] = 7894;
+        resultConfig["allow-lan"] = true;
+        resultConfig["bind-address"] = "*";
+        resultConfig.ipv6 = ipv6Enabled;
+        resultConfig.mode = "rule";
+        resultConfig["unified-delay"] = true;
+        resultConfig["tcp-concurrent"] = true;
+        resultConfig["find-process-mode"] = "off";
+        resultConfig["log-level"] = "info";
+        resultConfig["geodata-loader"] = "standard";
+        resultConfig["external-controller"] = ":9999";
+        resultConfig["disable-keep-alive"] = !keepAliveEnabled;
+        resultConfig.profile = { "store-selected": true };
     }
 
-    Object.assign(resultConfig, {
-        "proxy-groups": proxyGroups,
-        "rule-providers": ruleProviders,
-        rules: finalRules,
-        sniffer: snifferConfig,
-        dns: buildDns({ fakeIPEnabled, ipv6Enabled }),
-        "geodata-mode": true,
-        "geox-url": geoxURL,
-    });
+    resultConfig["proxy-groups"] = proxyGroups;
+    resultConfig["rule-providers"] = ruleProviders;
+    resultConfig.rules = finalRules;
+    resultConfig.sniffer = snifferConfig;
+    resultConfig.dns = buildDns({ fakeIPEnabled, ipv6Enabled });
+    resultConfig["geodata-mode"] = true;
+    resultConfig["geox-url"] = geoxURL;
 
     return resultConfig;
 }
