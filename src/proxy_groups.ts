@@ -242,6 +242,7 @@ export function buildProxyGroups({
             name: PROXY_GROUPS.WEIBO,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Weibo.png`,
             type: "select",
+            "include-all": true,
             proxies: defaultProxiesDirect,
         },
         {
