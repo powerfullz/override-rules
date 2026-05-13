@@ -6,11 +6,11 @@
 
 ## 🎯 核心架构与原则
 
-- **源文件驱动**：所有核心逻辑均采用 TypeScript 编写，存放在 `src/` 与 `yaml_generator/` 目录中。
+- **源文件驱动**：所有核心逻辑均采用 TypeScript 编写，存放在 `src/` 与 `scripts/yaml_generator/` 目录中。
   - `src/main.ts`：JS 动态覆写脚本的核心入口。
-  - `yaml_generator/generator.ts`：YAML 静态覆写文件的生成逻辑。
+  - `scripts/yaml_generator/generator.ts`：YAML 静态覆写文件的生成逻辑。
 - **禁止直接修改产物**：根目录下的 `convert.js`、`convert.min.js` 以及 `yamls/` 目录的内容属于自动生成的构建产物（注意：它们已被 `main` 分支取消 Git 跟踪，并由 GitHub Actions 在发布时自动处理）。**永远不要直接编辑这些产物文件**。一切修改必须在 `.ts` 源码中进行。
-- **构建工具链**：我们使用 `esbuild` 作为打包和压缩工具，可以通过编写的 `build.ts` 脚本一次性地编译出包含了完整注释的产物文件。
+- **构建工具链**：我们使用 `esbuild` 作为打包和压缩工具，可以通过编写的 `scripts/build.mjs` 脚本一次性地编译出包含了完整注释的产物文件。
 
 ## 🛠️ 开发与构建工作流
 

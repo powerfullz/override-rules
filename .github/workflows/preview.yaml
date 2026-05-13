@@ -6,10 +6,7 @@ name: Deploy Preview
       - main
     paths:
       - 'src/**'
-      - 'yaml_generator/**'
-      - 'package*.json'
-      - 'tsconfig.json'
-      - 'build.ts'
+      - 'scripts/**'
       - '.github/workflows/preview.yaml'
 
 permissions:

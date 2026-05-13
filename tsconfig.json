@@ -11,5 +11,5 @@
     "types": ["node"],
     "lib": ["ES2025", "DOM"]
   },
-  "include": ["src/**/*.ts", "yaml_generator/**/*.ts"]
+  "include": ["src/**/*.ts", "scripts/yaml_generator/**/*.ts"]
 }

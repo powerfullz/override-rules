@@ -23,12 +23,12 @@ import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 import YAML from "yaml";
 
-import type { ClashConfig } from "../src/types";
+import type { ClashConfig } from "../../src/types";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const BASE_DIR = path.resolve(__dirname, "..");
+const BASE_DIR = path.resolve(__dirname, "../..");
 const GENERATOR_DIR = __dirname;
 const CONVERT_FILE = path.join(BASE_DIR, "convert.js");
 const FAKE_PROXIES_FILE = path.join(GENERATOR_DIR, "fake_proxies.json");
