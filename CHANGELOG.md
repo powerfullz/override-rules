@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.3.0](https://github.com/powerfullz/override-rules/compare/src-v2.2.0...src-v2.3.0) (2026-05-13)
+
+
+### Chores
+
+- Migrate changelog generation from conventional-changelog-cli to git-cliff ([d2d45fe](https://github.com/powerfullz/override-rules/commit/d2d45fe1b7aa4a2b98c261f38a722729f59a4ec1))
+
+
+### Documentation
+
+- Update readme ([88af701](https://github.com/powerfullz/override-rules/commit/88af70156b3c2786883196bff766090e70af6121))
+
+
+### Features
+
+- Add `include-all` param to weibo proxy group ([58031b2](https://github.com/powerfullz/override-rules/commit/58031b2b76116e0be4827829f89dc2b6eefa1550))
+- Add TUN mode support via tun parameter ([5d74af4](https://github.com/powerfullz/override-rules/commit/5d74af4772445155168410c59e069e421063c29a))
+
+
+### Refactoring
+
+- Move build.mjs and yaml_generator into scripts/ ([cbddb5f](https://github.com/powerfullz/override-rules/commit/cbddb5f60bef2a5fb36b3c89f4146226707c081e))
 ## [2.2.0](https://github.com/powerfullz/override-rules/compare/src-v2.1.1...src-v2.2.0) (2026-05-13)
 
 
