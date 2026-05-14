@@ -79,6 +79,7 @@ export const countriesMeta: Record<string, CountryMeta> = {
         icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Japan.png`,
     },
     韩国: {
+        weight: 45,
         pattern:
             "韩国|韩|韓|春川|Chuncheon|首尔|\\b(?:KR|kr)(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|ICN|🇰🇷",
         icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Korea.png`,
@@ -90,6 +91,7 @@ export const countriesMeta: Record<string, CountryMeta> = {
         icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/United_States.png`,
     },
     加拿大: {
+        weight: 55,
         pattern:
             "加拿大|渥太华|温哥华|卡尔加里|蒙特利尔|Montreal|\\b(?:CA|ca)(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Canada|CANADA|CAN|YVR|YYZ|YUL|🇨🇦",
         icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Canada.png`,
