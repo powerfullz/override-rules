@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.3.3](https://github.com/powerfullz/override-rules/compare/src-v2.3.2...src-v2.3.3) (2026-05-14)
+
+
+### Features
+
+- Optimise `countriesMeta` ([0b999b4](https://github.com/powerfullz/override-rules/commit/0b999b43d1790713acd6fc722533199ab93219e1))
 ## [2.3.2](https://github.com/powerfullz/override-rules/compare/src-v2.3.1...src-v2.3.2) (2026-05-13)
 
 
