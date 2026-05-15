@@ -192,6 +192,12 @@ export function buildProxyGroups({
             proxies: defaultProxies,
         },
         {
+            name: PROXY_GROUPS.GITHUB,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/GitHub.png`,
+            type: "select",
+            proxies: defaultProxies,
+        },
+        {
             name: PROXY_GROUPS.BILIBILI,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/bilibili.png`,
             type: "select",
