@@ -5,10 +5,10 @@ export const ruleProviders: Record<string, RuleProvider> = {
     ADBlock: {
         type: "http",
         behavior: "domain",
-        format: "mrs",
+        format: "yaml",
         interval: 86400,
-        url: `${CDN_URL}/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs`,
-        path: "./ruleset/ADBlock.mrs",
+        url: `${CDN_URL}/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.yaml`,
+        path: "./ruleset/ADBlock.yaml",
     },
     SogouInput: {
         type: "http",
