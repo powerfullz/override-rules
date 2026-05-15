@@ -21,6 +21,7 @@ export const PROXY_GROUPS = {
     MICROSOFT: "微软服务",
     BILIBILI: "哔哩哔哩",
     BAHAMUT: "巴哈姆特",
+    XBOX: "Xbox",
     YOUTUBE: "Youtube",
     NETFLIX: "Netflix",
     TIKTOK: "TikTok",

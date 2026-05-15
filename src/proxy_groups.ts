@@ -186,6 +186,12 @@ export function buildProxyGroups({
             proxies: defaultProxies,
         },
         {
+            name: PROXY_GROUPS.XBOX,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Xbox.png`,
+            type: "select",
+            proxies: defaultProxies,
+        },
+        {
             name: PROXY_GROUPS.BILIBILI,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/bilibili.png`,
             type: "select",
