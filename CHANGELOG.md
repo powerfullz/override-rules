@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.3.4](https://github.com/powerfullz/override-rules/compare/src-v2.3.3...src-v2.3.4) (2026-05-15)
+
+
+### Bug Fixes
+
+- Use yaml payload for better compatibility ([cfcbed7](https://github.com/powerfullz/override-rules/commit/cfcbed79800d6c35d0f80108d7e9f4b3da315f78))
+
+
+### Features
+
+- Add GitHub proxy group and optimise rules ([d7ae690](https://github.com/powerfullz/override-rules/commit/d7ae6905cf2467ef0cd840b4e36d99c4d2c731c9))
+- Optimise rules and add xbox proxy group ([4869ce9](https://github.com/powerfullz/override-rules/commit/4869ce97cf6bd3a536ea88e95e43ea63abcf5808))
 ## [2.3.3](https://github.com/powerfullz/override-rules/compare/src-v2.3.2...src-v2.3.3) (2026-05-14)
 
 
