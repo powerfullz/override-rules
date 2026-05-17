@@ -31,7 +31,7 @@
     "eslint-config-prettier": "^10.1.8",
     "git-cliff": "^2.13.1",
     "husky": "^9.1.7",
-    "lint-staged": "^17.0.4",
+    "lint-staged": "^17.0.5",
     "prettier": "^3.8.1",
     "tsx": "^4.20.6",
     "typescript": "^6.0.3",
