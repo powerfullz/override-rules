@@ -33,7 +33,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.0.4",
     "prettier": "^3.8.1",
-    "tsx": "^4.20.6",
+    "tsx": "^4.22.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.2"
   },
