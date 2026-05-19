@@ -93,6 +93,10 @@ https://cdn.jsdelivr.net/gh/powerfullz/override-rules/convert.min.js#landing=tru
 https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/preview/convert.min.js
 ```
 
+### 关于 DNS 泄露的说明
+
+很多人问用了这覆写规则跑 DNS 泄露测试说会泄露，为此我写了一篇文章澄清一些误解，具体请看[「关于 DNS 泄露及其相关误解的说明」](https://blog.l3zc.com/2026/05/dns-leak-misunderstanding/)。
+
 ### 关于各 Mihomo 客户端覆盖 GeoIP/GeoSite 下载地址的说明
 
 这覆写规则大量引用了 Loyalsoldier/v2ray-rules-dat，大多数 Mihomo 客户端都会覆写 GeoIP/GeoSite 数据库资源链接，为了获得更好的分流体验，建议手动修改客户端内的覆写设置。以 Mihomo Party 为例，点击侧栏中的「外部资源」，分别将资源链接替换为以下值：
