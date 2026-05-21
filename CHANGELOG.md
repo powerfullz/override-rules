@@ -1,5 +1,33 @@
 # Changelog
 
+## [2.4.0](https://github.com/powerfullz/override-rules/compare/src-v2.3.4...src-v2.4.0) (2026-05-21)
+
+
+### Chores
+
+- Update dependencies ([76ff80f](https://github.com/powerfullz/override-rules/commit/76ff80f94eb76938a7741e4601ee0d4dbc5f47b6))
+- Bump yaml from 2.8.4 to 2.9.0 ([fa42bec](https://github.com/powerfullz/override-rules/commit/fa42bec3eac06b974c63da59e4e6cdecf89b93d0))
+- Update dependencies ([13ed461](https://github.com/powerfullz/override-rules/commit/13ed4617cbd1e6fefac455b4f04a49c08db1ee32))
+
+
+### Documentation
+
+- 补全 tun.ts 的 JSDoc 并优化 parseGroupType 注释 ([9182209](https://github.com/powerfullz/override-rules/commit/9182209525415c534265e6d1f661317b07957830))
+- 添加关于 DNS 泄露的说明及相关链接 ([e11641a](https://github.com/powerfullz/override-rules/commit/e11641a5ba7f4a660f757a9c373bef84df974ff6))
+
+
+### Features
+
+- 移除 PROXY_GROUPS.DIRECT 并添加 FINAL 代理组 ([5e84735](https://github.com/powerfullz/override-rules/commit/5e847353d6ae914b4b35fdc0d124cc643247be1c))
+- Remove `PROXY_GROUPS.DIRECT` ([904277c](https://github.com/powerfullz/override-rules/commit/904277c2a20ebb45f6cd1bff2e6fab908a7141b3))
+- Optimise the priority of rules ([154d59d](https://github.com/powerfullz/override-rules/commit/154d59d6ce8c49e78444c329f0c282edd10960fa))
+- Use gfwlist ruleset instead of geosite ([532ff4e](https://github.com/powerfullz/override-rules/commit/532ff4e87d34a3ea5c5c8dbf59703e33004605cd))
+
+
+### Refactoring
+
+- 让 LOW_COST 代理组跟随 grouptype ([f12dd89](https://github.com/powerfullz/override-rules/commit/f12dd89c5eca4dbb66d70679d34fbeb5458151c0))
+- 重构 loadbalance 参数为 grouptype 参数 ([ad77147](https://github.com/powerfullz/override-rules/commit/ad77147114d56e5fbb3c4c46eb4c7f9629e840ab))
 ## [2.3.4](https://github.com/powerfullz/override-rules/compare/src-v2.3.3...src-v2.3.4) (2026-05-15)
 
 
