@@ -36,10 +36,10 @@ import { buildBaseLists } from "./selectors";
 import type { ClashConfig, ScriptArgs } from "./types";
 
 const geoxURL = {
-    geoip: `${CDN_URL}/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat`,
-    geosite: `${CDN_URL}/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat`,
-    mmdb: `${CDN_URL}/gh/Loyalsoldier/geoip@release/Country.mmdb`,
-    asn: `${CDN_URL}/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb`,
+    geoip: `${CDN_URL}/gh/MetaCubeX/meta-rules-dat@release/geoip-lite.dat`,
+    geosite: `${CDN_URL}/gh/MetaCubeX/meta-rules-dat@release/geosite.dat`,
+    mmdb: `${CDN_URL}/gh/MetaCubeX/meta-rules-dat@release/country-lite.mmdb`,
+    asn: `${CDN_URL}/gh/MetaCubeX/meta-rules-dat@release/GeoLite2-ASN.mmdb`,
 };
 
 declare const $arguments: ScriptArgs;
