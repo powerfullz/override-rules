@@ -7,6 +7,17 @@ import type { FeatureFlags, GroupType, ScriptArgs } from "./types";
  * - 若 `grouptype` 不存在但 `loadbalance` 存在：true→2, false→1
  * - 均不存在时默认为 0（select）
  * - 非法值回退为 0
+ * @param args - 从外部脚本环境传入的原始参数对象
+ * @returns 解析后的代理组类型：0=select, 1=url-test, 2=load-balance
+ * @example
+ * ```ts
+ * // grouptype 优先
+ * parseGroupType({ grouptype: "1" }); // => 1 (url-test)
+ * // 回退到 loadbalance
+ * parseGroupType({ loadbalance: "true" }); // => 2 (load-balance)
+ * // 均不存在时默认 select
+ * parseGroupType({}); // => 0 (select)
+ * ```
  */
 function parseGroupType(args: ScriptArgs): GroupType {
     const fallback: GroupType =
