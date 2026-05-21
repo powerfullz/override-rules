@@ -9,7 +9,7 @@ export const PROXY_GROUPS = {
     MANUAL: "手动选择",
     AUTO: "自动选择",
     FALLBACK: "故障转移",
-    DIRECT: "直连",
+    DIRECT: "DIRECT",
     LANDING: "落地节点",
     LOW_COST: "低倍率节点",
     FRONT_PROXY: "前置代理",

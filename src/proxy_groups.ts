@@ -308,12 +308,6 @@ export function buildProxyGroups({
             tolerance: 20,
         },
         {
-            name: PROXY_GROUPS.DIRECT,
-            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Direct.png`,
-            type: "select",
-            proxies: ["DIRECT", PROXY_GROUPS.SELECT],
-        },
-        {
             name: PROXY_GROUPS.AD_BLOCK,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png`,
             type: "select",
