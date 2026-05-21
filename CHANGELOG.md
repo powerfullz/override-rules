@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.4.1](https://github.com/powerfullz/override-rules/compare/src-v2.4.0...src-v2.4.1) (2026-05-21)
+
+
+### Bug Fixes
+
+- Remove `geosite:cn` from fake-ip-filter ([90d2d46](https://github.com/powerfullz/override-rules/commit/90d2d46746c41318781343c420e1b3f32aa39e8f))
+
+
+### Documentation
+
+- 更新自动选择相关的说明 ([b22dc48](https://github.com/powerfullz/override-rules/commit/b22dc4879eb295fc7c9713cd2a49cc2cd4a89b87))
+
+
+### Features
+
+- Add Twitch proxy group ([a638feb](https://github.com/powerfullz/override-rules/commit/a638feb7aaec4efbc2e2479878c9f0922aaa1283))
+
+
+### Refactoring
+
+- 更新 GeoIP 和 GeoSite 数据库链接至 MetaCubeX ([0d90c80](https://github.com/powerfullz/override-rules/commit/0d90c80d6089299cedd916b9197124d716fd7df6))
 ## [2.4.0](https://github.com/powerfullz/override-rules/compare/src-v2.3.4...src-v2.4.0) (2026-05-21)
 
 
