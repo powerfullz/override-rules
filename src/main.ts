@@ -102,6 +102,7 @@ function main(config: ClashConfig): ClashConfig {
     const proxyGroups = buildProxyGroups({
         landing,
         regexFilter,
+        groupType,
         countries,
         countryProxyGroups,
         lowCostNodes,

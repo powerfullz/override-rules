@@ -10,9 +10,55 @@ import type {
     BuildCountryProxyGroupsInput,
     BuildProxyGroupsInput,
     CountryInfoItem,
+    GroupType,
     ProxyGroup,
 } from "./types";
 import { isNotNull } from "./utils";
+
+interface BuildGroupByTypeInput {
+    name: string;
+    icon: string;
+    groupType: GroupType;
+    nodeSource: Pick<ProxyGroup, "proxies" | "include-all" | "filter" | "exclude-filter">;
+}
+
+/**
+ * 根据代理组类型生成对应的代理组配置。
+ * 将 groupType 映射为具体的类型字段（select/url-test/load-balance），
+ * 并与节点来源字段合并，消除各处重复的 switch 逻辑。
+ */
+function buildGroupByType({
+    name,
+    icon,
+    groupType,
+    nodeSource,
+}: BuildGroupByTypeInput): ProxyGroup {
+    switch (groupType) {
+        case 0:
+            return { name, icon, type: "select", ...nodeSource };
+        case 1:
+            return {
+                name,
+                icon,
+                type: "url-test",
+                url: "https://cp.cloudflare.com/generate_204",
+                interval: 60,
+                tolerance: 20,
+                ...nodeSource,
+            };
+        case 2:
+            return {
+                name,
+                icon,
+                type: "load-balance",
+                strategy: "sticky-sessions",
+                url: "https://cp.cloudflare.com/generate_204",
+                interval: 60,
+                tolerance: 20,
+                ...nodeSource,
+            };
+    }
+}
 
 /**
  * 为每个地区生成对应的代理组配置。
@@ -44,81 +90,15 @@ export function buildCountryProxyGroups({
         const name = `${country}${NODE_SUFFIX}`;
         const icon = meta.icon;
 
-        let groupConfig: ProxyGroup;
+        const nodeSource = !regexFilter
+            ? { proxies: nodesByCountry?.[country] ?? [] }
+            : {
+                  "include-all": true as const,
+                  filter: meta.pattern,
+                  ...(landing ? { "exclude-filter": LANDING_NODE_MATCHER.pattern } : {}),
+              };
 
-        switch (groupType) {
-            case 0: {
-                // select 模式：不需要 url/interval/tolerance
-                if (!regexFilter) {
-                    const nodeNames = nodesByCountry?.[country] ?? [];
-                    groupConfig = { name, icon, type: "select", proxies: nodeNames };
-                } else {
-                    groupConfig = {
-                        name,
-                        icon,
-                        type: "select",
-                        "include-all": true,
-                        filter: meta.pattern,
-                        ...(landing ? { "exclude-filter": LANDING_NODE_MATCHER.pattern } : {}),
-                    };
-                }
-                break;
-            }
-            case 1: {
-                // url-test 模式
-                const testFields = {
-                    name,
-                    icon,
-                    url: "https://cp.cloudflare.com/generate_204",
-                    interval: 60,
-                    tolerance: 20,
-                };
-                if (!regexFilter) {
-                    const nodeNames = nodesByCountry?.[country] ?? [];
-                    groupConfig = { ...testFields, type: "url-test", proxies: nodeNames };
-                } else {
-                    groupConfig = {
-                        ...testFields,
-                        type: "url-test",
-                        "include-all": true,
-                        filter: meta.pattern,
-                        ...(landing ? { "exclude-filter": LANDING_NODE_MATCHER.pattern } : {}),
-                    };
-                }
-                break;
-            }
-            case 2: {
-                // load-balance 模式
-                const lbFields = {
-                    name,
-                    icon,
-                    url: "https://cp.cloudflare.com/generate_204",
-                    interval: 60,
-                    tolerance: 20,
-                };
-                if (!regexFilter) {
-                    const nodeNames = nodesByCountry?.[country] ?? [];
-                    groupConfig = {
-                        ...lbFields,
-                        type: "load-balance",
-                        strategy: "sticky-sessions",
-                        proxies: nodeNames,
-                    };
-                } else {
-                    groupConfig = {
-                        ...lbFields,
-                        type: "load-balance",
-                        strategy: "sticky-sessions",
-                        "include-all": true,
-                        filter: meta.pattern,
-                        ...(landing ? { "exclude-filter": LANDING_NODE_MATCHER.pattern } : {}),
-                    };
-                }
-                break;
-            }
-        }
-
-        groups.push(groupConfig);
+        groups.push(buildGroupByType({ name, icon, groupType, nodeSource }));
     }
 
     return groups;
@@ -127,6 +107,7 @@ export function buildCountryProxyGroups({
 export function buildProxyGroups({
     landing,
     regexFilter,
+    groupType,
     countries,
     countryProxyGroups,
     lowCostNodes,
@@ -346,17 +327,14 @@ export function buildProxyGroups({
             proxies: ["REJECT", "REJECT-DROP", "DIRECT"],
         },
         lowCostNodes.length > 0 || regexFilter
-            ? {
+            ? buildGroupByType({
                   name: PROXY_GROUPS.LOW_COST,
                   icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Lab.png`,
-                  type: "url-test",
-                  url: "https://cp.cloudflare.com/generate_204",
-                  interval: 60,
-                  tolerance: 20,
-                  ...(!regexFilter
+                  groupType,
+                  nodeSource: !regexFilter
                       ? { proxies: lowCostNodes }
-                      : { "include-all": true, filter: LOW_COST_NODE_MATCHER.pattern }),
-              }
+                      : { "include-all": true as const, filter: LOW_COST_NODE_MATCHER.pattern },
+              })
             : null,
         ...countryProxyGroups,
     ];

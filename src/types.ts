@@ -214,6 +214,7 @@ export interface BuildCountryProxyGroupsInput {
 export interface BuildProxyGroupsInput {
     landing: boolean;
     regexFilter: boolean;
+    groupType: GroupType;
     countries: string[];
     countryProxyGroups: ProxyGroup[];
     lowCostNodes: string[];
