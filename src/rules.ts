@@ -18,6 +18,7 @@ const baseRules = [
     `GEOSITE,xbox,${PROXY_GROUPS.XBOX}`,
     `GEOSITE,github,${PROXY_GROUPS.GITHUB}`,
     `GEOSITE,netflix,${PROXY_GROUPS.NETFLIX}`,
+    `GEOSITE,twitch,${PROXY_GROUPS.TWITCH}`,
     `GEOIP,netflix,${PROXY_GROUPS.NETFLIX},no-resolve`,
     `GEOSITE,spotify,${PROXY_GROUPS.SPOTIFY}`,
     `GEOSITE,bahamut,${PROXY_GROUPS.BAHAMUT}`,

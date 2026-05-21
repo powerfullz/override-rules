@@ -228,6 +228,12 @@ export function buildProxyGroups({
             proxies: defaultProxies,
         },
         {
+            name: PROXY_GROUPS.TWITCH,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Twitch.png`,
+            type: "select",
+            proxies: defaultProxies,
+        },
+        {
             name: PROXY_GROUPS.NETFLIX,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Netflix.png`,
             type: "select",
