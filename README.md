@@ -77,10 +77,10 @@
 
 #### JS 覆写使用示例
 
-无特殊需求，直接在 Substore 「脚本操作」处填入脚本链接：
+想要国家/地区代理组自动选择延迟最低的节点，使用`grouptype=1`参数，在 Substore「脚本操作」处填入脚本链接：
 
 ```
-https://cdn.jsdelivr.net/gh/powerfullz/override-rules/convert.min.js
+https://cdn.jsdelivr.net/gh/powerfullz/override-rules/convert.min.js#grouptype=1
 ```
 
 有链式代理和多个节点提供商之间负载均衡的需求，使用`landing=true&grouptype=2`两个参数：
