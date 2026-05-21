@@ -21,7 +21,7 @@ npm install
 ```typescript
 // src/args.ts
 const FEATURE_FLAG_DEFAULTS = {
-    loadBalance: false,
+    groupType: 0, // 0=select, 1=url-test, 2=load-balance
     landing: false,
     ipv6Enabled: true, // 例如：修改此处，默认开启 IPv6
     fullConfig: false,

@@ -19,7 +19,7 @@ import { isNotNull } from "./utils";
  * @param input - 构建地区代理组所需的输入参数
  * @param input.countries - 需要生成代理组的地区名称列表（不含后缀）
  * @param input.landing - 是否启用落地节点模式；启用时将排除落地节点
- * @param input.loadBalance - 是否使用负载均衡模式（`load-balance`），否则使用自动测速（`url-test`）
+ * @param input.groupType - 代理组类型：0=select, 1=url-test, 2=load-balance
  * @param input.regexFilter - 是否使用正则过滤模式（`include-all` + `filter`）
  * @param input.countryInfo - 地区节点信息数组，用于非正则模式下直接枚举节点名称
  * @returns 生成的地区代理组配置数组
@@ -27,7 +27,7 @@ import { isNotNull } from "./utils";
 export function buildCountryProxyGroups({
     countries,
     landing,
-    loadBalance,
+    groupType,
     regexFilter,
     countryInfo,
 }: BuildCountryProxyGroupsInput): ProxyGroup[] {
@@ -41,51 +41,80 @@ export function buildCountryProxyGroups({
         const meta = countriesMeta[country];
         if (!meta) continue;
 
-        const baseFields = {
-            name: `${country}${NODE_SUFFIX}`,
-            icon: meta.icon,
-            url: "https://cp.cloudflare.com/generate_204",
-            interval: 60,
-            tolerance: 20,
-        };
+        const name = `${country}${NODE_SUFFIX}`;
+        const icon = meta.icon;
 
         let groupConfig: ProxyGroup;
 
-        if (loadBalance) {
-            if (!regexFilter) {
-                const nodeNames = nodesByCountry?.[country] ?? [];
-                groupConfig = {
-                    ...baseFields,
-                    type: "load-balance",
-                    strategy: "sticky-sessions",
-                    proxies: nodeNames,
-                };
-            } else {
-                groupConfig = {
-                    ...baseFields,
-                    type: "load-balance",
-                    strategy: "sticky-sessions",
-                    "include-all": true,
-                    filter: meta.pattern,
-                    ...(landing ? { "exclude-filter": LANDING_NODE_MATCHER.pattern } : {}),
-                };
+        switch (groupType) {
+            case 0: {
+                // select 模式：不需要 url/interval/tolerance
+                if (!regexFilter) {
+                    const nodeNames = nodesByCountry?.[country] ?? [];
+                    groupConfig = { name, icon, type: "select", proxies: nodeNames };
+                } else {
+                    groupConfig = {
+                        name,
+                        icon,
+                        type: "select",
+                        "include-all": true,
+                        filter: meta.pattern,
+                        ...(landing ? { "exclude-filter": LANDING_NODE_MATCHER.pattern } : {}),
+                    };
+                }
+                break;
             }
-        } else {
-            if (!regexFilter) {
-                const nodeNames = nodesByCountry?.[country] ?? [];
-                groupConfig = {
-                    ...baseFields,
-                    type: "url-test",
-                    proxies: nodeNames,
+            case 1: {
+                // url-test 模式
+                const testFields = {
+                    name,
+                    icon,
+                    url: "https://cp.cloudflare.com/generate_204",
+                    interval: 60,
+                    tolerance: 20,
                 };
-            } else {
-                groupConfig = {
-                    ...baseFields,
-                    type: "url-test",
-                    "include-all": true,
-                    filter: meta.pattern,
-                    ...(landing ? { "exclude-filter": LANDING_NODE_MATCHER.pattern } : {}),
+                if (!regexFilter) {
+                    const nodeNames = nodesByCountry?.[country] ?? [];
+                    groupConfig = { ...testFields, type: "url-test", proxies: nodeNames };
+                } else {
+                    groupConfig = {
+                        ...testFields,
+                        type: "url-test",
+                        "include-all": true,
+                        filter: meta.pattern,
+                        ...(landing ? { "exclude-filter": LANDING_NODE_MATCHER.pattern } : {}),
+                    };
+                }
+                break;
+            }
+            case 2: {
+                // load-balance 模式
+                const lbFields = {
+                    name,
+                    icon,
+                    url: "https://cp.cloudflare.com/generate_204",
+                    interval: 60,
+                    tolerance: 20,
                 };
+                if (!regexFilter) {
+                    const nodeNames = nodesByCountry?.[country] ?? [];
+                    groupConfig = {
+                        ...lbFields,
+                        type: "load-balance",
+                        strategy: "sticky-sessions",
+                        proxies: nodeNames,
+                    };
+                } else {
+                    groupConfig = {
+                        ...lbFields,
+                        type: "load-balance",
+                        strategy: "sticky-sessions",
+                        "include-all": true,
+                        filter: meta.pattern,
+                        ...(landing ? { "exclude-filter": LANDING_NODE_MATCHER.pattern } : {}),
+                    };
+                }
+                break;
             }
         }
 

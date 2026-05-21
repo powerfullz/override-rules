@@ -4,7 +4,8 @@
  * 组合不同参数调用其 main(config) 生成 Clash/Stash 配置，并输出为 YAML 文件。
  *
  * 支持的布尔参数在下面的 FLAGS 数组中定义，与 convert.js 内保持一致。
- * 生成所有可能的参数组合，文件名基于参数动态生成。
+ * grouptype 参数（0=select, 1=url-test, 2=load-balance）控制代理组类型。
+ * 生成所有可能的参数组合（布尔标志 × grouptype），文件名基于参数动态生成。
  *
  * 可通过环境变量 LIMIT_COMBOS（整数）限制生成前 N 个组合。
  */
@@ -34,20 +35,20 @@ const CONVERT_FILE = path.join(BASE_DIR, "convert.js");
 const FAKE_PROXIES_FILE = path.join(GENERATOR_DIR, "fake_proxies.json");
 const OUTPUT_DIR = path.join(BASE_DIR, "yamls");
 
-const FLAGS = [
-    "loadbalance",
-    "landing",
-    "ipv6",
-    "full",
-    "keepalive",
-    "fakeip",
-    "quic",
-    "tun",
-] as const;
+const FLAGS = ["landing", "ipv6", "full", "keepalive", "fakeip", "quic", "tun"] as const;
 
 type FlagName = (typeof FLAGS)[number];
 type FlagArgs = Record<FlagName, boolean>;
-type GeneratorScriptArgs = { [K in FlagName]: boolean } & { regex: true };
+
+const GROUPTYPE_VALUES = [0, 1, 2] as const;
+type GroupTypeValue = (typeof GROUPTYPE_VALUES)[number];
+
+type GeneratorScriptArgs = { [K in FlagName]: boolean } & { regex: true; grouptype: string };
+
+interface ComboArgs {
+    flags: FlagArgs;
+    grouptype: GroupTypeValue;
+}
 
 interface VmSandbox extends Record<string, unknown> {
     $arguments: GeneratorScriptArgs;
@@ -56,7 +57,6 @@ interface VmSandbox extends Record<string, unknown> {
 }
 
 const FLAG_SHORT_NAMES: Record<FlagName, string> = {
-    loadbalance: "lb",
     landing: "landing",
     ipv6: "ipv6",
     full: "full",
@@ -79,22 +79,24 @@ function toYAML(obj: ClashConfig): string {
     return YAML.stringify(obj, { indent: 2, simpleKeys: false });
 }
 
-function generateArgCombos(): FlagArgs[] {
-    const combos: FlagArgs[] = [];
+function generateArgCombos(): ComboArgs[] {
+    const combos: ComboArgs[] = [];
     for (let mask = 0; mask < 1 << FLAGS.length; mask++) {
-        const combo = {} as FlagArgs;
+        const flags = {} as FlagArgs;
         FLAGS.forEach((flag, i) => {
-            combo[flag] = Boolean(mask & (1 << i));
+            flags[flag] = Boolean(mask & (1 << i));
         });
-        combos.push(combo);
+        for (const grouptype of GROUPTYPE_VALUES) {
+            combos.push({ flags, grouptype });
+        }
     }
     return combos;
 }
 
-function runConvert(baseConfig: ClashConfig, args: FlagArgs): ClashConfig {
+function runConvert(baseConfig: ClashConfig, args: ComboArgs): ClashConfig {
     const code = readFileSync(CONVERT_FILE, "utf-8");
     const sandbox: VmSandbox = {
-        $arguments: { ...args, regex: true },
+        $arguments: { ...args.flags, grouptype: String(args.grouptype), regex: true },
         console,
     };
 
@@ -113,9 +115,9 @@ function getShortName(flag: FlagName): string {
     return FLAG_SHORT_NAMES[flag];
 }
 
-function fileNameFromArgs(args: FlagArgs): string {
-    const parts = FLAGS.map((flag) => `${getShortName(flag)}-${Number(args[flag])}`);
-    return `config_${parts.join("_")}.yaml`;
+function fileNameFromArgs(args: ComboArgs): string {
+    const flagParts = FLAGS.map((flag) => `${getShortName(flag)}-${Number(args.flags[flag])}`);
+    return `config_gt-${args.grouptype}_${flagParts.join("_")}.yaml`;
 }
 
 function ensureDir(dirPath: string): void {
@@ -126,7 +128,7 @@ function ensureDir(dirPath: string): void {
 
 function cleanupLegacyYamlFiles(): void {
     const flagPatterns = FLAGS.map((flag) => `${getShortName(flag)}-\\d`);
-    const currentPattern = new RegExp(`^config_${flagPatterns.join("_")}\\.yaml$`);
+    const currentPattern = new RegExp(`^config_gt-\\d_${flagPatterns.join("_")}\\.yaml$`);
 
     for (const fileName of readdirSync(OUTPUT_DIR)) {
         if (!/^config_.*\.yaml$/.test(fileName)) {

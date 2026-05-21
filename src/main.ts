@@ -3,7 +3,8 @@ powerfullz 的 Substore 订阅转换脚本
 https://github.com/powerfullz/override-rules
 
 支持的传入参数：
-- loadbalance: 启用负载均衡（url-test/load-balance，默认 false）
+- grouptype: 地区代理组类型（0=select 手动选择, 1=url-test 自动测速, 2=load-balance 负载均衡，默认 0）
+  - 向后兼容：若未传 grouptype 但传了 loadbalance，则 loadbalance=true 映射为 grouptype=2，loadbalance=false 映射为 grouptype=1
 - landing: 启用落地节点功能（如机场家宽/星链/落地分组，默认 false）
 - ipv6: 启用 IPv6 支持（默认 false）
 - tun: 启用 TUN 模式（默认 false）
@@ -54,7 +55,7 @@ function getRawArgs(): ScriptArgs {
 
 const rawArgs = getRawArgs();
 const {
-    loadBalance,
+    groupType,
     landing,
     ipv6Enabled,
     fullConfig,
@@ -93,7 +94,7 @@ function main(config: ClashConfig): ClashConfig {
     const countryProxyGroups = buildCountryProxyGroups({
         countries,
         landing,
-        loadBalance,
+        groupType,
         regexFilter,
         countryInfo,
     });

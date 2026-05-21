@@ -1,4 +1,5 @@
 export interface ScriptArgs {
+    grouptype?: string;
     loadbalance?: string;
     landing?: string;
     ipv6?: string;
@@ -11,8 +12,10 @@ export interface ScriptArgs {
     tun?: string;
 }
 
+export type GroupType = 0 | 1 | 2;
+
 export interface FeatureFlags {
-    loadBalance: boolean;
+    groupType: GroupType;
     landing: boolean;
     ipv6Enabled: boolean;
     fullConfig: boolean;
@@ -203,7 +206,7 @@ export interface BuildBaseListsInput {
 export interface BuildCountryProxyGroupsInput {
     countries: string[];
     landing: boolean;
-    loadBalance: boolean;
+    groupType: GroupType;
     regexFilter: boolean;
     countryInfo: CountryInfoItem[];
 }
