@@ -7,7 +7,6 @@ import type { DnsConfig, SnifferConfig } from "./types";
 const FAKE_IP_FILTER = [
     "geosite:private",
     "geosite:connectivity-check",
-    "geosite:cn",
     "Mijia Cloud",
     "dig.io.mi.com",
     "localhost.ptlogin2.qq.com",
