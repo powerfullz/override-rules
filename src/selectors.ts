@@ -37,11 +37,11 @@ export function buildBaseLists({
         countryGroupNames,
         lowCost && PROXY_GROUPS.LOW_COST,
         PROXY_GROUPS.MANUAL,
-        PROXY_GROUPS.DIRECT
+        "DIRECT"
     );
 
     const defaultProxiesDirect = buildList(
-        PROXY_GROUPS.DIRECT,
+        "DIRECT",
         landing && PROXY_GROUPS.LANDING,
         countryGroupNames,
         lowCost && PROXY_GROUPS.LOW_COST,

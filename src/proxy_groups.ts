@@ -201,17 +201,14 @@ export function buildProxyGroups({
             name: PROXY_GROUPS.BILIBILI,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/bilibili.png`,
             type: "select",
-            proxies:
-                hasTW && hasHK
-                    ? [PROXY_GROUPS.DIRECT, "台湾节点", "香港节点"]
-                    : defaultProxiesDirect,
+            proxies: hasTW && hasHK ? ["DIRECT", "台湾节点", "香港节点"] : defaultProxiesDirect,
         },
         {
             name: PROXY_GROUPS.BAHAMUT,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Bahamut.png`,
             type: "select",
             proxies: hasTW
-                ? ["台湾节点", PROXY_GROUPS.SELECT, PROXY_GROUPS.MANUAL, PROXY_GROUPS.DIRECT]
+                ? ["台湾节点", PROXY_GROUPS.SELECT, PROXY_GROUPS.MANUAL, "DIRECT"]
                 : defaultProxies,
         },
         {
@@ -281,13 +278,19 @@ export function buildProxyGroups({
             name: PROXY_GROUPS.SOGOU_INPUT,
             icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/Sougou.png`,
             type: "select",
-            proxies: [PROXY_GROUPS.DIRECT, "REJECT"],
+            proxies: ["DIRECT", "REJECT"],
         },
         {
             name: PROXY_GROUPS.SSH,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Server.png`,
             type: "select",
             proxies: defaultProxies,
+        },
+        {
+            name: PROXY_GROUPS.FINAL,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Final.png`,
+            type: "select",
+            proxies: [PROXY_GROUPS.SELECT, "DIRECT"],
         },
         {
             name: PROXY_GROUPS.AUTO,
@@ -311,7 +314,7 @@ export function buildProxyGroups({
             name: PROXY_GROUPS.AD_BLOCK,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png`,
             type: "select",
-            proxies: ["REJECT", "REJECT-DROP", PROXY_GROUPS.DIRECT],
+            proxies: ["REJECT", "REJECT-DROP", "DIRECT"],
         },
         lowCostNodes.length > 0 || regexFilter
             ? {

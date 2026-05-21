@@ -2,7 +2,7 @@ import { PROXY_GROUPS } from "./constants";
 
 const baseRules = [
     `DST-PORT,22,${PROXY_GROUPS.SSH}`,
-    `GEOIP,private,${PROXY_GROUPS.DIRECT},no-resolve`,
+    `GEOIP,private,DIRECT,no-resolve`,
     `RULE-SET,ADBlock,${PROXY_GROUPS.AD_BLOCK}`,
     `RULE-SET,AdditionalFilter,${PROXY_GROUPS.AD_BLOCK}`,
     `RULE-SET,SogouInput,${PROXY_GROUPS.SOGOU_INPUT}`,
@@ -26,17 +26,17 @@ const baseRules = [
     `RULE-SET,Weibo,${PROXY_GROUPS.WEIBO}`,
     `RULE-SET,EHentai,${PROXY_GROUPS.EHENTAI}`,
     `RULE-SET,TikTok,${PROXY_GROUPS.TIKTOK}`,
-    `RULE-SET,SteamFix,${PROXY_GROUPS.DIRECT}`,
-    `RULE-SET,GoogleFCM,${PROXY_GROUPS.DIRECT}`,
-    `GEOSITE,google-play@cn,${PROXY_GROUPS.DIRECT}`,
-    `GEOSITE,microsoft@cn,${PROXY_GROUPS.DIRECT}`,
+    `RULE-SET,SteamFix,DIRECT`,
+    `RULE-SET,GoogleFCM,DIRECT`,
+    `GEOSITE,google-play@cn,DIRECT`,
+    `GEOSITE,microsoft@cn,DIRECT`,
     `GEOSITE,apple,${PROXY_GROUPS.APPLE}`,
     `GEOSITE,microsoft,${PROXY_GROUPS.MICROSOFT}`,
     `GEOSITE,google,${PROXY_GROUPS.GOOGLE}`,
     `RULE-SET,Crypto,${PROXY_GROUPS.CRYPTO}`,
     `RULE-SET,GFWList,${PROXY_GROUPS.SELECT}`,
-    `GEOIP,cn,${PROXY_GROUPS.DIRECT}`,
-    `MATCH,${PROXY_GROUPS.SELECT}`,
+    `GEOIP,cn,DIRECT`,
+    `MATCH,${PROXY_GROUPS.FINAL}`,
 ];
 
 /**
