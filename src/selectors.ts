@@ -49,13 +49,7 @@ export function buildBaseLists({
         PROXY_GROUPS.MANUAL
     );
 
-    const defaultFallback = buildList(
-        landing && PROXY_GROUPS.LANDING,
-        countryGroupNames,
-        lowCost && PROXY_GROUPS.LOW_COST,
-        PROXY_GROUPS.MANUAL,
-        "DIRECT"
-    );
+    const defaultFallback = buildList(landing && PROXY_GROUPS.LANDING, countryGroupNames);
 
     const frontProxySelector = buildList(
         countryGroupNames,
