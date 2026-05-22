@@ -1,7 +1,7 @@
 {
   "name": "override-rules",
   "private": true,
-  "version": "2.4.1",
+  "version": "2.4.2",
   "description": "Override rules YAML generator",
   "license": "MIT",
   "type": "commonjs",

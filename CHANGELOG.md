@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.4.2](https://github.com/powerfullz/override-rules/compare/src-v2.4.1...src-v2.4.2) (2026-05-22)
+
+
+### Features
+
+- 优化自动选择和故障转移的selector ([2a01839](https://github.com/powerfullz/override-rules/commit/2a0183906439d282ee19c7ab4947c6c227793b89))
 ## [2.4.1](https://github.com/powerfullz/override-rules/compare/src-v2.4.0...src-v2.4.1) (2026-05-21)
 
 
