@@ -16,20 +16,24 @@ npm install
 
 ## 自定义默认的脚本参数
 
-通过 URL 传递参数（如 `#fakeip=true`）是控制脚本行为的常用方式。如果你希望修改这些参数的默认值（例如，默认开启 IPv6 支持），可以修改 `src/args.ts` 中的 `FEATURE_FLAG_DEFAULTS` 常量：
+通过 URL 传递参数（如 `#fakeip=true`）是控制脚本行为的常用方式。如果你希望修改这些参数的默认值（例如，默认开启 IPv6 支持），可以修改 `src/args.ts` 中的 `buildFeatureFlags` 函数，为其解析函数补充或修改默认值参数：
 
 ```typescript
 // src/args.ts
-const FEATURE_FLAG_DEFAULTS = {
-    groupType: 0, // 0=select, 1=url-test, 2=load-balance
-    landing: false,
-    ipv6Enabled: true, // 例如：修改此处，默认开启 IPv6
-    fullConfig: false,
-    keepAliveEnabled: false,
-    fakeIPEnabled: true,
-    quicEnabled: false,
-    regexFilter: false,
-} as const;
+export function buildFeatureFlags(args: ScriptArgs): FeatureFlags {
+    return {
+        groupType: parseGroupType(args),
+        landing: parseBool(args.landing),
+        ipv6Enabled: parseBool(args.ipv6, true), // 例如：传入 true 作为默认值以默认开启 IPv6
+        fullConfig: parseBool(args.full),
+        keepAliveEnabled: parseBool(args.keepalive),
+        fakeIPEnabled: parseBool(args.fakeip, true),
+        quicEnabled: parseBool(args.quic),
+        regexFilter: parseBool(args.regex),
+        tunEnabled: parseBool(args.tun),
+        countryThreshold: parseNumber(args.threshold, 0),
+    };
+}
 ```
 
 ## 调整代理组
@@ -48,16 +52,21 @@ export const PROXY_GROUPS = {
 
 **定义新的代理组：**
 
-```ts
-export const ruleProviders = {
-    // ...
+打开 `src/proxy_groups.ts` 文件，在 `buildProxyGroups` 函数返回的数组中添加你的新代理组：
+
+```typescript
+// src/proxy_groups.ts
+export function buildProxyGroups({ /* 参数 */ }): ProxyGroup[] {
+    return [
+        // ... 已有代理组 ...
         {
             name: PROXY_GROUPS.MY_CUSTOM_GROUP,
-            icon: `图标链接`,
+            icon: `图标链接`, // 代理组的图标，可以使用 url 或者 icon 字符串
             type: "select",
-            proxies: defaultProxies,    // 可以自行在 selectors.ts 中定制
+            proxies: defaultProxies, // 可以自行指定代理集合或者用 selectors.ts 中预设的变量
         },
-    // ...
+        // ...
+    ];
 }
 ```
 
@@ -123,7 +132,7 @@ const baseRules = [
 ];
 ```
 
-## 5. 构建并使用你的定制脚本
+## 构建并使用你的定制脚本
 
 在修改完成后，你可以先在本地运行构建命令来验证你的更改是否正确：
 
