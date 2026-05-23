@@ -36,9 +36,9 @@ import { buildBaseLists } from "./selectors";
 import type { ClashConfig, ScriptArgs } from "./types";
 
 const geoxURL = {
-    geoip: `${CDN_URL}/gh/MetaCubeX/meta-rules-dat@release/geoip-lite.dat`,
+    geoip: `${CDN_URL}/gh/MetaCubeX/meta-rules-dat@release/geoip.dat`,
     geosite: `${CDN_URL}/gh/MetaCubeX/meta-rules-dat@release/geosite.dat`,
-    mmdb: `${CDN_URL}/gh/MetaCubeX/meta-rules-dat@release/country-lite.mmdb`,
+    mmdb: `${CDN_URL}/gh/MetaCubeX/meta-rules-dat@release/country.mmdb`,
     asn: `${CDN_URL}/gh/MetaCubeX/meta-rules-dat@release/GeoLite2-ASN.mmdb`,
 };
 
