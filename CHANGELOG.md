@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.4.3](https://github.com/powerfullz/override-rules/compare/src-v2.4.2...src-v2.4.3) (2026-05-23)
+
+
+### Bug Fixes
+
+- Use full geoip database to fix some precision issue ([2e8ba77](https://github.com/powerfullz/override-rules/commit/2e8ba7778d4d518a3aee5c91241600c3ba04518a))
 ## [2.4.2](https://github.com/powerfullz/override-rules/compare/src-v2.4.1...src-v2.4.2) (2026-05-22)
 
 
