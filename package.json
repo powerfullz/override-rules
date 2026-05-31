@@ -35,7 +35,7 @@
     "prettier": "^3.8.3",
     "tsx": "^4.22.2",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.4"
+    "typescript-eslint": "^8.60.0"
   },
   "lint-staged": {
     "*.{ts,js,json,md,yml,yaml}": [
