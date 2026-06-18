@@ -10,14 +10,6 @@ export const ruleProviders: Record<string, RuleProvider> = {
         url: `${CDN_URL}/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.yaml`,
         path: "./ruleset/ADBlock.yaml",
     },
-    SogouInput: {
-        type: "http",
-        behavior: "classical",
-        format: "text",
-        interval: 86400,
-        url: "https://ruleset.skk.moe/Clash/non_ip/sogouinput.txt",
-        path: "./ruleset/SogouInput.txt",
-    },
     StaticResources: {
         type: "http",
         behavior: "domain",
@@ -66,14 +58,6 @@ export const ruleProviders: Record<string, RuleProvider> = {
         url: `${CDN_URL}/gh/powerfullz/override-rules@master/ruleset/FirebaseCloudMessaging.list`,
         path: "./ruleset/FirebaseCloudMessaging.list",
     },
-    AdditionalFilter: {
-        type: "http",
-        behavior: "classical",
-        format: "text",
-        interval: 86400,
-        url: `${CDN_URL}/gh/powerfullz/override-rules@master/ruleset/AdditionalFilter.list`,
-        path: "./ruleset/AdditionalFilter.list",
-    },
     AdditionalCDNResources: {
         type: "http",
         behavior: "classical",
@@ -90,20 +74,20 @@ export const ruleProviders: Record<string, RuleProvider> = {
         url: `${CDN_URL}/gh/powerfullz/override-rules@master/ruleset/Crypto.list`,
         path: "./ruleset/Crypto.list",
     },
-    Weibo: {
-        type: "http",
-        behavior: "classical",
-        format: "text",
-        interval: 86400,
-        url: `${CDN_URL}/gh/powerfullz/override-rules@master/ruleset/Weibo.list`,
-        path: "./ruleset/Weibo.list",
-    },
     GFWList: {
         type: "http",
         behavior: "domain",
         format: "yaml",
         interval: 86400,
-        url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt",
+        url: `${CDN_URL}/gh/Loyalsoldier/clash-rules@release/gfw.txt`,
         path: "./ruleset/GFWList.yaml",
     },
+    Applications: {
+        type: "http",
+        behavior: "classical",
+        format: "text",
+        interval: 86400,
+        url: `${CDN_URL}/gh/Loyalsoldier/clash-rules@release/applications.txt`,
+        path: "./ruleset/applications.yaml",
+    }
 };

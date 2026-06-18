@@ -195,12 +195,12 @@ export function buildProxyGroups({
             type: "select",
             proxies: defaultProxies,
         },
-        {
-            name: PROXY_GROUPS.XBOX,
-            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Xbox.png`,
-            type: "select",
-            proxies: defaultProxies,
-        },
+        // {
+        //     name: PROXY_GROUPS.XBOX,
+        //     icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Xbox.png`,
+        //     type: "select",
+        //     proxies: defaultProxies,
+        // },
         {
             name: PROXY_GROUPS.GITHUB,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/GitHub.png`,
@@ -213,14 +213,14 @@ export function buildProxyGroups({
             type: "select",
             proxies: hasTW && hasHK ? ["DIRECT", "台湾节点", "香港节点"] : defaultProxiesDirect,
         },
-        {
-            name: PROXY_GROUPS.BAHAMUT,
-            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Bahamut.png`,
-            type: "select",
-            proxies: hasTW
-                ? ["台湾节点", PROXY_GROUPS.SELECT, PROXY_GROUPS.MANUAL, "DIRECT"]
-                : defaultProxies,
-        },
+        // {
+        //     name: PROXY_GROUPS.BAHAMUT,
+        //     icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Bahamut.png`,
+        //     type: "select",
+        //     proxies: hasTW
+        //         ? ["台湾节点", PROXY_GROUPS.SELECT, PROXY_GROUPS.MANUAL, "DIRECT"]
+        //         : defaultProxies,
+        // },
         {
             name: PROXY_GROUPS.YOUTUBE,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/YouTube.png`,
@@ -233,24 +233,24 @@ export function buildProxyGroups({
             type: "select",
             proxies: defaultProxies,
         },
-        {
-            name: PROXY_GROUPS.NETFLIX,
-            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Netflix.png`,
-            type: "select",
-            proxies: defaultProxies,
-        },
+        // {
+        //     name: PROXY_GROUPS.NETFLIX,
+        //     icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Netflix.png`,
+        //     type: "select",
+        //     proxies: defaultProxies,
+        // },
         {
             name: PROXY_GROUPS.TIKTOK,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/TikTok.png`,
             type: "select",
             proxies: defaultProxies,
         },
-        {
-            name: PROXY_GROUPS.SPOTIFY,
-            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Spotify.png`,
-            type: "select",
-            proxies: defaultProxies,
-        },
+        // {
+        //     name: PROXY_GROUPS.SPOTIFY,
+        //     icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Spotify.png`,
+        //     type: "select",
+        //     proxies: defaultProxies,
+        // },
         {
             name: PROXY_GROUPS.TELEGRAM,
             icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/Telegram.png`,
@@ -263,39 +263,39 @@ export function buildProxyGroups({
             type: "select",
             proxies: defaultProxies,
         },
-        {
-            name: PROXY_GROUPS.WEIBO,
-            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Weibo.png`,
-            type: "select",
-            "include-all": true,
-            proxies: defaultProxiesDirect,
-        },
-        {
-            name: PROXY_GROUPS.TRUTH_SOCIAL,
-            icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/Truth_Social.png`,
-            type: "select",
-            proxies: hasUS
-                ? ["美国节点", PROXY_GROUPS.SELECT, PROXY_GROUPS.MANUAL]
-                : defaultProxies,
-        },
+        // {
+        //     name: PROXY_GROUPS.WEIBO,
+        //     icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Weibo.png`,
+        //     type: "select",
+        //     "include-all": true,
+        //     proxies: defaultProxiesDirect,
+        // },
+        // {
+        //     name: PROXY_GROUPS.TRUTH_SOCIAL,
+        //     icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/Truth_Social.png`,
+        //     type: "select",
+        //     proxies: hasUS
+        //         ? ["美国节点", PROXY_GROUPS.SELECT, PROXY_GROUPS.MANUAL]
+        //         : defaultProxies,
+        // },
         {
             name: PROXY_GROUPS.EHENTAI,
             icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/Ehentai.png`,
             type: "select",
             proxies: defaultProxies,
         },
-        {
-            name: PROXY_GROUPS.PIKPAK,
-            icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/PikPak.png`,
-            type: "select",
-            proxies: defaultProxies,
-        },
-        {
-            name: PROXY_GROUPS.SOGOU_INPUT,
-            icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/Sougou.png`,
-            type: "select",
-            proxies: ["DIRECT", "REJECT"],
-        },
+        // {
+        //     name: PROXY_GROUPS.PIKPAK,
+        //     icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/PikPak.png`,
+        //     type: "select",
+        //     proxies: defaultProxies,
+        // },
+        // {
+        //     name: PROXY_GROUPS.SOGOU_INPUT,
+        //     icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/Sougou.png`,
+        //     type: "select",
+        //     proxies: ["DIRECT", "REJECT"],
+        // },
         {
             name: PROXY_GROUPS.SSH,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Server.png`,

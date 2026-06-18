@@ -36,7 +36,7 @@ export const PROXY_GROUPS = {
     SSH: "SSH",
     SOGOU_INPUT: "搜狗输入法",
     AD_BLOCK: "广告拦截",
-    GLOBAL: "GLOBAL",
+    GLOBAL: "GLOBAL", // 全局代理的时候使用，参考 https://wiki.metacubex.one/config/proxy-groups/built-in/?h=global#global
     FINAL: "Final",
 } as const;
 
