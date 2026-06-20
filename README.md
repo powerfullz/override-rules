@@ -54,7 +54,7 @@
 
 目前支持的参数：
 
-*   `grouptype`：地区代理组类型（0=手动选择 select，1=自动测速 url-test，2=负载均衡 load-balance，默认 0）
+*   `grouptype`：地区代理组类型（0=手动选择 select，1=自动测速 url-test，2=负载均衡 load-balance，默认 1）
 *   `ipv6`：启用 IPv6 支持（默认 false）
 *   `full`：生成完整配置（适合纯内核启动，默认 false）
 *   `keepalive`：启用 TCP Keep Alive（默认 false）[^fn2]
