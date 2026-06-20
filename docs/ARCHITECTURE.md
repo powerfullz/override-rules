@@ -77,7 +77,7 @@ flowchart TD
 
 ---
 
-## 文件职责矩阵
+## 文件职责
 
 | 文件 | 职责 | 关键导出 |
 |------|------|----------|
@@ -96,7 +96,7 @@ flowchart TD
 
 ---
 
-## 关键设计决策
+## 设计决策
 
 ### 落地/非落地自动检测
 
@@ -107,7 +107,7 @@ flowchart TD
 
 变量 `landing` 为 `true` 当且仅当两类节点均存在（`landingNodes.length > 0 && nonLandingNodes.length > 0`）。这保证了中继代理组仅在真正需要时才生成，避免了空组或配置不一致的问题。
 
-### 节点分类的三维模型
+### 节点分类
 
 节点在进入配置构建阶段前，经过三个独立维度的分类：
 
@@ -117,17 +117,17 @@ flowchart TD
 
 这三个分类维度相互独立，构建阶段通过组合它们来生成完整的代理组树。
 
-### 数据流设计原则
+### 数据流
 
 - **减少中间类型**：`parseCountries()` 直接返回 `Record<string, ProxyNode[]>` 而非引入额外的中间结构。`getActiveCountryNames()` 返回纯净的国家名称（不含 `"节点"` 后缀）。国家代理组的构建逻辑已内联于 `buildProxyGroups()` 中，不再需要独立的 `buildCountryProxyGroups()` 函数。
 - **`NODE_SUFFIX` 仅在展示层添加**：`"节点"` 后缀（如「香港」→「香港节点」）只在 `buildBaseLists()` 和 `buildProxyGroups()` 中拼接，分类层完全不涉及此概念。
 - **数据优于标志**：接收节点信息的参数统一使用具体数据（如 `landingNodes: ProxyNode[]`、`countryNodes: Record<string, ProxyNode[]>`）而非布尔值。布尔标志（如 `landing`）由数据推导得出，保证了判定依据的可追溯性。
 
-### args.ts 的默认值策略
+### args.ts 的默认值
 
 所有 URL 参数都有明确的默认值。`buildFeatureFlags()` 负责解析并回填默认值，产出类型安全的 `FeatureFlags` 对象。这使得下游模块无需关心参数来源或缺失情况——每个标志都有确定的值。
 
-### YAML Generator 的参数穷举
+### YAML Generator 的参数
 
 静态 YAML 配置文件通过 `scripts/yaml_generator/generator.ts` 穷举参数组合生成：
 
@@ -145,7 +145,7 @@ flowchart TD
 
 ---
 
-## 两种输出模式
+## 输出模式
 
 本项目支持两种部署方式，分别适用于不同使用场景：
 
