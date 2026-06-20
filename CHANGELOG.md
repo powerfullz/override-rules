@@ -1,5 +1,35 @@
 # Changelog
 
+## [2.5.0](https://github.com/powerfullz/override-rules/compare/src-v2.4.3...src-v2.5.0) (2026-06-20)
+
+
+### Bug Fixes
+
+- Fix landing sort logic ([c0eecd8](https://github.com/powerfullz/override-rules/commit/c0eecd8e80c4c7d00ee809ee4c61300350b15a79))
+
+
+### Chores
+
+- Update dev dependencies ([4d1f15f](https://github.com/powerfullz/override-rules/commit/4d1f15fb1012fe4df597316ad4e5fe77d95cee24))
+- Optimise icons ([052e732](https://github.com/powerfullz/override-rules/commit/052e7321fb8452d121a808e1d6fac30e0c3df122))
+- Update dependencies and remove noisy dependabot ([45f77f5](https://github.com/powerfullz/override-rules/commit/45f77f555bb309b7920300008297ff4b0a88cc27))
+- Bump @typescript/native-preview ([12c53b6](https://github.com/powerfullz/override-rules/commit/12c53b682ff4ab07b77d033ed8fb25e202d7f3df))
+
+
+### Documentation
+
+- Optimise  docs ([ef7158e](https://github.com/powerfullz/override-rules/commit/ef7158e7c7f7b2926fd16dfa82d4ae588ccf418f))
+- Update HOW_TO_CUSTOMISE.md ([e118050](https://github.com/powerfullz/override-rules/commit/e1180506868432fd55bb7538783842b3a0c8e13b))
+
+
+### Features
+
+- 默认组类型调整回 URL-TEST ([0eec548](https://github.com/powerfullz/override-rules/commit/0eec548fe9d7400c0a7a110089b2a81df6e8cdc3))
+
+
+### Refactoring
+
+- Eliminate AI slop, auto-detect landing, simplify data flow ([3ab2e23](https://github.com/powerfullz/override-rules/commit/3ab2e23e4be83620773d049fb8350d4cb9e7724a))
 ## [2.4.3](https://github.com/powerfullz/override-rules/compare/src-v2.4.2...src-v2.4.3) (2026-05-23)
 
 
