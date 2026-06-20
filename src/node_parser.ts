@@ -17,9 +17,11 @@ export function parseLowCost(nodes: ProxyNode[]): ProxyNode[] {
 }
 
 /**
- * 将订阅中的所有节点按是否为落地节点进行分类。
+ * 根据 dialer-proxy 字段将节点分为落地节点和非落地节点。
+ * 在 Mihomo 链式代理中，`dialer-proxy` 表示当前节点通过指定代理拨号。
+ * 因此带 `dialer-proxy: "前置代理"` 的节点是落地节点（目标节点），其余为非落地节点。
  * @param nodes - 节点数组，一般是 `config.proxies` 列表
- * @returns 包含 `landingNodes`（落地节点数组）和 `nonLandingNodes`（非落地节点数组）的对象
+ * @returns 包含 `landingNodes`（带 dialer-proxy 的落地节点）和 `nonLandingNodes`（普通/中继节点）
  */
 export function parseNodesByLanding(nodes: ProxyNode[]): {
     landingNodes: ProxyNode[];
@@ -33,7 +35,7 @@ export function parseNodesByLanding(nodes: ProxyNode[]): {
 
         if (!name) continue;
 
-        if (node["dialer-proxy"] !== "前置代理") {
+        if (node["dialer-proxy"] === "前置代理") {
             landingNodes.push(node);
         } else {
             nonLandingNodes.push(node);
@@ -45,7 +47,7 @@ export function parseNodesByLanding(nodes: ProxyNode[]): {
 
 /**
  * 遍历订阅中的所有节点，按 `countriesMeta` 中定义的地区进行归类。
- * @param nodes - 节点数组，一般是过滤掉 LandingNodes 以后的 `config.proxies` 列表
+ * @param nodes - 节点数组，当链式代理激活时为 nonLandingNodes，否则为全部节点
  * @returns 地区名到节点数组的映射 Record
  */
 export function parseCountries(nodes: ProxyNode[]): Record<string, ProxyNode[]> {
