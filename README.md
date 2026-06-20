@@ -50,12 +50,11 @@
 
 参考[最速 Substore 订阅管理指南](https://blog.l3zc.com/2025/03/clash-subscription-convert/)。
 
-2025/06/17 更新：新增 JavaScript 格式覆写，更易于维护，已经成为首选方式。JavaScript 格式覆写支持在脚本链接末尾加入`#`以传入参数，传入多个参数时，用`&`分隔，例如`#landing=true&grouptype=2`。
+2025/06/17 更新：新增 JavaScript 格式覆写，更易于维护，已经成为首选方式。JavaScript 格式覆写支持在脚本链接末尾加入`#`以传入参数，传入多个参数时，用`&`分隔，例如`#grouptype=2`。
 
 目前支持的参数：
 
 *   `grouptype`：地区代理组类型（0=手动选择 select，1=自动测速 url-test，2=负载均衡 load-balance，默认 0）
-*   `landing`：启用落地节点功能（如机场家宽/星链/落地分组，默认 false）[^landing]
 *   `ipv6`：启用 IPv6 支持（默认 false）
 *   `full`：生成完整配置（适合纯内核启动，默认 false）
 *   `keepalive`：启用 TCP Keep Alive（默认 false）[^fn2]
@@ -67,7 +66,6 @@
 
 > **向后兼容**：旧的 `loadbalance` 参数仍然可用。当 `grouptype` 未指定时，`loadbalance=true` 等价于 `grouptype=2`，`loadbalance=false` 等价于 `grouptype=1`。
 
-[^landing]: 注意在默认的枚举模式下，如果没有符合条件的落地节点（e.g 名称中带有「家宽」、「商宽」、「落地」等关键词的节点），内核会无法启动。
 [^quic]: 默认屏蔽了 QUIC 流量防止节点 UDP 性能不佳影响上网体验，如果确信节点质量良好，建议设置为 true。
 [^regex]: 默认情况下覆写脚本会直接把节点都筛选好，如果想让内核来筛（比如，你在 Clash Party 客户端里额外添加了自建节点，想直接通过正则表达式筛选进入配置文件）那就打开吧。
 
@@ -81,12 +79,6 @@
 
 ```
 https://cdn.jsdelivr.net/gh/powerfullz/override-rules/convert.min.js#grouptype=1
-```
-
-有链式代理和多个节点提供商之间负载均衡的需求，使用`landing=true&grouptype=2`两个参数：
-
-```
-https://cdn.jsdelivr.net/gh/powerfullz/override-rules/convert.min.js#landing=true&grouptype=2
 ```
 
 如果想第一时间体验最新加入的 ~~Bug~~ 功能，可以使用 preview 分支的 Github Raw 链接：
@@ -111,20 +103,15 @@ https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/preview/c
 
 ~~**Steam 修复**：~~ 用于让 Steam 客户端调用国内 CDN 及 P2P 网络下载，节省大量流量，已经是默认行为。
 
-### 关于链式代理的说明
+### 链式代理（前置代理 + 落地节点）
 
-若有链式代理需求，直接在 JS 链接后加 `landing=true` 参数即可（例如：`convert.min.js#landing=true`）。这样会新增「落地节点」和「前置代理」两个代理组，其中「落地节点」会自动匹配名称包含「家宽」「家庭」「商宽」「落地」「Starlink/星链」等关键词的节点，其他诸如「香港节点」等国家/地区分组会自动剔除这些落地节点。需要被链式代理的落地节点请在你的订阅里为该节点配置 `dialer-proxy: "前置代理"`，示例：
+本脚本会自动检测订阅中的链式代理节点：如果节点带有 `dialer-proxy: "前置代理"` 字段，
+该节点将被识别为**前置代理**（中继节点），其余节点视为**落地节点**（目标节点，如家宽/商宽/星链等）。
 
-```yaml
-proxies:
-  - name: '香港 HGC NAT 商宽落地'
-    type: ss
-    server: example.com
-    port: 6666
-    cipher: aes-256-gcm
-    password: goodpassword
-    dialer-proxy: "前置代理"
-```
+**无需任何参数。** 脚本会根据节点是否包含 `dialer-proxy` 字段自动生成相应的
+「前置代理」和「落地节点」代理组，并在分组和规则中正确排除落地节点。
+
+如果你的机场支持链式代理，只需在订阅中配置好 `dialer-proxy` 字段即可自动生效。
 
 ### 关于自动生成的 YAML 格式覆写
 
@@ -142,22 +129,22 @@ proxies:
 文件命名规则依据支持的开关参数穷举，格式如下：
 
 ```text
-config_gt-{0|1|2}_landing-{0|1}_ipv6-{0|1}_full-{0|1}_keepalive-{0|1}_fakeip-{0|1}_quic-{0|1}_tun-{0|1}.yaml
+config_gt-{0|1|2}_ipv6-{0|1}_full-{0|1}_keepalive-{0|1}_fakeip-{0|1}_quic-{0|1}_tun-{0|1}.yaml
 ```
 
 **获取示例（开启 full，其余关闭）：**
 ```text
-https://cdn.jsdelivr.net/gh/powerfullz/override-rules/yamls/config_gt-0_landing-0_ipv6-0_full-1_keepalive-0_fakeip-0_quic-0_tun-0.yaml
+https://cdn.jsdelivr.net/gh/powerfullz/override-rules/yamls/config_gt-0_ipv6-0_full-1_keepalive-0_fakeip-0_quic-0_tun-0.yaml
 ```
 
 **固定版本获取示例：**
 ```text
-https://cdn.jsdelivr.net/gh/powerfullz/override-rules@v0.1.0/yamls/config_gt-0_landing-0_ipv6-0_full-1_keepalive-0_fakeip-0_quic-0_tun-0.yaml
+https://cdn.jsdelivr.net/gh/powerfullz/override-rules@v0.1.0/yamls/config_gt-0_ipv6-0_full-1_keepalive-0_fakeip-0_quic-0_tun-0.yaml
 ```
 
 如果使用镜像：
 ```text
-https://git.l3zc.com/powerfullz/override-rules/raw/branch/dist/yamls/config_gt-0_landing-0_ipv6-0_full-1_keepalive-0_fakeip-0_quic-0_tun-0.yaml
+https://git.l3zc.com/powerfullz/override-rules/raw/branch/dist/yamls/config_gt-0_ipv6-0_full-1_keepalive-0_fakeip-0_quic-0_tun-0.yaml
 ```
 
 *注：CI 仅套用了一份虚拟的 `fake_proxies.json` 来模拟生成 YAML，因此它无法像 JS 动态脚本那样根据你的实际节点智能生成专属分组策略，只能保守地包含常用的国家/地区。为了最高效的分流体验，仍强烈推荐使用 JS 覆写。*

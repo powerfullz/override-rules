@@ -23,7 +23,6 @@ npm install
 export function buildFeatureFlags(args: ScriptArgs): FeatureFlags {
     return {
         groupType: parseGroupType(args),
-        landing: parseBool(args.landing),
         ipv6Enabled: parseBool(args.ipv6, true), // 例如：传入 true 作为默认值以默认开启 IPv6
         fullConfig: parseBool(args.full),
         keepAliveEnabled: parseBool(args.keepalive),

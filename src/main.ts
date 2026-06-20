@@ -5,7 +5,7 @@ https://github.com/powerfullz/override-rules
 支持的传入参数：
 - grouptype: 地区代理组类型（0=select 手动选择, 1=url-test 自动测速, 2=load-balance 负载均衡，默认 0）
   - 向后兼容：若未传 grouptype 但传了 loadbalance，则 loadbalance=true 映射为 grouptype=2，loadbalance=false 映射为 grouptype=1
-- landing: 启用落地节点功能（如机场家宽/星链/落地分组，默认 false）
+- landing: auto-detected from nodes with `dialer-proxy` field; no user parameter needed
 - ipv6: 启用 IPv6 支持（默认 false）
 - tun: 启用 TUN 模式（默认 false）
 - full: 输出完整配置（适合纯内核启动，默认 false）
@@ -20,13 +20,12 @@ https://github.com/powerfullz/override-rules
 
 import { CDN_URL, PROXY_GROUPS } from "./constants";
 import { buildFeatureFlags } from "./args";
-import { buildCountryProxyGroups, buildProxyGroups } from "./proxy_groups";
+import { buildProxyGroups } from "./proxy_groups";
 import {
-    getCountryGroupNames,
+    getActiveCountryNames,
     parseCountries,
     parseLowCost,
     parseNodesByLanding,
-    stripNodeSuffix,
 } from "./node_parser";
 import { buildRules } from "./rules";
 import { ruleProviders } from "./rule_providers";
@@ -56,7 +55,6 @@ function getRawArgs(): ScriptArgs {
 const rawArgs = getRawArgs();
 const {
     groupType,
-    landing,
     ipv6Enabled,
     fullConfig,
     keepAliveEnabled,
@@ -68,14 +66,14 @@ const {
 } = buildFeatureFlags(rawArgs);
 
 function main(config: ClashConfig): ClashConfig {
-    const countryInfo = parseCountries(config, landing);
-    const lowCostNodes = parseLowCost(config);
-    const countryGroupNames = getCountryGroupNames(countryInfo, countryThreshold);
-    const countries = stripNodeSuffix(countryGroupNames);
-
-    const { landingNodes, nonLandingNodes } = landing
-        ? parseNodesByLanding(config)
-        : { landingNodes: [], nonLandingNodes: [] };
+    if (!config.proxies || !Array.isArray(config.proxies)) {
+        throw new Error("[powerfullz 的覆写脚本] 错误：Clash 配置中缺少有效的 proxies 字段");
+    }
+    const { landingNodes, nonLandingNodes } = parseNodesByLanding(config.proxies);
+    const landing = landingNodes.length > 0 && nonLandingNodes.length > 0;
+    const countryNodes = parseCountries(landing ? nonLandingNodes : config.proxies);
+    const lowCostNodes = parseLowCost(landing ? nonLandingNodes : config.proxies);
+    const countryNames = getActiveCountryNames(countryNodes, countryThreshold);
 
     const {
         defaultProxies,
@@ -86,26 +84,18 @@ function main(config: ClashConfig): ClashConfig {
     } = buildBaseLists({
         landing,
         lowCostNodes,
-        countryGroupNames,
+        countryNames,
         nonLandingNodes,
         regexFilter,
     });
 
-    const countryProxyGroups = buildCountryProxyGroups({
-        countries,
-        landing,
-        groupType,
-        regexFilter,
-        countryInfo,
-    });
-
     const proxyGroups = buildProxyGroups({
-        landing,
         regexFilter,
         groupType,
-        countries,
-        countryProxyGroups,
+        countryNames,
+        countryNodes,
         lowCostNodes,
+        landing,
         landingNodes,
         defaultProxies,
         defaultProxiesDirect,

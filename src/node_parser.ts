@@ -1,10 +1,5 @@
-import {
-    LANDING_NODE_MATCHER,
-    NODE_SUFFIX,
-    LOW_COST_NODE_MATCHER,
-    countriesMeta,
-} from "./constants";
-import type { ClashConfig, CountryInfoItem } from "./types";
+import { LOW_COST_NODE_MATCHER, countriesMeta } from "./constants";
+import type { ClashConfig, ProxyNode } from "./types";
 
 const COUNTRY_REGEX_MAP = Object.fromEntries(
     Object.entries(countriesMeta).map(([country, meta]) => {
@@ -15,37 +10,34 @@ const COUNTRY_REGEX_MAP = Object.fromEntries(
 /**
  * 从 Clash 配置中筛选出所有低价节点的名称。
  * @param config - 当前的 Clash 配置对象，需包含 `proxies` 字段
- * @returns 匹配低价节点正则的节点名称数组
+ * @returns 匹配低价节点正则的节点数组
  */
-export function parseLowCost(config: ClashConfig): string[] {
-    return (config.proxies || [])
-        .filter((proxy) => LOW_COST_NODE_MATCHER.regex.test(proxy.name || ""))
-        .map((proxy) => proxy.name)
-        .filter((name): name is string => Boolean(name));
+export function parseLowCost(nodes: ProxyNode[]): ProxyNode[] {
+    return (nodes || []).filter((proxy) => LOW_COST_NODE_MATCHER.regex.test(proxy.name || ""));
 }
 
 /**
  * 将订阅中的所有节点按是否为落地节点进行分类。
- * @param config - 当前的 Clash 配置对象，需包含 `proxies` 字段
- * @returns 包含 `landingNodes`（落地节点名称列表）和 `nonLandingNodes`（非落地节点名称列表）的对象
+ * @param nodes - 节点数组，一般是 `config.proxies` 列表
+ * @returns 包含 `landingNodes`（落地节点数组）和 `nonLandingNodes`（非落地节点数组）的对象
  */
-export function parseNodesByLanding(config: ClashConfig): {
-    landingNodes: string[];
-    nonLandingNodes: string[];
+export function parseNodesByLanding(nodes: ProxyNode[]): {
+    landingNodes: ProxyNode[];
+    nonLandingNodes: ProxyNode[];
 } {
-    const landingNodes: string[] = [];
-    const nonLandingNodes: string[] = [];
+    const landingNodes: ProxyNode[] = [];
+    const nonLandingNodes: ProxyNode[] = [];
 
-    for (const proxy of config.proxies || []) {
-        const name = proxy.name;
+    for (const node of nodes || []) {
+        const name = node.name;
+
         if (!name) continue;
 
-        if (LANDING_NODE_MATCHER.regex.test(name)) {
-            landingNodes.push(name);
-            continue;
+        if (node["dialer-proxy"] !== "前置代理") {
+            landingNodes.push(node);
+        } else {
+            nonLandingNodes.push(node);
         }
-
-        nonLandingNodes.push(name);
     }
 
     return { landingNodes, nonLandingNodes };
@@ -53,18 +45,14 @@ export function parseNodesByLanding(config: ClashConfig): {
 
 /**
  * 遍历订阅中的所有节点，按 `countriesMeta` 中定义的地区进行归类。
- * @param config - 当前的 Clash 配置对象，需包含 `proxies` 字段
- * @param landing - 是否启用落地节点模式；为 `true` 时将跳过落地节点，默认为 `false`
- * @returns 按地区归类后的节点信息数组，每项包含 `country`（地区名）和 `nodes`（节点名称列表）
+ * @param nodes - 节点数组，一般是过滤掉 LandingNodes 以后的 `config.proxies` 列表
+ * @returns 地区名到节点数组的映射 Record
  */
-export function parseCountries(config: ClashConfig, landing = false): CountryInfoItem[] {
-    const proxies = config.proxies || [];
-    const countryNodes: Record<string, string[]> = Object.create(null);
+export function parseCountries(nodes: ProxyNode[]): Record<string, ProxyNode[]> {
+    const countryNodes: Record<string, ProxyNode[]> = Object.create(null);
 
-    for (const proxy of proxies) {
-        const name = proxy.name || "";
-
-        if (landing && LANDING_NODE_MATCHER.regex.test(name)) continue;
+    for (const node of nodes) {
+        const name = node.name || "";
 
         for (const [country, regex] of Object.entries(COUNTRY_REGEX_MAP)) {
             if (!regex.test(name)) continue;
@@ -72,38 +60,31 @@ export function parseCountries(config: ClashConfig, landing = false): CountryInf
             if (!countryNodes[country]) {
                 countryNodes[country] = [];
             }
-            countryNodes[country].push(name);
+            countryNodes[country].push(node);
             break;
         }
     }
 
-    return Object.entries(countryNodes).map(([country, nodes]) => ({ country, nodes }));
+    return countryNodes;
 }
 
 /**
- * 根据最小节点数量阈值过滤地区，并按权重排序后返回带后缀的地区分组名称列表。
- * @param countryInfo - 由 `parseCountries` 返回的地区节点信息数组
+ * 根据最小节点数量阈值过滤地区，并按权重排序后返回地区名称列表。
+ * @param countryNodes - 由 `parseCountries` 返回的地区名到节点数组的映射
  * @param minCount - 地区节点数量的最小阈值，节点数不足该值的地区将被过滤掉
- * @returns 按权重升序排列、附加了节点后缀（`NODE_SUFFIX`）的地区分组名称数组
+ * @returns 按权重排序的地区名数组（不含后缀）
  */
-export function getCountryGroupNames(countryInfo: CountryInfoItem[], minCount: number): string[] {
-    const filtered = countryInfo.filter((item) => item.nodes.length >= minCount);
+export function getActiveCountryNames(
+    countryNodes: Record<string, ProxyNode[]>,
+    minCount: number
+): string[] {
+    const filtered = Object.entries(countryNodes).filter(([, nodes]) => nodes.length >= minCount);
 
-    filtered.sort((a, b) => {
-        const wa = countriesMeta[a.country]?.weight ?? Infinity;
-        const wb = countriesMeta[b.country]?.weight ?? Infinity;
+    filtered.sort(([a], [b]) => {
+        const wa = countriesMeta[a]?.weight ?? Infinity;
+        const wb = countriesMeta[b]?.weight ?? Infinity;
         return wa - wb;
     });
 
-    return filtered.map((item) => item.country + NODE_SUFFIX);
-}
-
-/**
- * 移除分组名称末尾的节点后缀（`NODE_SUFFIX`），还原为纯地区名称。
- * @param groupNames - 带节点后缀的分组名称数组，通常来自 `getCountryGroupNames`
- * @returns 去除后缀后的地区名称数组
- */
-export function stripNodeSuffix(groupNames: string[]): string[] {
-    const suffixPattern = new RegExp(`${NODE_SUFFIX}$`);
-    return groupNames.map((name) => name.replace(suffixPattern, ""));
+    return filtered.map(([country]) => country);
 }

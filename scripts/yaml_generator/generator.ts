@@ -35,7 +35,7 @@ const CONVERT_FILE = path.join(BASE_DIR, "convert.js");
 const FAKE_PROXIES_FILE = path.join(GENERATOR_DIR, "fake_proxies.json");
 const OUTPUT_DIR = path.join(BASE_DIR, "yamls");
 
-const FLAGS = ["landing", "ipv6", "full", "keepalive", "fakeip", "quic", "tun"] as const;
+const FLAGS = ["ipv6", "full", "keepalive", "fakeip", "quic", "tun"] as const;
 
 type FlagName = (typeof FLAGS)[number];
 type FlagArgs = Record<FlagName, boolean>;
@@ -57,7 +57,6 @@ interface VmSandbox extends Record<string, unknown> {
 }
 
 const FLAG_SHORT_NAMES: Record<FlagName, string> = {
-    landing: "landing",
     ipv6: "ipv6",
     full: "full",
     keepalive: "keepalive",
