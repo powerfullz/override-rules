@@ -1,5 +1,5 @@
 import { LOW_COST_NODE_MATCHER, countriesMeta } from "./constants";
-import type { ClashConfig, ProxyNode } from "./types";
+import type { ProxyNode } from "./types";
 
 const COUNTRY_REGEX_MAP = Object.fromEntries(
     Object.entries(countriesMeta).map(([country, meta]) => {
