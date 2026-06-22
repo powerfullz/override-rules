@@ -20,9 +20,8 @@ import type { FeatureFlags, GroupType, ScriptArgs } from "./types";
  * ```
  */
 function parseGroupType(args: ScriptArgs): GroupType {
-    const fallback: GroupType =
-        args.loadbalance !== undefined ? (parseBool(args.loadbalance) ? 2 : 1) : 1;
-    const raw = parseNumber(args.grouptype, fallback);
+    if (parseBool(args.loadbalance)) return 2; // 兼容旧参数：loadbalance=true 等价于 grouptype=2 (load-balance)
+    const raw = parseNumber(args.grouptype);
     if (raw === 0 || raw === 1 || raw === 2) return raw;
     return 1;
 }
@@ -42,6 +41,6 @@ export function buildFeatureFlags(args: ScriptArgs): FeatureFlags {
         quicEnabled: parseBool(args.quic),
         regexFilter: parseBool(args.regex),
         tunEnabled: parseBool(args.tun),
-        countryThreshold: parseNumber(args.threshold, 0),
+        countryThreshold: parseNumber(args.threshold, 2),
     };
 }
