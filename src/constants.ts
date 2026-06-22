@@ -5,6 +5,10 @@ export const NODE_SUFFIX = "节点";
 export const CDN_URL = "https://cdn.jsdelivr.net";
 export const SPEEDTEST_URL = "http://www.gstatic.com/generate_204";
 
+export const LOW_COST_NODE_MATCHER = createCaseInsensitiveNodeMatcher(
+    String.raw`0\.[0-5]|低倍率|省流|实验性`
+);
+
 export const PROXY_GROUPS = {
     SELECT: "选择代理",
     MANUAL: "手动选择",
@@ -40,14 +44,6 @@ export const PROXY_GROUPS = {
     GLOBAL: "GLOBAL",
     FINAL: "Final",
 } as const;
-
-export const LOW_COST_NODE_MATCHER = createCaseInsensitiveNodeMatcher(
-    String.raw`0\.[0-5]|低倍率|省流|实验性`
-);
-
-export const LANDING_NODE_MATCHER = createCaseInsensitiveNodeMatcher(
-    String.raw`家宽|家庭宽带|商宽|商业宽带|星链|Starlink|落地`
-);
 
 /**
  * 各地区的元数据：`weight` 决定在代理组列表中的排列顺序（值越小越靠前，未设置则排末尾）；
