@@ -1,5 +1,7 @@
 ## powerfullz 的 Mihomo/Substore 覆写规则
 
+![](img/cover.png)
+
 [![](https://data.jsdelivr.com/v1/package/gh/powerfullz/override-rules/badge?style=rounded)](https://www.jsdelivr.com/package/gh/powerfullz/override-rules)
 
 本仓库为 Mihomo/Substore 设计，提供高效、灵活的覆写规则（**不建议用于 Stash**）。核心特色如下：
@@ -62,7 +64,7 @@
 *   `quic`：允许 QUIC 流量（UDP 443，默认 false）[^quic]
 *   `regex`：各国家/地区代理组改用 `include-all` + 正则过滤模式，由 Mihomo 内核在运行时按正则动态筛选节点，而非在脚本执行时枚举节点名称（默认 false）[^regex]
 *   `tun`：启用 TUN 模式（gvisor 栈，自动配置路由排除地址与 DNS 劫持，默认 false）
-*   `threshold`：国家/地区节点数量小于该值时不显示分组（默认 0）
+*   `threshold`：国家/地区节点数量小于该值时不显示分组（默认 2）
 
 > **向后兼容**：旧的 `loadbalance` 参数仍然可用。当 `grouptype` 未指定时，`loadbalance=true` 等价于 `grouptype=2`，`loadbalance=false` 等价于 `grouptype=1`。
 
@@ -103,17 +105,11 @@ https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/preview/c
 
 ~~**Steam 修复**：~~ 用于让 Steam 客户端调用国内 CDN 及 P2P 网络下载，节省大量流量，已经是默认行为。
 
-### 链式代理（前置代理 + 落地节点）
+### 关于链式代理的说明
 
-在 Mihomo 链式代理中，`dialer-proxy` 字段表示当前节点通过指定代理拨号。
-因此，带 `dialer-proxy: "前置代理"` 的节点是**落地节点**（目标/出口节点，如家宽/商宽/星链），
-不带的则是**前置代理**（中继/入口节点）。
+对于使用机场线路配合自行购买的落地机进行链式代理的情况，在 Substore 添加自建节点时，加入`dialer-proxy: "前置代理"`脚本即可自动识别，并新增「前置代理」和「落地节点」两个代理组。
 
-**无需任何参数。** 脚本会根据节点是否包含 `dialer-proxy` 字段自动生成相应的
-「前置代理」和「落地节点」代理组。国家/地区代理组仅包含非落地节点（前置代理），
-落地节点单独归入「落地节点」组，并通过规则正确排除。
-
-如果你的机场支持链式代理，只需在订阅中配置好 `dialer-proxy` 字段即可自动生效。
+![新增的代理组](img/dialer-group.png) ![如何配置自建节点](img/dialer-example.png)
 
 ### 关于自动生成的 YAML 格式覆写
 
