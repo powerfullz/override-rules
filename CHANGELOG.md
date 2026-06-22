@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.5.1](https://github.com/powerfullz/override-rules/compare/src-v2.5.0...src-v2.5.1) (2026-06-22)
+
+
+### Bug Fixes
+
+- Typecheck issue ([75832b6](https://github.com/powerfullz/override-rules/commit/75832b623ec3ad7eed3cf3a9d945f622f81c9137))
+
+
+### Refactoring
+
+- Add SPEEDTEST_URL constant ([29313d5](https://github.com/powerfullz/override-rules/commit/29313d5867ed72a422bb511739d1e6959231d1a6))
 ## [2.5.0](https://github.com/powerfullz/override-rules/compare/src-v2.4.3...src-v2.5.0) (2026-06-20)
 
 
