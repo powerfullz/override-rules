@@ -21,7 +21,7 @@ import type { FeatureFlags, GroupType, ScriptArgs } from "./types";
  */
 function parseGroupType(args: ScriptArgs): GroupType {
     if (parseBool(args.loadbalance)) return 2; // 兼容旧参数：loadbalance=true 等价于 grouptype=2 (load-balance)
-    const raw = parseNumber(args.grouptype);
+    const raw = parseNumber(args.grouptype, 1);
     if (raw === 0 || raw === 1 || raw === 2) return raw;
     return 1;
 }
