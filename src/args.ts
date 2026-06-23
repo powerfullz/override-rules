@@ -9,15 +9,6 @@ import type { FeatureFlags, GroupType, ScriptArgs } from "./types";
  * - 非法值回退为 1
  * @param args - 从外部脚本环境传入的原始参数对象
  * @returns 解析后的代理组类型：0=select, 1=url-test, 2=load-balance
- * @example
- * ```ts
- * // grouptype 优先
- * parseGroupType({ grouptype: "1" }); // => 1 (url-test)
- * // 回退到 loadbalance
- * parseGroupType({ loadbalance: "true" }); // => 2 (load-balance)
- * // 均不存在时默认 url-test
- * parseGroupType({}); // => 1 (url-test)
- * ```
  */
 function parseGroupType(args: ScriptArgs): GroupType {
     if (parseBool(args.loadbalance)) return 2; // 兼容旧参数：loadbalance=true 等价于 grouptype=2 (load-balance)
