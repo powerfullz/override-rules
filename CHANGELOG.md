@@ -1,5 +1,28 @@
 # Changelog
 
+## [2.5.2](https://github.com/powerfullz/override-rules/compare/src-v2.5.1...src-v2.5.2) (2026-06-23)
+
+
+### Bug Fixes
+
+- Argument parsing issue ([e39d0f4](https://github.com/powerfullz/override-rules/commit/e39d0f4a534a6fc0e6de8425fadbec6cfd872c01))
+
+
+### Chores
+
+- Cleanup some AI nonsense ([cf4db69](https://github.com/powerfullz/override-rules/commit/cf4db69ae7f73069eeffa0200826d6fca8f301e2))
+- Remove unnecessary matcher ([ca6d68c](https://github.com/powerfullz/override-rules/commit/ca6d68c189194b8c6afd07f9b5562726df955162))
+
+
+### Documentation
+
+- Remove redundant js docs ([6f71889](https://github.com/powerfullz/override-rules/commit/6f718898845ad700d03828ffcb9838a7b73bd4fc))
+- Update docs ([505a292](https://github.com/powerfullz/override-rules/commit/505a29299fd0f19ad2b304fff44ba139cf9c90fe))
+
+
+### Refactoring
+
+- Optimize `parseGroupType` function ([04bc47e](https://github.com/powerfullz/override-rules/commit/04bc47e5eafdecde9beaa469f86a19aaed741b01))
 ## [2.5.1](https://github.com/powerfullz/override-rules/compare/src-v2.5.0...src-v2.5.1) (2026-06-22)
 
 
