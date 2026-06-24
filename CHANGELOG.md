@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.5.3](https://github.com/powerfullz/override-rules/compare/src-v2.5.2...src-v2.5.3) (2026-06-24)
+
+
+### Bug Fixes
+
+- Temporarily remove `console.log` as it appears to be buggy on clash verge rev ([59d77c4](https://github.com/powerfullz/override-rules/commit/59d77c43699c81393fc471481724733afb16fb41))
+
+
+### Refactoring
+
+- Expose main via esbuild globalName to avoid globalThis pollution ([c382761](https://github.com/powerfullz/override-rules/commit/c3827611f81d005e2c6046398605a4c76977bd5f))
 ## [2.5.2](https://github.com/powerfullz/override-rules/compare/src-v2.5.1...src-v2.5.2) (2026-06-23)
 
 
