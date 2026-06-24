@@ -47,7 +47,7 @@ function getRawArgs(): ScriptArgs {
     try {
         return $arguments;
     } catch {
-        console.log("[powerfullz 的覆写脚本] 未检测到传入参数，使用默认参数。", {});
+        // console.log("[powerfullz 的覆写脚本] 未检测到传入参数，使用默认参数。");
         return {};
     }
 }
