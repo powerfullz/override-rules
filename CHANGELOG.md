@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.5.4](https://github.com/powerfullz/override-rules/compare/src-v2.5.3...src-v2.5.4) (2026-06-25)
+
+
+### Refactoring
+
+- Revert "refactor: expose main via esbuild globalName to avoid globalThis pollution" ([f4a65e4](https://github.com/powerfullz/override-rules/commit/f4a65e45c49285f6bec55f050c6c3fc21307cc6d))
 ## [2.5.3](https://github.com/powerfullz/override-rules/compare/src-v2.5.2...src-v2.5.3) (2026-06-24)
 
 
