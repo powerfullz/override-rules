@@ -10,12 +10,10 @@ const commonOptions = {
     bundle: true,
     platform: "neutral",
     format: "iife",
-    globalName: "convert",
     target: "ES2025",
     legalComments: "none",
     charset: "utf8",
     banner: { js: bannerText },
-    footer: { js: "\nvar main = convert.main;" },
 };
 
 Promise.all([
