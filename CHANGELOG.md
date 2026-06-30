@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.5.5](https://github.com/powerfullz/override-rules/compare/src-v2.5.4...src-v2.5.5) (2026-06-30)
+
+
+### Chores
+
+- 更新元数据 ([34b62b1](https://github.com/powerfullz/override-rules/commit/34b62b1b78bd759471509d190eaa504da2151786))
+- Change speedurl to cloudflare ([b0719c3](https://github.com/powerfullz/override-rules/commit/b0719c31938c59ae8fc8a5b3ca9dc2728de36811))
+
+
+### Features
+
+- 排除更多冷门地区 ([b543f1c](https://github.com/powerfullz/override-rules/commit/b543f1c46464fa3d39df87f4e598ce17d22597e8))
+- 地区节点组加入 exclude-filter 排除冷门地区 ([74d83f2](https://github.com/powerfullz/override-rules/commit/74d83f21b3177512755775023cdb658a6bdf0b4e))
 ## [2.5.4](https://github.com/powerfullz/override-rules/compare/src-v2.5.3...src-v2.5.4) (2026-06-25)
 
 
