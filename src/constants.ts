@@ -89,6 +89,7 @@ export const countriesMeta: Record<string, CountryMeta> = {
         pattern:
             "美国|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|亚特兰大|迈阿密|华盛顿|\\b(?:US|us)(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇺🇸",
         icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/United_States.png`,
+        excludePattern: "美属",
     },
     加拿大: {
         weight: 55,
@@ -117,6 +118,7 @@ export const countriesMeta: Record<string, CountryMeta> = {
         pattern:
             "法国|法|巴黎|马赛|Marseille|\\b(?:FR|fr)(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|France|FRANCE|FRA|CDG|MRS|🇫🇷",
         icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/France.png`,
+        excludePattern: "法属",
     },
     俄罗斯: {
         pattern: "俄罗斯|俄|\\b(?:RU|ru)(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Russia|🇷🇺",

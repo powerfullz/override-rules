@@ -295,6 +295,7 @@ export function buildProxyGroups({
                 ? {
                       "include-all": true as const,
                       filter: meta.pattern,
+                      ...(meta.excludePattern ? { "exclude-filter": meta.excludePattern } : {}),
                   }
                 : { proxies: countryNodes[country]?.map((n) => n.name).filter(isNotNull) };
             return buildGroupByType({
