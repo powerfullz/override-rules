@@ -3,7 +3,7 @@ import { createCaseInsensitiveNodeMatcher } from "./utils";
 
 export const NODE_SUFFIX = "节点";
 export const CDN_URL = "https://cdn.jsdelivr.net";
-export const SPEEDTEST_URL = "http://www.gstatic.com/generate_204";
+export const SPEEDTEST_URL = "https://cp.cloudflare.com";
 
 export const LOW_COST_NODE_MATCHER = createCaseInsensitiveNodeMatcher(
     String.raw`0\.[0-5]|低倍率|省流|实验性`
