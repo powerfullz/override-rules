@@ -53,6 +53,7 @@ export function parseNodesByLanding(nodes: ProxyNode[]): {
 
 /**
  * 遍历订阅中的所有节点，按 `countriesMeta` 中定义的地区进行归类。
+ * 排除匹配 COUNTRY_EXCLUDE_MAP[country] 的节点。
  * @param nodes - 节点数组，当链式代理激活时为 nonLandingNodes，否则为全部节点
  * @returns 地区名到节点数组的映射 Record
  */

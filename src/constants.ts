@@ -112,6 +112,7 @@ export const countriesMeta: Record<string, CountryMeta> = {
         pattern:
             "德国|德|柏林|法兰克福|慕尼黑|Munich|\\b(?:DE|de)(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Germany|GERMANY|DEU|MUC|🇩🇪",
         icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Germany.png`,
+        excludePattern: "瓜德罗普",
     },
     法国: {
         weight: 80,
