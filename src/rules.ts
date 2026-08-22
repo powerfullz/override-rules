@@ -22,6 +22,7 @@ export function buildRules(
         `RULE-SET,ADBlock,${PROXY_GROUPS.AD_BLOCK}`,
         `RULE-SET,AdditionalFilter,${PROXY_GROUPS.AD_BLOCK}`,
         `RULE-SET,SogouInput,${PROXY_GROUPS.SOGOU_INPUT}`,
+        `GEOSITE,douyu,DIRECT`,
         `DOMAIN-SUFFIX,truthsocial.com,${PROXY_GROUPS.TRUTH_SOCIAL}`,
         `RULE-SET,StaticResources,${PROXY_GROUPS.STATIC_RESOURCES}`,
         `RULE-SET,CDNResources,${PROXY_GROUPS.STATIC_RESOURCES}`,
