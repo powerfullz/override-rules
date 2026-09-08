@@ -73,10 +73,7 @@ export interface FallbackProxyGroup extends BaseProxyGroup {
 }
 
 export type ProxyGroup =
-    | SelectProxyGroup
-    | UrlTestProxyGroup
-    | LoadBalanceProxyGroup
-    | FallbackProxyGroup;
+    SelectProxyGroup | UrlTestProxyGroup | LoadBalanceProxyGroup | FallbackProxyGroup;
 
 export interface SnifferProtocolConfig {
     ports: number[];
@@ -119,7 +116,7 @@ export interface DnsConfig {
     "default-nameserver"?: string[];
     nameserver: string[];
     fallback: string[];
-    "proxy-server-nameserver": string[];
+    "proxy-server-nameserver"?: string[];
     "direct-nameserver"?: string[];
     "nameserver-policy"?: Record<string, DnsPolicyValue>;
     "proxy-server-nameserver-policy"?: Record<string, DnsPolicyValue>;

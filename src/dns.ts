@@ -204,7 +204,6 @@ function buildDnsConfig({ mode, ipv6Enabled, fakeIpFilter }: BuildDnsConfigInput
             "tcp://208.67.222.222",
             "tcp://8.26.56.2",
         ],
-        "proxy-server-nameserver": ["tls://dot.pub", "quic://223.5.5.5"],
     };
 
     if (fakeIpFilter) {
