@@ -123,15 +123,6 @@ interface BuildDnsConfigInput {
     fakeIpFilter?: string[];
 }
 
-/** 支持与上游配置合并的 DNS 字符串列表字段。 */
-const DNS_LIST_FIELDS = [
-    "default-nameserver",
-    "nameserver",
-    "fallback",
-    "proxy-server-nameserver",
-    "direct-nameserver",
-] as const;
-
 /** 支持从上游配置继承的 DNS Policy 字段。 */
 const DNS_POLICY_FIELDS = ["nameserver-policy", "proxy-server-nameserver-policy"] as const;
 
@@ -155,13 +146,6 @@ function mergeStringLists(current: string[] | undefined, upstream: unknown): str
     return [...new Set([...(current ?? []), ...(upstreamList ?? [])])];
 }
 
-/** 判断 DNS 服务器地址是否指向本机监听地址。 */
-function isLocalDnsServer(value: string): boolean {
-    return /^(?:(?:udp|tcp|tls|https?|quic):\/\/)?(?:localhost|127(?:\.\d{1,3}){3}|0\.0\.0\.0|::1|\[::1\])(?::\d+)?(?:\/|$)/i.test(
-        value
-    );
-}
-
 /** 合并 DNS Policy，仅保留 Mihomo 支持的字符串或字符串数组值。 */
 function mergeDnsPolicies(
     current: Record<string, DnsPolicyValue> | undefined,
@@ -181,52 +165,15 @@ function mergeDnsPolicies(
     return { ...(current ?? {}), ...upstreamPolicy };
 }
 
-/** 继承允许的上游 DNS 字段，同时保留脚本控制字段的优先级。 */
+/** 仅合并允许继承的上游 DNS 字段，同时保留脚本控制字段的优先级。 */
 function inheritDnsFields(generated: DnsConfig, upstream?: DnsConfig): DnsConfig {
     if (!isRecord(upstream)) return generated;
 
     const merged = { ...generated };
 
-    for (const field of DNS_LIST_FIELDS) {
-        const values = mergeStringLists(merged[field], upstream[field]);
-        if (values) merged[field] = values;
-    }
-
-    const hasUpstreamListen = typeof upstream.listen === "string" && upstream.listen.length > 0;
-    if (hasUpstreamListen) merged.listen = upstream.listen;
-
-    if (upstream["cache-algorithm"] === "lru" || upstream["cache-algorithm"] === "arc") {
-        merged["cache-algorithm"] = upstream["cache-algorithm"];
-    }
-    for (const field of ["use-hosts", "use-system-hosts", "respect-rules"] as const) {
-        if (typeof upstream[field] === "boolean") merged[field] = upstream[field];
-    }
-    for (const field of ["fake-ip-range", "fake-ip-range6"] as const) {
-        if (typeof upstream[field] === "string") merged[field] = upstream[field];
-    }
-    if (
-        upstream["fake-ip-filter-mode"] === "blacklist" ||
-        upstream["fake-ip-filter-mode"] === "whitelist" ||
-        upstream["fake-ip-filter-mode"] === "rule"
-    ) {
-        merged["fake-ip-filter-mode"] = upstream["fake-ip-filter-mode"];
-    }
-    if (typeof upstream["direct-nameserver-follow-policy"] === "boolean") {
-        merged["direct-nameserver-follow-policy"] = upstream["direct-nameserver-follow-policy"];
-    }
-    if (isRecord(upstream["fallback-filter"])) {
-        merged["fallback-filter"] = upstream["fallback-filter"];
-    }
-
     for (const field of DNS_POLICY_FIELDS) {
         const policy = mergeDnsPolicies(merged[field], upstream[field]);
         if (policy) merged[field] = policy;
-    }
-
-    if (!hasUpstreamListen) {
-        merged["proxy-server-nameserver"] = merged["proxy-server-nameserver"].filter(
-            (server) => !isLocalDnsServer(server)
-        );
     }
 
     const fakeIpFilter = mergeStringLists(merged["fake-ip-filter"], upstream["fake-ip-filter"]);
