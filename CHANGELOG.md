@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.7.3](https://github.com/powerfullz/override-rules/compare/src-v2.7.2...src-v2.7.3) (2026-09-08)
+
+
+### Bug Fixes
+
+- 删除多余的proxy-server-nameserver ([9c29203](https://github.com/powerfullz/override-rules/commit/9c292033ed82ace9b209253ca8b51a1005ec94f1))
+- 仅合并必要的字段 ([85ede6f](https://github.com/powerfullz/override-rules/commit/85ede6fe10c2f1659d0852e0e07a22d4c53249b7))
+
+
+### Chores
+
+- Update dependencies ([2ec6f64](https://github.com/powerfullz/override-rules/commit/2ec6f645198e824885ab2aee4b94eafc8d4d19d1))
+
+
+### Other
+
+- Update readme ([b503979](https://github.com/powerfullz/override-rules/commit/b5039799646aedbcb53fac1323c8f852da536b93))
 ## [2.7.2](https://github.com/powerfullz/override-rules/compare/src-v2.7.1...src-v2.7.2) (2026-08-21)
 
 
