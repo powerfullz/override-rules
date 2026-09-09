@@ -14,7 +14,7 @@ export function buildRules(
     tailscale: boolean
 ): string[] {
     return [
-        quicEnabled ? `AND,((DST-PORT,443),(NETWORK,UDP)),REJECT` : null,
+        !quicEnabled ? `AND,((DST-PORT,443),(NETWORK,UDP)),REJECT` : null,
         tailscale ? `IP-CIDR,100.64.0.0/10,${PROXY_GROUPS.TAILSCALE},no-resolve` : null,
         tailscale ? `IP-CIDR,fd7a:115c:a1e0::/48,${PROXY_GROUPS.TAILSCALE},no-resolve` : null,
         tailscale ? `DOMAIN-SUFFIX,ts.net,${PROXY_GROUPS.TAILSCALE}` : null,
