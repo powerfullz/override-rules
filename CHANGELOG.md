@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.7.4](https://github.com/powerfullz/override-rules/compare/src-v2.7.3...src-v2.7.4) (2026-09-09)
+
+
+### Other
+
+- Quic 参数的逻辑写反了
+Fixes #66 ([c149a40](https://github.com/powerfullz/override-rules/commit/c149a400b33b4fe14cef9764bea1f53ff167a4e7))
 ## [2.7.3](https://github.com/powerfullz/override-rules/compare/src-v2.7.2...src-v2.7.3) (2026-09-08)
 
 
