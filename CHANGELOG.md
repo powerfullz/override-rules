@@ -1,5 +1,39 @@
 # Changelog
 
+## [2.7.5](https://github.com/powerfullz/override-rules/compare/src-v2.7.4...src-v2.7.5) (2026-09-16)
+
+
+### Build
+
+- 恢复 TypeScript 7 类型检查工具链与 TS lint 覆盖 ([5d12e06](https://github.com/powerfullz/override-rules/commit/5d12e064988de66329db4fd232ebc1309825ca79))
+
+
+### CI
+
+- 修复 release/preview 调用已删除的 typecheck 脚本 ([2db0c1c](https://github.com/powerfullz/override-rules/commit/2db0c1cf8c898aff3ff13ac00c68cf419c4be5ba))
+
+
+### Documentation
+
+- 说明双 TypeScript 版本设计与 typecheck 工作流 ([17816dc](https://github.com/powerfullz/override-rules/commit/17816dc2313b3a576cb58712bee2a37fb6d959bd))
+
+
+### Features
+
+- 添加金融服务代理组 ([fa263d8](https://github.com/powerfullz/override-rules/commit/fa263d89a73a03f5b96ba1e19bf4c1e441b79550))
+
+
+### Other
+
+- Agent Host changes for agents/update-architecture-doc (#69) ([9964641](https://github.com/powerfullz/override-rules/commit/996464115236585d946455d95153197ebc478455))
+- Update package-lock.json and package.json for TypeScript 7 migration ([bada7d2](https://github.com/powerfullz/override-rules/commit/bada7d2955b9ad14e30556f60a82d684bd759041))
+- Refactor CI workflow and update documentation for TypeScript 7 migration
+
+- Adjust CI configuration in ci.yaml
+- Update HOW_TO_CUSTOMISE.md for clarity
+- Refine eslint.config.mjs to improve linting rules
+- Optimize package-lock.json and package.json for dependencies ([9abb81a](https://github.com/powerfullz/override-rules/commit/9abb81a06d884a3566b5382674584959b5c8a249))
+- Agent Host changes for agents/typescript-7-migration-and-dependencies ([d0eadd9](https://github.com/powerfullz/override-rules/commit/d0eadd9dedeabfe992f13ae9b5353436afbfee6a))
 ## [2.7.4](https://github.com/powerfullz/override-rules/compare/src-v2.7.3...src-v2.7.4) (2026-09-09)
 
 
