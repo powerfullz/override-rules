@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.7.6](https://github.com/powerfullz/override-rules/compare/src-v2.7.5...src-v2.7.6) (2026-09-16)
+
+
+### Bug Fixes
+
+- 升级 brace-expansion 至 5.0.12 修复高危 DoS 告警 ([ba5d324](https://github.com/powerfullz/override-rules/commit/ba5d32433da3746ec75d6fbe404c123efc251242))
 ## [2.7.5](https://github.com/powerfullz/override-rules/compare/src-v2.7.4...src-v2.7.5) (2026-09-16)
 
 
