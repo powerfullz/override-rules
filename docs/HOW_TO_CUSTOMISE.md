@@ -14,7 +14,7 @@ npm install
 
 我们使用 TypeScript 进行源码管理，所有的核心逻辑都在 `src/` 目录中。**请务必不要直接修改根目录下的 `.js` 和 `.yaml` 产物文件**。
 
-类型检查使用 TypeScript 7 原生预览编译器 `tsgo`；ESLint 所需的 TypeScript 6 仅作为 `typescript-eslint` 的兼容运行时，不参与项目类型检查。
+构建阶段由 esbuild 直接完成 TypeScript 的类型擦除和打包；YAML 生成器由 `tsx` 执行，因此不需要额外安装 TypeScript 编译器。
 
 ## 自定义默认的脚本参数
 
@@ -169,4 +169,3 @@ https://cdn.jsdelivr.net/gh/你的用户名/override-rules@dist/convert.min.js
 ```text
 https://raw.githubusercontent.com/你的用户名/override-rules/refs/heads/dist/convert.min.js
 ```
-

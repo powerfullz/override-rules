@@ -1,24 +1,18 @@
 import js from "@eslint/js";
-import tseslint from "typescript-eslint";
 import prettierConfig from "eslint-config-prettier";
-
-const tsRecommended = tseslint.configs.recommended.map((config) => ({
-    ...config,
-    files: ["**/*.ts"],
-}));
 
 export default [
     // 全局忽略
     {
-        ignores: ["yamls/**", "convert.js", "convert.min.js", "node_modules/**"],
+        ignores: ["yamls/**", "convert.js", "convert.min.js", "node_modules/**", "**/*.ts"],
     },
 
     // 主规则：应用于所有 JS 文件
     {
-        files: ["**/*.js"],
+        files: ["**/*.{js,mjs}"],
         languageOptions: {
             ecmaVersion: 2026,
-            sourceType: "commonjs",
+            sourceType: "module",
             globals: {
                 // Node.js 全局变量
                 require: "readonly",
@@ -53,19 +47,6 @@ export default [
             "no-var": "error",
             // 优先使用 const
             "prefer-const": ["warn", { destructuring: "all" }],
-        },
-    },
-
-    // TypeScript 规则：应用于所有 TS 文件
-    ...tsRecommended,
-    {
-        files: ["**/*.ts"],
-        rules: {
-            // 允许未使用变量以 _ 开头
-            "@typescript-eslint/no-unused-vars": [
-                "warn",
-                { argsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" },
-            ],
         },
     },
 
