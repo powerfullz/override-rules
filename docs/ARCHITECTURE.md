@@ -12,6 +12,7 @@
 flowchart TD
     subgraph Input["1. 输入"]
         CP["config.proxies (ProxyNode[])"]
+        UP["上游 hosts / dns"]
         RA["rawArgs (来自 $arguments)"]
     end
 
@@ -22,6 +23,7 @@ flowchart TD
 
     subgraph Parser["3. 节点多维度分类 (node_parser.ts)"]
         CP --> PNL["parseNodesByLanding()"]
+        CP --> TS["parseTailscale()"]
         PNL --> LN["landingNodes"]
         PNL --> NLN["nonLandingNodes"]
         LN --> LCHK{"landingNodes.length > 0<br/>&& nonLandingNodes.length > 0"}
@@ -41,6 +43,7 @@ flowchart TD
         ACN --> BBL["buildBaseLists()"]
         LAND --> BBL
         LCN --> BBL
+        TS --> BPG
         NLN --> BBL
         BBL --> BL["BaseLists"]
         BL --> BPG["buildProxyGroups()"]
@@ -56,12 +59,17 @@ flowchart TD
         PG --> RULES["buildRules()"]
         PG --> DNS["buildDns()"]
         PG --> TUN["buildTunConfig()"]
+        UP --> DNS
+        UP --> HOSTS["保留上游 hosts"]
+        TS --> RULES
+        TS --> TUN
         FF --> RULES
         FF --> DNS
         FF --> TUN
         RULES --> FINAL["ClashConfig"]
         DNS --> FINAL
         TUN --> FINAL
+        HOSTS --> FINAL
     end
 ```
 
@@ -69,11 +77,11 @@ flowchart TD
 
 | 阶段 | 核心模块 | 职责 |
 |------|----------|------|
-| 输入 | — | 上游订阅传入的代理节点列表 (`config.proxies`) 与用户提供的 URL 覆写参数 (`$arguments`) |
+| 输入 | — | 上游订阅传入的代理节点列表 (`config.proxies`)、可继承的 `hosts`/DNS 字段与用户提供的 URL 覆写参数 (`$arguments`) |
 | 参数解析 | `src/args.ts` | 将原始字符串参数转换为类型安全的 `FeatureFlags` 对象，设置各项开关的默认值 |
-| 节点分类 | `src/node_parser.ts` | 将节点按三个维度分类：落地/非落地 (`parseNodesByLanding`)、所属国家/地区 (`parseCountries`)、低价节点 (`parseLowCost`)；提取活跃国家名称 (`getActiveCountryNames`) |
-| 配置构建 | `src/selectors.ts` + `src/proxy_groups.ts` | 先生成基础代理选择列表 (`BaseLists`)，再基于这些列表和节点分类结果生成完整的代理组定义（国家/地区代理组已内联于 `buildProxyGroups` 中） |
-| 最终组装 | `src/main.ts` | 将代理组、路由规则 (`buildRules`)、DNS 配置 (`buildDns`) 与 TUN 配置 (`buildTunConfig`) 拼装为最终输出的 `ClashConfig` |
+| 节点分类 | `src/node_parser.ts` | 将节点按落地/非落地、所属国家/地区、低价节点和 Tailscale 类型分类；按阈值提取活跃国家名称 |
+| 配置构建 | `src/selectors.ts` + `src/proxy_groups.ts` | 先生成基础代理选择列表 (`BaseLists`)，再生成通用服务组、条件组、国家/地区组和 Tailscale 组 |
+| 最终组装 | `src/main.ts` | 将原始节点、代理组、规则、Rule Provider、DNS、TUN、Geo 数据源及必要的上游字段拼装为最终 `ClashConfig` |
 
 ---
 
@@ -81,18 +89,18 @@ flowchart TD
 
 | 文件 | 职责 | 关键导出 |
 |------|------|----------|
-| `src/args.ts` | URL 参数解析与默认值处理 | `buildFeatureFlags()`, `parseGroupType()` |
-| `src/constants.ts` | 常量集中管理（国家元数据、代理组名称、节点匹配器、CDN 地址等） | `countriesMeta`, `NODE_SUFFIX`, `PROXY_GROUPS`, `LOW_COST_NODE_MATCHER`, `LANDING_NODE_MATCHER` |
-| `src/node_parser.ts` | 多维度节点分类与过滤 | `parseNodesByLanding()`, `parseCountries()`, `parseLowCost()`, `getActiveCountryNames()` |
+| `src/args.ts` | URL 参数解析与默认值处理 | `buildFeatureFlags()` |
+| `src/constants.ts` | 常量集中管理（国家元数据、代理组名称、节点匹配器、CDN 地址等） | `countriesMeta`, `NODE_SUFFIX`, `PROXY_GROUPS`, `LOW_COST_NODE_MATCHER` |
+| `src/node_parser.ts` | 多维度节点分类与过滤 | `parseNodesByLanding()`, `parseCountries()`, `parseLowCost()`, `parseTailscale()`, `getActiveCountryNames()` |
 | `src/selectors.ts` | 代理选择列表构建（各策略组的基础选项列表） | `buildBaseLists()` |
-| `src/proxy_groups.ts` | 代理组定义生成（含内联国家代理组） | `buildProxyGroups()`, `buildGroupByType()` |
+| `src/proxy_groups.ts` | 代理组定义生成（含国家/地区、金融服务和 Tailscale 代理组） | `buildProxyGroups()` |
 | `src/rules.ts` | 路由规则构建 | `buildRules()` |
-| `src/dns.ts` | DNS 配置构建 | `buildDns()`, `snifferConfig` |
+| `src/dns.ts` | DNS、Fake-IP 过滤和上游 DNS 字段继承 | `buildDns()`, `snifferConfig` |
 | `src/tun.ts` | TUN 模式配置构建 | `buildTunConfig()` |
 | `src/rule_providers.ts` | Rule Provider 定义（外部规则集引用） | `ruleProviders` |
 | `src/types.ts` | TypeScript 类型与接口定义 | `FeatureFlags`, `ProxyNode`, `ProxyGroup`, `ClashConfig`, `BaseLists`, `BuildBaseListsInput`, `BuildProxyGroupsInput` 等 |
 | `src/utils.ts` | 通用工具函数 | `buildList()`, `parseBool()`, `parseNumber()`, `isNotNull()` |
-| `scripts/yaml_generator/generator.ts` | 静态 YAML 覆写文件生成器 | 穷举参数组合，生成 `yamls/` 目录下的 192 个 YAML 配置文件 |
+| `scripts/yaml_generator/generator.ts` | 静态 YAML 覆写文件生成器 | 穷举参数组合，生成 `yamls/` 目录下的 192 个 YAML 配置文件；支持 `LIMIT_COMBOS` 限制生成数量 |
 
 ---
 
@@ -109,13 +117,24 @@ flowchart TD
 
 ### 节点分类
 
-节点在进入配置构建阶段前，经过三个独立维度的分类：
+节点在进入配置构建阶段前，经过四个独立维度的分类：
 
 1. **落地/非落地** — 决定节点归属的代理组类型。当 `landing = true` 时，后续的国家和低价节点分类只扫描非落地节点（即落地节点不参与按国家分发）。
 2. **国家/地区** — 通过正则匹配节点名称中的地理位置关键字，将节点归入对应的国家/地区分组。匹配规则定义在 `countriesMeta` 中。
 3. **低价节点** — 匹配特定正则 (`LOW_COST_NODE_MATCHER`) 的节点归入低价策略组，供用户按需选用。
+4. **Tailscale** — `type: "tailscale"` 的节点单独归入 Tailscale 代理组；只有检测到此类节点时才生成该组及对应的规则。
 
-这三个分类维度相互独立，构建阶段通过组合它们来生成完整的代理组树。
+这些分类维度相互独立，构建阶段通过组合它们来生成完整的代理组树。
+
+### Tailscale 集成
+
+当订阅中存在 `type: "tailscale"` 的节点时，脚本会：
+
+- 创建只包含 Tailscale 节点的「Tailscale」代理组；
+- 为 `100.64.0.0/10`、`fd7a:115c:a1e0::/48` 和 `ts.net` 添加定向分流规则；
+- Tailscale 存在时不排除对应地址段，使其能够交由 Tailscale 代理组处理；不存在时则排除这些地址段，避免无效的路由进入 TUN。
+
+没有 Tailscale 节点时，上述代理组和分流规则不会生成；TUN 仍输出统一的基础配置，并额外排除 Tailscale 地址段与局域网地址段。
 
 ### 数据流
 
@@ -125,7 +144,24 @@ flowchart TD
 
 ### args.ts 的默认值
 
-所有 URL 参数都有明确的默认值。`buildFeatureFlags()` 负责解析并回填默认值，产出类型安全的 `FeatureFlags` 对象。这使得下游模块无需关心参数来源或缺失情况——每个标志都有确定的值。
+所有 URL 参数都有明确的默认值。`buildFeatureFlags()` 负责解析并回填默认值，产出类型安全的 `FeatureFlags` 对象。这使得下游模块无需关心参数来源或缺失情况——每个标志都有确定的值。当前默认值包括：
+
+- `grouptype=1`（`url-test`）；若未指定 `grouptype`，仍兼容旧的 `loadbalance` 参数；
+- `fakeip=true`；
+- `threshold=2`，少于两个节点的地区不会生成地区组；
+- `ipv6`、`full`、`keepalive`、`quic`、`regex`、`tun` 默认关闭。
+
+布尔参数接受 `true`/`false` 和 `1`/`0` 形式。
+
+### 上游配置继承
+
+脚本不会无条件覆盖上游配置的全部字段：
+
+- 始终保留上游 `hosts`；
+- 在生成 DNS 配置后，合并上游的 `nameserver-policy`、`proxy-server-nameserver-policy` 和 `fake-ip-filter`；
+- 脚本生成的 DNS 核心设置（如增强模式、IPv6 开关和默认 DNS 列表）保持优先级。
+
+这样既能维持脚本的统一 DNS 行为，也能保留订阅提供方针对特定域名的策略。
 
 ### YAML Generator 的参数
 
