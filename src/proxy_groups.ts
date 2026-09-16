@@ -127,6 +127,12 @@ export function buildProxyGroups({
             proxies: defaultProxies,
         },
         {
+            name: PROXY_GROUPS.FINANCE,
+            icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/Nasdaq.png`,
+            type: "select",
+            proxies: defaultProxiesDirect,
+        },
+        {
             name: PROXY_GROUPS.APPLE,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Apple_2.png`,
             type: "select",
