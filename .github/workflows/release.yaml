@@ -40,7 +40,7 @@ jobs:
         run: npm ci || npm install --no-audit --no-fund
 
       - name: Validate source
-        run: npm run typecheck && npm run format && npm run lint
+        run: npm run typecheck && npm run format:check && npm run lint
 
       - name: Build release artifacts
         run: npm run artifacts
