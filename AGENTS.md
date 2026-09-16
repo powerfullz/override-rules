@@ -16,7 +16,8 @@
 
 在修改源代码后，执行以下命令以验证更改并生成本地对应的产物文件：
 
-- `npm run build`: 运行 `scripts/build.mjs` 脚本，同时编译生成未压缩的 `convert.js` 与经过强力压缩的 `convert.min.js`，并在顶部注入开源版权声明。
+- `npm run typecheck`: 使用 TypeScript 7 原生编译器（`typescript-native`）对 `src/` 与 `scripts/yaml_generator/` 做全量类型检查，不产出任何文件。
+- `npm run build`: 先执行类型检查，再运行 `scripts/build.mjs` 脚本，同时编译生成未压缩的 `convert.js` 与经过强力压缩的 `convert.min.js`，并在顶部注入开源版权声明。
 - `npm run generate`: 运行 YAML 覆写配置生成器，更新 `yamls/` 目录内的排列组合文件。
 - `npm run artifacts`: 一键依次执行上述所有构建与生成阶段。
 
@@ -26,6 +27,10 @@
 
 1. **统一格式化**：本项目使用 ESLint 和 Prettier。修改完代码后，可以通过 `npm run format` 及 `npm run lint:fix` 整理代码，遵循既有代码风格。
 2. **保持纯粹**：对于 `convert.min.js` 中的构建结果，项目脚本配置了 `--legal-comments=none` 去除多余注释，并自动添加统一的文件 Header Banner。
+3. **双 TypeScript 版本（重要）**：`devDependencies` 中同时存在两份 TypeScript，这是刻意设计，请勿"顺手统一"：
+   - `typescript-native`（`npm:typescript@^7.0.2`）：TypeScript 7 原生编译器，仅供 `npm run typecheck` 使用。
+   - `typescript@^6.0.3`：`typescript-eslint` 的运行时。`typescript-eslint` 依赖 TypeScript 的 JS API（`ts.createSourceFile` 等），而 TypeScript 7 已移除该 API 并将 peer 范围限定为 `<6.1.0`，因此 ESLint 无法运行在 TypeScript 7 上。
+   - 升级 `typescript` 前请先确认 `typescript-eslint` 已宣布支持 TypeScript 7，届时可移除 `typescript-native` 别名并合并为单一版本。
 
 ## 📦 提交与 PR 规范
 

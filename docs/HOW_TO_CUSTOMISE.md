@@ -14,7 +14,7 @@ npm install
 
 我们使用 TypeScript 进行源码管理，所有的核心逻辑都在 `src/` 目录中。**请务必不要直接修改根目录下的 `.js` 和 `.yaml` 产物文件**。
 
-构建阶段由 esbuild 直接完成 TypeScript 的类型擦除和打包；YAML 生成器由 `tsx` 执行，因此不需要额外安装 TypeScript 编译器。
+类型检查由 TypeScript 7 原生编译器执行（`npm run typecheck`）；`devDependencies` 中的 `typescript` 6 仅作为 `typescript-eslint` 的运行时（该插件尚不兼容 TypeScript 7 的 API），不参与项目类型检查。构建阶段由 esbuild 完成 TypeScript 的类型擦除和打包，YAML 生成器由 `tsx` 执行。
 
 ## 自定义默认的脚本参数
 
