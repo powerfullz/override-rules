@@ -14,6 +14,8 @@ npm install
 
 我们使用 TypeScript 进行源码管理，所有的核心逻辑都在 `src/` 目录中。**请务必不要直接修改根目录下的 `.js` 和 `.yaml` 产物文件**。
 
+构建阶段由 esbuild 直接完成 TypeScript 的类型擦除和打包；YAML 生成器由 `tsx` 执行，因此不需要额外安装 TypeScript 编译器。
+
 ## 自定义默认的脚本参数
 
 通过 URL 传递参数（如 `#fakeip=true`）是控制脚本行为的常用方式。如果你希望修改这些参数的默认值（例如，默认开启 IPv6 支持），可以修改 `src/args.ts` 中的 `buildFeatureFlags` 函数，为其解析函数补充或修改默认值参数：
@@ -167,5 +169,3 @@ https://cdn.jsdelivr.net/gh/你的用户名/override-rules@dist/convert.min.js
 ```text
 https://raw.githubusercontent.com/你的用户名/override-rules/refs/heads/dist/convert.min.js
 ```
-
-
