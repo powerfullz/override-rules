@@ -6,7 +6,8 @@
   "license": "MIT",
   "type": "commonjs",
   "scripts": {
-    "build": "node scripts/build.mjs",
+    "typecheck": "node node_modules/typescript-native/bin/tsc --noEmit",
+    "build": "npm run typecheck && node scripts/build.mjs",
     "generate": "tsx scripts/yaml_generator/generator.ts",
     "artifacts": "npm run build && npm run generate",
     "lint": "eslint .",
@@ -14,7 +15,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky",
-    "preversion": "npm run lint",
+    "preversion": "npm run lint && npm run typecheck",
     "version": "node scripts/changelog.mjs && git add CHANGELOG.md",
     "postversion": "git push --follow-tags"
   },
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/node": "^26.2.0",
     "esbuild": "^0.28.2",
     "eslint": "^10.10.0",
     "eslint-config-prettier": "^10.1.8",
@@ -30,7 +32,10 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.5.1",
     "prettier": "^3.9.7",
-    "tsx": "^4.23.13"
+    "tsx": "^4.23.13",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.70.0",
+    "typescript-native": "npm:typescript@^7.0.2"
   },
   "lint-staged": {
     "*.{ts,js,json,md,yml,yaml}": [
@@ -38,6 +43,6 @@
     ]
   },
   "allowScripts": {
-    "esbuild@0.28.1": true
+    "esbuild@0.28.2": true
   }
 }
