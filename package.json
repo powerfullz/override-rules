@@ -9,6 +9,7 @@
     "typecheck": "node node_modules/typescript-native/bin/tsc --noEmit",
     "build": "npm run typecheck && node scripts/build.mjs",
     "generate": "tsx scripts/yaml_generator/generator.ts",
+    "test": "node --import tsx --test \"tests/**/*.test.ts\"",
     "artifacts": "npm run build && npm run generate",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
