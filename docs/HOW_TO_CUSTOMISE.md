@@ -18,67 +18,81 @@ npm install
 
 ## 自定义默认的脚本参数
 
-通过 URL 传递参数（如 `#fakeip=true`）是控制脚本行为的常用方式。如果你希望修改这些参数的默认值（例如，默认开启 IPv6 支持），可以修改 `src/args.ts` 中的 `buildFeatureFlags` 函数，为其解析函数补充或修改默认值参数：
+通过 URL 传递参数（如 `#fakeip=true`）是控制脚本行为的常用方式。各参数的默认值集中在 `src/args/schema.ts` 的 `ARG_DEFAULTS` 中；布尔开关的默认值则在 `src/args/parse.ts` 的 `buildFeatureFlags` 里通过解析函数的第二个参数指定。
+
+例如，要默认开启 IPv6 支持：
 
 ```typescript
-// src/args.ts
+// src/args/parse.ts
 export function buildFeatureFlags(args: ScriptArgs): FeatureFlags {
     return {
         groupType: parseGroupType(args),
-        ipv6Enabled: parseBool(args.ipv6, true), // 例如：传入 true 作为默认值以默认开启 IPv6
-        fullConfig: parseBool(args.full),
-        keepAliveEnabled: parseBool(args.keepalive),
-        fakeIPEnabled: parseBool(args.fakeip, true),
-        quicEnabled: parseBool(args.quic),
-        regexFilter: parseBool(args.regex),
-        tunEnabled: parseBool(args.tun),
-        countryThreshold: parseNumber(args.threshold, 0),
+        ipv6Enabled: parseBool(args.ipv6, true), // 例如：改为 true 即可默认开启 IPv6
+        // ...
     };
 }
 ```
 
+而 `grouptype`、`threshold`、`fakeip` 这类带类型语义的默认值，直接修改 `src/args/schema.ts`：
+
+```typescript
+// src/args/schema.ts
+export const ARG_DEFAULTS = {
+    groupType: 1, // 0=select，1=url-test，2=load-balance
+    countryThreshold: 2,
+    fakeIPEnabled: true,
+} as const;
+```
+
 ## 调整代理组
 
-如果你需要调整生成的代理组（Proxy Groups），或需要添加新的国家/地区节点分组，请编辑 `src/constants.ts` 和 `src/proxy_groups.ts`。
+如果你需要调整生成的代理组（Proxy Groups），或需要添加新的国家/地区节点分组，请编辑 `src/catalog/group-names.ts`、`src/catalog/icons.ts` 与 `src/catalog/service-groups.ts`。
 
 **添加新的代理组名称：**
 
 ```typescript
-// src/constants.ts
+// src/catalog/group-names.ts
 export const PROXY_GROUPS = {
     // ... 已有代理组 ...
     MY_CUSTOM_GROUP: "自定义代理组",
 } as const;
 ```
 
-**定义新的代理组：**
-
-打开 `src/proxy_groups.ts` 文件，在 `buildProxyGroups` 函数返回的数组中添加你的新代理组：
+**（可选）为该组登记图标：**
 
 ```typescript
-// src/proxy_groups.ts
-export function buildProxyGroups({ /* 参数 */ }): ProxyGroup[] {
-    return [
-        // ... 已有代理组 ...
-        {
-            name: PROXY_GROUPS.MY_CUSTOM_GROUP,
-            icon: `图标链接`, // 代理组的图标，可以使用 url 或者 icon 字符串
-            type: "select",
-            proxies: defaultProxies, // 可以自行指定代理集合或者用 selectors.ts 中预设的变量
-        },
-        // ...
-    ];
-}
+// src/catalog/icons.ts
+export const ICONS = {
+    // ... 已有图标 ...
+    myCustomGroup: `${QURE}/MyIcon.png`,
+} as const;
+```
+
+**定义新的服务代理组：**
+
+服务代理组采用声明式目录，在 `src/catalog/service-groups.ts` 的 `serviceGroups` 数组中新增一条记录即可，**无需改动任何组装逻辑**：
+
+```typescript
+// src/catalog/service-groups.ts
+export const serviceGroups: ServiceGroupDef[] = [
+    // ... 已有服务组 ...
+    {
+        name: PROXY_GROUPS.MY_CUSTOM_GROUP,
+        icon: ICONS.myCustomGroup,
+        // ctx 包含 flags / nodes / lists，可按需挑选候选代理
+        proxies: (ctx) => ctx.lists.defaultProxies,
+    },
+];
 ```
 
 ## 调整国家/地区匹配规则
 
 脚本会根据`countriesMeta`自动生成实际存在的代理组，因此只需修改国家/地区元数据即可。
 
-在 `src/constants.ts` 的 `countriesMeta` 中，你可以修改节点的正则匹配 `pattern` 以及代理组显示的 `icon`。`weight` 用于控制代理组在列表中的排序（越小越靠前）。
+在 `src/catalog/countries.ts` 的 `countriesMeta` 中，你可以修改节点的正则匹配 `pattern` 以及代理组显示的 `icon`。`weight` 用于控制代理组在列表中的排序（越小越靠前）。
 
 ```typescript
-// src/constants.ts
+// src/catalog/countries.ts
 export const countriesMeta: Record<string, CountryMeta> = {
     // ...
     印度尼西亚: {
@@ -91,11 +105,11 @@ export const countriesMeta: Record<string, CountryMeta> = {
 
 ## 自定义分流规则 (`rule-providers`和`rules`)
 
-若需要添加新的 Rule Provider（例如引入其他 GitHub 仓库或第三方链接的规则集），请在 `src/rule_providers.ts` 中配置：
+若需要添加新的 Rule Provider（例如引入其他 GitHub 仓库或第三方链接的规则集），请在 `src/catalog/rule-sets.ts` 中配置：
 
 ```typescript
-// src/rule_providers.ts
-export const ruleProviders = {
+// src/catalog/rule-sets.ts
+export const ruleSets = {
     // ...
     exampleProvider: {
         type: "http",
@@ -105,32 +119,30 @@ export const ruleProviders = {
         url: "https://example.com/custom_rules.txt",
         path: "./ruleset/MyCustomProvider.txt",
     },
-};
+} satisfies Record<string, RuleProvider>;
 ```
 
-接着，在 `src/rules.ts` 中将流量分配至对应的代理组：
+接着，在 `src/builders/rules.ts` 中将流量分配至对应的代理组。规则集名称通过 `ruleSet()` 生成，其键受 `RuleSetKey` 类型约束，写错会在编译期报错：
 
 ```typescript
-// src/rules.ts
-import { PROXY_GROUPS } from "./constants";
+// src/builders/rules.ts
+import { PROXY_GROUPS } from "../catalog/group-names";
+import { ruleSet } from "../catalog/rule-sets";
 
-const baseRules = [
-    // ... 其他规则 ...
-    `RULE-SET,exampleProvider,${PROXY_GROUPS.MY_CUSTOM_GROUP}`,
-    // 如果没有在 constants 中添加新代理组，也可以直接用 PROXY_GROUPS.SELECT 等
-];
+// 在 buildRules() 返回的数组中：
+ruleSet("exampleProvider", PROXY_GROUPS.MY_CUSTOM_GROUP),
+// 如果没有在 group-names 中添加新代理组，也可以直接用 PROXY_GROUPS.SELECT 等
 ```
 
 ### 使用 GeoSite 数据库
 
-参考[v2fly/domain-list-community](https://github.com/v2fly/domain-list-community)仓库以获取你所需要的域名集合名称，并直接修改`src/rules.ts`即可。
+参考[v2fly/domain-list-community](https://github.com/v2fly/domain-list-community)仓库以获取你所需要的域名集合名称，并直接修改 `src/builders/rules.ts` 即可。
 
 ```ts
-const baseRules = [
-    // ... 其他规则 ...
-    `GEOSITE,CATEGORY-PORN,${PROXY_GROUPS.MY_CUSTOM_GROUP}`,    // 示例：添加成人内容集合，GeoSite 规则大小写不敏感。
-    // 如果没有在 constants 中添加新代理组，也可以直接用现有的 PROXY_GROUPS.SELECT 等
-];
+// src/builders/rules.ts
+// 在 buildRules() 返回的数组中！
+`GEOSITE,CATEGORY-PORN,${PROXY_GROUPS.MY_CUSTOM_GROUP}`,    // 示例：添加成人内容集合，GeoSite 规则大小写不敏感。
+// 如果没有在 group-names 中添加新代理组，也可以直接用现有的 PROXY_GROUPS.SELECT 等
 ```
 
 ## 构建并使用你的定制脚本
@@ -141,6 +153,9 @@ const baseRules = [
 # 格式化并检查代码
 npm run format
 npm run lint:fix
+
+# 运行单元测试
+npm test
 
 # 本地验证构建产物（可选）
 npm run artifacts

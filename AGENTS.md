@@ -16,9 +16,10 @@
 
 在修改源代码后，执行以下命令以验证更改并生成本地对应的产物文件：
 
-- `npm run typecheck`: 使用 TypeScript 7 原生编译器（`typescript-native`）对 `src/` 与 `scripts/yaml_generator/` 做全量类型检查，不产出任何文件。
+- `npm run typecheck`: 使用 TypeScript 7 原生编译器（`typescript-native`）对 `src/`、`scripts/yaml_generator/` 与 `tests/` 做全量类型检查，不产出任何文件。
 - `npm run build`: 先执行类型检查，再运行 `scripts/build.mjs` 脚本，同时编译生成未压缩的 `convert.js` 与经过强力压缩的 `convert.min.js`，并在顶部注入开源版权声明。
 - `npm run generate`: 运行 YAML 覆写配置生成器，更新 `yamls/` 目录内的排列组合文件。
+- `npm test`: 使用 Node 内置测试运行器（经 `tsx` 加载 TypeScript）运行 `tests/` 下的单元测试。
 - `npm run artifacts`: 一键依次执行上述所有构建与生成阶段。
 
 推荐在提交相关修改前，在终端运行 `npm run artifacts` 进行本地全量测试（确保没有编译报错、产生的体积符合正常逻辑）。

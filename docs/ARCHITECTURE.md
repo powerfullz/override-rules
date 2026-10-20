@@ -2,6 +2,8 @@
 
 本项目是一个 Mihomo/Clash 订阅覆写脚本。它拦截上游订阅配置中的代理节点，按落地/非落地、国家和地区进行多维度分类，并按照预设的规则与策略组将其重组为优化后的 Clash 配置——包含代理组、路由规则、DNS 及 TUN 支持。
 
+源码采用「声明式数据 / 纯构建逻辑 / 组装入口」三层结构：`catalog/` 存放可独立修改的数据，`builders/` 存放不持有状态的纯函数，`main.ts` 只做流程编排。
+
 ---
 
 ## 数据流概览
@@ -16,60 +18,31 @@ flowchart TD
         RA["rawArgs (来自 $arguments)"]
     end
 
-    subgraph Args["2. 参数解析 (args.ts)"]
+    subgraph Args["2. 参数解析 (src/args)"]
         RA --> BFF["buildFeatureFlags()"]
         BFF --> FF["FeatureFlags"]
     end
 
-    subgraph Parser["3. 节点多维度分类 (node_parser.ts)"]
-        CP --> PNL["parseNodesByLanding()"]
-        CP --> TS["parseTailscale()"]
-        PNL --> LN["landingNodes"]
-        PNL --> NLN["nonLandingNodes"]
-        LN --> LCHK{"landingNodes.length > 0<br/>&& nonLandingNodes.length > 0"}
-        LCHK --> LAND["landing: boolean"]
-        LCHK -->|"true: 用 nonLandingNodes"| PC["parseCountries()"]
-        LCHK -->|"false: 用 config.proxies"| PC
-        LCHK -->|"true: 用 nonLandingNodes"| PLC["parseLowCost()"]
-        LCHK -->|"false: 用 config.proxies"| PLC
-        PC --> CN["countryNodes (Record)"]
-        PLC --> LCN["lowCostNodes"]
-        CN --> GACN["getActiveCountryNames()"]
-        GACN --> ACN["countryNames (无后缀)"]
-        FF --> GACN
+    subgraph Parser["3. 节点多维度分类 (src/analysis)"]
+        CP --> AN["analyzeNodes()"]
+        AN --> NA["NodeAnalysis<br/>(landing / countryNodes / lowCost / tailscale)"]
     end
 
-    subgraph Builders["4. 配置构建"]
-        ACN --> BBL["buildBaseLists()"]
-        LAND --> BBL
-        LCN --> BBL
-        TS --> BPG
-        NLN --> BBL
+    subgraph Builders["4. 配置构建 (src/builders + src/catalog)"]
+        NA --> BBL["buildBaseLists()"]
+        NA --> BPG["buildProxyGroups()"]
+        FF --> BPG
         BBL --> BL["BaseLists"]
-        BL --> BPG["buildProxyGroups()"]
-        ACN --> BPG
-        CN --> BPG
-        LAND --> BPG
-        LN --> BPG
-        LCN --> BPG
-        BPG --> PG["proxy-groups<br/>(含内联 country 代理组)"]
+        BL --> BPG
+        BPG --> PG["proxy-groups"]
     end
 
-    subgraph Output["5. 最终组装 (main.ts)"]
-        PG --> RULES["buildRules()"]
-        PG --> DNS["buildDns()"]
-        PG --> TUN["buildTunConfig()"]
-        UP --> DNS
-        UP --> HOSTS["保留上游 hosts"]
-        TS --> RULES
-        TS --> TUN
-        FF --> RULES
-        FF --> DNS
-        FF --> TUN
-        RULES --> FINAL["ClashConfig"]
-        DNS --> FINAL
-        TUN --> FINAL
-        HOSTS --> FINAL
+    subgraph Output["5. 最终组装 (src/main.ts + builders/config.ts)"]
+        PG --> AC["assembleConfig()"]
+        FF --> AC
+        NA --> AC
+        UP --> AC
+        AC --> FINAL["ClashConfig"]
     end
 ```
 
@@ -78,10 +51,10 @@ flowchart TD
 | 阶段 | 核心模块 | 职责 |
 |------|----------|------|
 | 输入 | — | 上游订阅传入的代理节点列表 (`config.proxies`)、可继承的 `hosts`/DNS 字段与用户提供的 URL 覆写参数 (`$arguments`) |
-| 参数解析 | `src/args.ts` | 将原始字符串参数转换为类型安全的 `FeatureFlags` 对象，设置各项开关的默认值 |
-| 节点分类 | `src/node_parser.ts` | 将节点按落地/非落地、所属国家/地区、低价节点和 Tailscale 类型分类；按阈值提取活跃国家名称 |
-| 配置构建 | `src/selectors.ts` + `src/proxy_groups.ts` | 先生成基础代理选择列表 (`BaseLists`)，再生成通用服务组、条件组、国家/地区组和 Tailscale 组 |
-| 最终组装 | `src/main.ts` | 将原始节点、代理组、规则、Rule Provider、DNS、TUN、Geo 数据源及必要的上游字段拼装为最终 `ClashConfig` |
+| 参数解析 | `src/args/` | 将原始字符串参数转换为类型安全的 `FeatureFlags` 对象；默认值集中在 `schema.ts` |
+| 节点分类 | `src/analysis/` | 将节点按落地/非落地、所属国家/地区、低价节点和 Tailscale 类型分类；按阈值提取活跃国家名称 |
+| 配置构建 | `src/builders/` + `src/catalog/` | 先生成基础代理选择列表 (`BaseLists`)，再按声明式目录生成服务组、条件组、国家/地区组和 Tailscale 组 |
+| 最终组装 | `src/main.ts` + `src/builders/config.ts` | 将原始节点、代理组、规则、Rule Provider、DNS、TUN、Geo 数据源及必要的上游字段拼装为最终 `ClashConfig` |
 
 ---
 
@@ -89,26 +62,51 @@ flowchart TD
 
 | 文件 | 职责 | 关键导出 |
 |------|------|----------|
-| `src/args.ts` | URL 参数解析与默认值处理 | `buildFeatureFlags()` |
-| `src/constants.ts` | 常量集中管理（国家元数据、代理组名称、节点匹配器、CDN 地址等） | `countriesMeta`, `NODE_SUFFIX`, `PROXY_GROUPS`, `LOW_COST_NODE_MATCHER` |
-| `src/node_parser.ts` | 多维度节点分类与过滤 | `parseNodesByLanding()`, `parseCountries()`, `parseLowCost()`, `parseTailscale()`, `getActiveCountryNames()` |
-| `src/selectors.ts` | 代理选择列表构建（各策略组的基础选项列表） | `buildBaseLists()` |
-| `src/proxy_groups.ts` | 代理组定义生成（含国家/地区、金融服务和 Tailscale 代理组） | `buildProxyGroups()` |
-| `src/rules.ts` | 路由规则构建 | `buildRules()` |
-| `src/dns.ts` | DNS、Fake-IP 过滤和上游 DNS 字段继承 | `buildDns()`, `snifferConfig` |
-| `src/tun.ts` | TUN 模式配置构建 | `buildTunConfig()` |
-| `src/rule_providers.ts` | Rule Provider 定义（外部规则集引用） | `ruleProviders` |
-| `src/types.ts` | TypeScript 类型与接口定义 | `FeatureFlags`, `ProxyNode`, `ProxyGroup`, `ClashConfig`, `BaseLists`, `BuildBaseListsInput`, `BuildProxyGroupsInput` 等 |
-| `src/utils.ts` | 通用工具函数 | `buildList()`, `parseBool()`, `parseNumber()`, `isNotNull()` |
+| `src/main.ts` | 覆写脚本入口（banner、`globalThis.main` 契约、流程编排） | `main()` |
+| `src/types/args.ts` | 参数与功能开关类型 | `ScriptArgs`, `FeatureFlags`, `GroupType` |
+| `src/types/proxy.ts` | 代理节点、代理组、分类结果类型 | `ProxyNode`, `ProxyGroup`, `NodeAnalysis`, `GroupBuildContext` 等 |
+| `src/types/clash.ts` | Clash 配置结构类型 | `ClashConfig`, `DnsConfig`, `TunConfig`, `SnifferConfig`, `RuleProvider` |
+| `src/args/schema.ts` | URL 参数默认值的唯一来源 | `ARG_DEFAULTS` |
+| `src/args/parse.ts` | URL 参数解析与默认值回填 | `buildFeatureFlags()` |
+| `src/catalog/endpoints.ts` | CDN 与测速端点 | `CDN_URL`, `SPEEDTEST_URL` |
+| `src/catalog/icons.ts` | 代理组图标集中定义 | `ICONS` |
+| `src/catalog/group-names.ts` | 代理组名称与命名辅助 | `PROXY_GROUPS`, `NODE_SUFFIX`, `countryGroupName()` |
+| `src/catalog/countries.ts` | 国家/地区元数据；派生匹配正则 | `countriesMeta`, `countryRegexMap`, `countryExcludeRegexMap` |
+| `src/catalog/low-cost.ts` | 低倍率节点匹配器 | `LOW_COST_NODE_MATCHER` |
+| `src/catalog/service-groups.ts` | 服务代理组的声明式目录 | `serviceGroups` |
+| `src/catalog/rule-sets.ts` | Rule Provider 注册表（强类型键） | `ruleSets`, `RuleSetKey`, `ruleSet()` |
+| `src/analysis/classify.ts` | 节点多维度分类 | `analyzeNodes()` |
+| `src/analysis/active-countries.ts` | 地区阈值过滤与权重排序 | `getActiveCountryNames()` |
+| `src/domain/proxy-group.ts` | 代理组构造工厂（字段顺序集中管理） | `buildGroupByType()`, `selectGroup()`, `urlTestGroup()`, `fallbackGroup()` |
+| `src/builders/base-lists.ts` | 各策略组的基础候选列表 | `buildBaseLists()` |
+| `src/builders/proxy-groups.ts` | 代理组组装（前置/服务/尾部/地区） | `buildProxyGroups()` |
+| `src/builders/rules.ts` | 路由规则构建 | `buildRules()` |
+| `src/builders/rule-set` 引用 | 规则集名称受 `RuleSetKey` 约束，改名可编译期报错 | — |
+| `src/builders/dns.ts` | DNS 配置、fake-ip 过滤与上游字段继承 | `buildDns()` |
+| `src/builders/sniffer.ts` | 域名嗅探配置 | `snifferConfig` |
+| `src/builders/tun.ts` | TUN 模式配置 | `buildTunConfig()` |
+| `src/builders/full-config.ts` | `full=true` 时追加的完整内核参数 | `buildFullConfig()` |
+| `src/builders/geox.ts` | GeoIP/GeoSite/MMDB/ASN 数据源地址 | `geoxUrl` |
+| `src/builders/config.ts` | 最终配置组装（含 GLOBAL 组追加） | `assembleConfig()` |
+| `src/utils/primitives.ts` | 通用工具函数 | `buildList()`, `parseBool()`, `parseNumber()`, `isNotNull()` |
+| `src/utils/regex.ts` | 正则匹配工具 | `createCaseInsensitiveNodeMatcher()` |
 | `scripts/yaml_generator/generator.ts` | 静态 YAML 覆写文件生成器 | 穷举参数组合，生成 `yamls/` 目录下的 192 个 YAML 配置文件；支持 `LIMIT_COMBOS` 限制生成数量 |
+| `tests/` | 轻量单元测试（`node --import tsx --test`） | 覆盖参数解析、节点分类、代理组构造、规则/DNS/TUN、最终组装 |
 
 ---
 
 ## 设计决策
 
+### 模块化与「改一处不影响别处」
+
+- **声明式数据与逻辑分离**：新增/调整一个服务代理组，只需在 `catalog/service-groups.ts` 增加一条记录，无需改动组装逻辑；调整图标只需改 `catalog/icons.ts`；调整参数默认值只需改 `args/schema.ts`。
+- **规则集强类型**：`rules.ts` 中所有 `RULE-SET` 引用都通过 `ruleSet(key, target)` 生成，`key` 受 `RuleSetKey` 约束，规则集改名或拼写错误会在编译期报错。
+- **字段顺序集中管理**：代理组的键插入顺序决定 YAML 输出顺序，因此各类代理组的字段顺序统一由 `domain/proxy-group.ts` 的工厂函数保证，测试中亦有断言锁定。
+- **类型按域拆分**：`types/args.ts`、`types/proxy.ts`、`types/clash.ts` 各自独立，避免单文件成为全局改动的耦合点。
+
 ### 落地/非落地自动检测
 
-`dialer-proxy` 在 Mihomo 链式代理中表示当前节点通过指定代理拨号。脚本据此自动区分：
+`dialer-proxy` 在 Clash 链式代理中表示当前节点通过指定代理拨号。脚本据此自动区分：
 
 - 包含 `dialer-proxy: "前置代理"` 字段的节点 → **落地节点**（目标/出口节点），归入「落地节点」组
 - 其余所有节点 → **非落地节点**（中继/普通节点），归入国家地区分组和「前置代理」组
@@ -117,7 +115,7 @@ flowchart TD
 
 ### 节点分类
 
-节点在进入配置构建阶段前，经过四个独立维度的分类：
+节点在进入配置构建阶段前，由 `analyzeNodes()` 经过四个独立维度的分类，产出一个 `NodeAnalysis`：
 
 1. **落地/非落地** — 决定节点归属的代理组类型。当 `landing = true` 时，后续的国家和低价节点分类只扫描非落地节点（即落地节点不参与按国家分发）。
 2. **国家/地区** — 通过正则匹配节点名称中的地理位置关键字，将节点归入对应的国家/地区分组。匹配规则定义在 `countriesMeta` 中。
@@ -138,13 +136,13 @@ flowchart TD
 
 ### 数据流
 
-- **减少中间类型**：`parseCountries()` 直接返回 `Record<string, ProxyNode[]>` 而非引入额外的中间结构。`getActiveCountryNames()` 返回纯净的国家名称（不含 `"节点"` 后缀）。国家代理组的构建逻辑已内联于 `buildProxyGroups()` 中，不再需要独立的 `buildCountryProxyGroups()` 函数。
-- **`NODE_SUFFIX` 仅在展示层添加**：`"节点"` 后缀（如「香港」→「香港节点」）只在 `buildBaseLists()` 和 `buildProxyGroups()` 中拼接，分类层完全不涉及此概念。
-- **数据优于标志**：接收节点信息的参数统一使用具体数据（如 `landingNodes: ProxyNode[]`、`countryNodes: Record<string, ProxyNode[]>`）而非布尔值。布尔标志（如 `landing`）由数据推导得出，保证了判定依据的可追溯性。
+- **分类结果即唯一数据源**：`analyzeNodes()` 一次性返回 `NodeAnalysis`，后续构建阶段不再回读 `config.proxies`，保证判定依据可追溯。
+- **`NODE_SUFFIX` 仅在展示层添加**：`"节点"` 后缀（如「香港」→「香港节点」）只在 `buildBaseLists()` 与 `buildProxyGroups()` 中通过 `countryGroupName()` 拼接，分类层完全不涉及此概念。
+- **数据优于标志**：接收节点信息的参数统一使用具体数据（如 `landingNodes: ProxyNode[]`、`countryNodes: Record<string, ProxyNode[]>`）而非布尔值；布尔标志（如 `landing`）由数据推导得出。
 
-### args.ts 的默认值
+### args 的默认值
 
-所有 URL 参数都有明确的默认值。`buildFeatureFlags()` 负责解析并回填默认值，产出类型安全的 `FeatureFlags` 对象。这使得下游模块无需关心参数来源或缺失情况——每个标志都有确定的值。当前默认值包括：
+所有 URL 参数都有明确的默认值，集中在 `src/args/schema.ts` 的 `ARG_DEFAULTS`，由 `buildFeatureFlags()` 解析并回填。当前默认值包括：
 
 - `grouptype=1`（`url-test`）；若未指定 `grouptype`，仍兼容旧的 `loadbalance` 参数；
 - `fakeip=true`；
@@ -205,4 +203,4 @@ YAML 模式的特点：
 - 所有参数组合已预编译，用户只需选择对应的 YAML 文件 URL
 - 不依赖脚本运行时，兼容性最广
 
-两种模式共享同一套常量定义（`src/constants.ts`）和代理组结构逻辑，区别仅在于运行时的数据来源和过滤方式。
+两种模式共享同一套 `src/catalog/` 与 `src/builders/` 逻辑，区别仅在于运行时的数据来源和过滤方式。
