@@ -1,8 +1,11 @@
-import type { DnsConfig, DnsPolicyValue, SnifferConfig } from "./types";
+/**
+ * DNS 配置构建，包含 fake-ip 过滤列表与上游 DNS 字段继承。
+ */
+
+import type { DnsConfig, DnsPolicyValue } from "../types/clash";
 
 /**
- * 默认的 fake-ip 过滤域名列表。
- * 这些域名不会被 fake-ip 机制代理。
+ * 默认的 fake-ip 过滤域名列表：这些域名不会被 fake-ip 机制代理。
  */
 const FAKE_IP_FILTER = [
     "geosite:connectivity-check",
@@ -93,36 +96,6 @@ const FAKE_IP_FILTER = [
     "+.apt-agent.com",
 ];
 
-/**
- * 嗅探器配置。
- */
-export const snifferConfig: SnifferConfig = {
-    sniff: {
-        TLS: {
-            ports: [443, 8443],
-        },
-        HTTP: {
-            ports: [80, 8080, 8880],
-        },
-        QUIC: {
-            ports: [443, 8443],
-        },
-    },
-    "override-destination": false,
-    enable: true,
-    "force-dns-mapping": true,
-    "skip-domain": ["Mijia Cloud", "dlg.io.mi.com", "+.push.apple.com"],
-};
-
-/**
- * 构建 DNS 配置的输入参数类型。
- */
-interface BuildDnsConfigInput {
-    mode: "redir-host" | "fake-ip";
-    ipv6Enabled: boolean;
-    fakeIpFilter?: string[];
-}
-
 /** 支持从上游配置继承的 DNS Policy 字段。 */
 const DNS_POLICY_FIELDS = ["nameserver-policy", "proxy-server-nameserver-policy"] as const;
 
@@ -146,7 +119,7 @@ function mergeStringLists(current: string[] | undefined, upstream: unknown): str
     return [...new Set([...(current ?? []), ...(upstreamList ?? [])])];
 }
 
-/** 合并 DNS Policy，仅保留 Mihomo 支持的字符串或字符串数组值。 */
+/** 合并 DNS Policy，仅保留 Clash 支持的字符串或字符串数组值。 */
 function mergeDnsPolicies(
     current: Record<string, DnsPolicyValue> | undefined,
     upstream: unknown
@@ -182,14 +155,13 @@ function inheritDnsFields(generated: DnsConfig, upstream?: DnsConfig): DnsConfig
     return merged;
 }
 
-/**
- * 构建 Clash DNS 配置对象。
- * @param {BuildDnsConfigInput} params - 构建参数
- * @param {('redir-host'|'fake-ip')} params.mode - DNS 增强模式
- * @param {boolean} params.ipv6Enabled - 是否启用 IPv6
- * @param {string[]=} params.fakeIpFilter - fake-ip 过滤域名列表（可选）
- * @returns {DnsConfig} DNS 配置对象
- */
+interface BuildDnsConfigInput {
+    mode: "redir-host" | "fake-ip";
+    ipv6Enabled: boolean;
+    fakeIpFilter?: string[];
+}
+
+/** 生成脚本控制的核心 DNS 设置。 */
 function buildDnsConfig({ mode, ipv6Enabled, fakeIpFilter }: BuildDnsConfigInput): DnsConfig {
     const config: DnsConfig = {
         enable: true,
@@ -213,9 +185,7 @@ function buildDnsConfig({ mode, ipv6Enabled, fakeIpFilter }: BuildDnsConfigInput
     return config;
 }
 
-/**
- * 构建 DNS 配置的输入参数类型（外部接口）。
- */
+/** 构建 DNS 配置的输入参数。 */
 export interface BuildDnsInput {
     fakeIPEnabled: boolean;
     ipv6Enabled: boolean;
@@ -224,12 +194,8 @@ export interface BuildDnsInput {
 }
 
 /**
- * 根据 fakeIP 和 IPv6 开关生成最终 DNS 配置。
- * @param {BuildDnsInput} params - 构建参数
- * @param {boolean} params.fakeIPEnabled - 是否启用 fake-ip 模式
- * @param {boolean} params.ipv6Enabled - 是否启用 IPv6
- * @param {DnsConfig} params.upstreamDns - 上游 DNS 配置（可选）
- * @returns {DnsConfig} DNS 配置对象
+ * 根据 fakeIP 与 IPv6 开关生成最终 DNS 配置，并合并上游允许继承的字段。
+ * @param input - 详见 `BuildDnsInput`
  */
 export function buildDns({ fakeIPEnabled, ipv6Enabled, upstreamDns }: BuildDnsInput): DnsConfig {
     const generated = fakeIPEnabled

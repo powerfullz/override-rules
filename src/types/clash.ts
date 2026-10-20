@@ -1,79 +1,8 @@
-export interface ScriptArgs {
-    grouptype?: string;
-    loadbalance?: string;
-    ipv6?: string;
-    full?: string;
-    keepalive?: string;
-    fakeip?: string;
-    quic?: string;
-    regex?: string;
-    threshold?: string;
-    tun?: string;
-}
+/**
+ * Clash 配置结构相关的类型定义。
+ */
 
-export type GroupType = 0 | 1 | 2;
-
-export interface FeatureFlags {
-    groupType: GroupType;
-    ipv6Enabled: boolean;
-    fullConfig: boolean;
-    keepAliveEnabled: boolean;
-    fakeIPEnabled: boolean;
-    quicEnabled: boolean;
-    regexFilter: boolean;
-    countryThreshold: number;
-    tunEnabled: boolean;
-}
-
-export interface ProxyNode {
-    name: string;
-    type?: string;
-    server?: string;
-    port?: number;
-    [key: string]: unknown;
-}
-
-export type ProxyGroupType = "select" | "url-test" | "load-balance" | "fallback";
-
-export type LoadBalanceStrategy = "sticky-sessions" | "consistent-hashing" | "round-robin";
-
-export interface BaseProxyGroup {
-    name: string;
-    icon?: string;
-    proxies?: string[];
-    "include-all"?: boolean;
-    filter?: string;
-    "exclude-filter"?: string;
-}
-
-export interface SelectProxyGroup extends BaseProxyGroup {
-    type: "select";
-}
-
-export interface UrlTestProxyGroup extends BaseProxyGroup {
-    type: "url-test";
-    url: string;
-    interval: number;
-    tolerance: number;
-}
-
-export interface LoadBalanceProxyGroup extends BaseProxyGroup {
-    type: "load-balance";
-    url: string;
-    interval: number;
-    tolerance: number;
-    strategy: LoadBalanceStrategy;
-}
-
-export interface FallbackProxyGroup extends BaseProxyGroup {
-    type: "fallback";
-    url: string;
-    interval: number;
-    tolerance: number;
-}
-
-export type ProxyGroup =
-    SelectProxyGroup | UrlTestProxyGroup | LoadBalanceProxyGroup | FallbackProxyGroup;
+import type { ProxyGroup, ProxyNode } from "./proxy";
 
 export interface SnifferProtocolConfig {
     ports: number[];
@@ -125,7 +54,7 @@ export interface DnsConfig {
     "fake-ip-filter"?: string[];
 }
 
-/** Mihomo DNS Policy 支持的值类型。 */
+/** Clash DNS Policy 支持的值类型。 */
 export type DnsPolicyValue = string | string[];
 
 export type RuleProviderType = "http" | "file";
@@ -155,7 +84,7 @@ export interface ClashProfile {
 
 export interface ClashConfig {
     proxies?: ProxyNode[];
-    /** Mihomo 根级 hosts 映射。 */
+    /** Clash 根级 hosts 映射。 */
     hosts?: Record<string, string | string[]>;
     "proxy-groups"?: ProxyGroup[];
     rules?: string[];
@@ -181,50 +110,4 @@ export interface ClashConfig {
     "external-controller"?: string;
     "disable-keep-alive"?: boolean;
     profile?: ClashProfile;
-}
-
-export interface CountryMeta {
-    weight?: number;
-    pattern: string;
-    icon: string;
-    excludePattern?: string;
-}
-
-export interface CaseInsensitiveNodeMatcher {
-    source: string;
-    regex: RegExp;
-    pattern: string;
-}
-
-export interface BaseLists {
-    defaultProxies: string[];
-    defaultProxiesDirect: string[];
-    defaultSelector: string[];
-    defaultFallback: string[];
-    frontProxySelector: string[];
-}
-
-export interface BuildBaseListsInput {
-    landing: boolean;
-    lowCostNodes: ProxyNode[];
-    countryNames: string[];
-    nonLandingNodes: ProxyNode[];
-    regexFilter: boolean;
-}
-
-export interface BuildProxyGroupsInput {
-    allNodes: string[];
-    regexFilter: boolean;
-    groupType: GroupType;
-    countryNames: string[];
-    countryNodes: Record<string, ProxyNode[]>;
-    lowCostNodes: ProxyNode[];
-    landing: boolean;
-    landingNodes: ProxyNode[];
-    tailscaleNodes: ProxyNode[];
-    defaultProxies: string[];
-    defaultProxiesDirect: string[];
-    defaultSelector: string[];
-    defaultFallback: string[];
-    frontProxySelector: string[];
 }

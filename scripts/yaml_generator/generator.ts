@@ -24,7 +24,7 @@ import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 import YAML from "yaml";
 
-import type { ClashConfig } from "../../src/types";
+import type { ClashConfig } from "../../src/types/clash";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
