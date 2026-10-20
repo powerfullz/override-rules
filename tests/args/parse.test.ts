@@ -27,10 +27,11 @@ describe("buildFeatureFlags", () => {
     it("向后兼容 loadbalance", () => {
         assert.equal(buildFeatureFlags({ loadbalance: "true" }).groupType, 2);
         assert.equal(buildFeatureFlags({ loadbalance: "false" }).groupType, 1);
-        // 既有行为：loadbalance=true 优先于 grouptype
-        assert.equal(buildFeatureFlags({ loadbalance: "true", grouptype: "0" }).groupType, 2);
-        // loadbalance=false 不覆盖显式 grouptype
-        assert.equal(buildFeatureFlags({ loadbalance: "false", grouptype: "0" }).groupType, 0);
+        // 显式 grouptype 优先于 loadbalance
+        assert.equal(buildFeatureFlags({ loadbalance: "true", grouptype: "0" }).groupType, 0);
+        assert.equal(buildFeatureFlags({ loadbalance: "false", grouptype: "2" }).groupType, 2);
+        // grouptype 未指定或非法时才回退到 loadbalance
+        assert.equal(buildFeatureFlags({ loadbalance: "true", grouptype: "9" }).groupType, 2);
     });
 
     it("fakeip 显式传 false 时关闭", () => {

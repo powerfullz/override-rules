@@ -15,11 +15,23 @@ import type { CountryMeta } from "../types/proxy";
 const QURE = `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color`;
 
 /**
+ * 供其他模块（如服务代理组）引用的地区键。
+ *
+ * 将「香港 / 台湾 / 美国」这类会被别处判断的地区收敛为常量，
+ * 避免在 `service-groups.ts` 等处硬编码字符串导致重命名时静默失效。
+ */
+export const COUNTRY_KEYS = {
+    hongKong: "香港",
+    taiwan: "台湾",
+    unitedStates: "美国",
+} as const;
+
+/**
  * 各地区的元数据：`weight` 决定在代理组列表中的排列顺序（值越小越靠前，未设置则排末尾）；
  * `pattern` 是用于匹配节点名称的正则字符串；`icon` 为策略组图标 URL。
  */
 export const countriesMeta: Record<string, CountryMeta> = {
-    香港: {
+    [COUNTRY_KEYS.hongKong]: {
         weight: 10,
         pattern:
             "香港|港|\\b(?:HK|hk)(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇭🇰",
@@ -29,7 +41,7 @@ export const countriesMeta: Record<string, CountryMeta> = {
         pattern: "澳门|\\b(?:MO|mo)(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Macau|🇲🇴",
         icon: `${QURE}/Macao.png`,
     },
-    台湾: {
+    [COUNTRY_KEYS.taiwan]: {
         weight: 20,
         pattern:
             "台|新北|彰化|\\b(?:TW|tw)(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇹🇼|🇼🇸",
@@ -53,7 +65,7 @@ export const countriesMeta: Record<string, CountryMeta> = {
             "韩国|韩|韓|春川|Chuncheon|首尔|\\b(?:KR|kr)(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|ICN|🇰🇷",
         icon: `${QURE}/Korea.png`,
     },
-    美国: {
+    [COUNTRY_KEYS.unitedStates]: {
         weight: 50,
         pattern:
             "美国|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|亚特兰大|迈阿密|华盛顿|\\b(?:US|us)(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇺🇸",

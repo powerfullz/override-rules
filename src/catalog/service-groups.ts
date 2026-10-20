@@ -5,6 +5,7 @@
  * 无需改动组装逻辑（`builders/proxy-groups.ts`）。
  */
 
+import { COUNTRY_KEYS } from "./countries";
 import { countryGroupName, PROXY_GROUPS } from "./group-names";
 import { ICONS } from "./icons";
 import type { GroupBuildContext } from "../types/proxy";
@@ -71,16 +72,26 @@ export const serviceGroups: ServiceGroupDef[] = [
         name: PROXY_GROUPS.BILIBILI,
         icon: ICONS.bilibili,
         proxies: (ctx) =>
-            ctx.nodes.countryNames.includes("台湾") && ctx.nodes.countryNames.includes("香港")
-                ? ["DIRECT", countryGroupName("台湾"), countryGroupName("香港")]
+            ctx.nodes.countryNames.includes(COUNTRY_KEYS.taiwan) &&
+            ctx.nodes.countryNames.includes(COUNTRY_KEYS.hongKong)
+                ? [
+                      "DIRECT",
+                      countryGroupName(COUNTRY_KEYS.taiwan),
+                      countryGroupName(COUNTRY_KEYS.hongKong),
+                  ]
                 : ctx.lists.defaultProxiesDirect,
     },
     {
         name: PROXY_GROUPS.BAHAMUT,
         icon: ICONS.bahamut,
         proxies: (ctx) =>
-            ctx.nodes.countryNames.includes("台湾")
-                ? [countryGroupName("台湾"), PROXY_GROUPS.SELECT, PROXY_GROUPS.MANUAL, "DIRECT"]
+            ctx.nodes.countryNames.includes(COUNTRY_KEYS.taiwan)
+                ? [
+                      countryGroupName(COUNTRY_KEYS.taiwan),
+                      PROXY_GROUPS.SELECT,
+                      PROXY_GROUPS.MANUAL,
+                      "DIRECT",
+                  ]
                 : ctx.lists.defaultProxies,
     },
     {
@@ -128,8 +139,12 @@ export const serviceGroups: ServiceGroupDef[] = [
         name: PROXY_GROUPS.TRUTH_SOCIAL,
         icon: ICONS.truthSocial,
         proxies: (ctx) =>
-            ctx.nodes.countryNames.includes("美国")
-                ? [countryGroupName("美国"), PROXY_GROUPS.SELECT, PROXY_GROUPS.MANUAL]
+            ctx.nodes.countryNames.includes(COUNTRY_KEYS.unitedStates)
+                ? [
+                      countryGroupName(COUNTRY_KEYS.unitedStates),
+                      PROXY_GROUPS.SELECT,
+                      PROXY_GROUPS.MANUAL,
+                  ]
                 : ctx.lists.defaultProxies,
     },
     {
