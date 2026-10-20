@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.8.0](https://github.com/powerfullz/override-rules/compare/src-v2.7.6...src-v2.8.0) (2026-10-20)
+
+
+### Bug Fixes
+
+- 修复无地区组时 fallback 空 proxies 导致的启动报错 ([0e85728](https://github.com/powerfullz/override-rules/commit/0e857289b9e4e5caa410231d1ba40af1f82477bc))
+
+
+### Documentation
+
+- 添加地区组展平优化草案 (issue #64) ([411920e](https://github.com/powerfullz/override-rules/commit/411920e78f895dd74e123db7a0b66c4966134f16))
+- 同步模块化重构后的结构说明 ([22ea62b](https://github.com/powerfullz/override-rules/commit/22ea62bc805dc4341eb7f7e0daee47c52f9153a3))
+
+
+### Refactoring
+
+- 重构 src 为分层模块化结构并统一命名为 Clash ([ca26023](https://github.com/powerfullz/override-rules/commit/ca260233409049d48e9b12ffa8b729f3ab905cca))
+
+
+### Testing
+
+- 添加核心逻辑单元测试 ([9902b55](https://github.com/powerfullz/override-rules/commit/9902b55a85edc20a59e15b41bf4cdaf83836b156))
 ## [2.7.6](https://github.com/powerfullz/override-rules/compare/src-v2.7.5...src-v2.7.6) (2026-09-16)
 
 
