@@ -68,6 +68,16 @@ describe("assembleConfig", () => {
         assert.equal(result["mixed-port"], undefined);
     });
 
+    it("无地区组时 AUTO / FALLBACK 仍有兜底候选（回归 #64）", () => {
+        const result = run({}, { proxies: [{ name: "NodeA" }, { name: "NodeB" }] });
+        const groups = result["proxy-groups"] ?? [];
+        const auto = groups.find((group) => group.name === PROXY_GROUPS.AUTO);
+        const fallback = groups.find((group) => group.name === PROXY_GROUPS.FALLBACK);
+
+        assert.ok((auto?.proxies?.length ?? 0) > 0, "自动选择不应为空");
+        assert.ok((fallback?.proxies?.length ?? 0) > 0, "故障转移不应为空");
+    });
+
     it("引用同一份规则集与 Geo 数据源", () => {
         const result = run({}, CONFIG);
         assert.equal(result["rule-providers"], ruleSets);

@@ -48,7 +48,14 @@ export function buildBaseLists({
         PROXY_GROUPS.MANUAL
     );
 
-    const defaultFallback = buildList(landing && PROXY_GROUPS.LANDING, suffixedCountryNames);
+    // 末尾固定保留「手动选择」与「DIRECT」作为兜底，避免在无落地节点且无任何地区组时
+    // 生成空的 proxies 数组（Mihomo 会报 `use or proxies missing`，见 issue #64）。
+    const defaultFallback = buildList(
+        landing && PROXY_GROUPS.LANDING,
+        suffixedCountryNames,
+        PROXY_GROUPS.MANUAL,
+        "DIRECT"
+    );
 
     const frontProxySelector = buildList(
         suffixedCountryNames,
