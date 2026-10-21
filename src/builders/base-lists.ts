@@ -49,13 +49,12 @@ export function buildBaseLists({
         PROXY_GROUPS.MANUAL
     );
 
-    // 末尾有「手动选择」与「DIRECT」作为兜底，避免在无落地节点且无任何地区组时
-    // 生成空的 proxies 数组（Mihomo 会报 `use or proxies missing`，见 issue #64）。
+    // 无地区组时「DIRECT」作为兜底，避免在无落地节点且无任何地区组时
+    // 生成空 proxies 数组（Mihomo 会报 `use or proxies missing`，见 issue #64）。
     const defaultFallback = buildList(
         landing && PROXY_GROUPS.LANDING,
         suffixedCountryNames,
-        hasContries ? PROXY_GROUPS.MANUAL : null,
-        hasContries ? "DIRECT" : null
+        hasContries ? null : "DIRECT"
     );
 
     const frontProxySelector = buildList(
