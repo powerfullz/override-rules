@@ -4,6 +4,7 @@ import { describe, it } from "node:test";
 import {
     buildGroupByType,
     fallbackGroup,
+    selectAllGroup,
     selectGroup,
     urlTestGroup,
 } from "../../src/domain/proxy-group";
@@ -81,6 +82,16 @@ describe("固定结构代理组", () => {
             "include-all",
             "proxies",
         ]);
+    });
+
+    it("selectAllGroup 仅输出 include-all，不包含 proxies", () => {
+        assert.deepEqual(Object.keys(selectAllGroup("n", "i")), [
+            "name",
+            "icon",
+            "type",
+            "include-all",
+        ]);
+        assert.equal(selectAllGroup("n", "i").proxies, undefined);
     });
 
     it("urlTestGroup 键顺序", () => {
