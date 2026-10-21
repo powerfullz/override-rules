@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.8.2](https://github.com/powerfullz/override-rules/compare/src-v2.8.1...src-v2.8.2) (2026-10-21)
+
+
+### Bug Fixes
+
+- 静态 YAML 的手动选择组改用 include-all ([5dbf0dd](https://github.com/powerfullz/override-rules/commit/5dbf0ddd993c427945121410bb0168609d179430))
+
+
+### Documentation
+
+- 同步 regex 模式对「手动选择」组的说明 ([b6f16e2](https://github.com/powerfullz/override-rules/commit/b6f16e24a08782bbae3f1e7fc92bd400d8740e15))
 ## [2.8.1](https://github.com/powerfullz/override-rules/compare/src-v2.8.0...src-v2.8.1) (2026-10-21)
 
 
