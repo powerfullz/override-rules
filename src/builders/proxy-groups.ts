@@ -12,15 +12,25 @@ import { countryGroupName, PROXY_GROUPS } from "../catalog/group-names";
 import { ICONS } from "../catalog/icons";
 import { LOW_COST_NODE_MATCHER } from "../catalog/low-cost";
 import { serviceGroups } from "../catalog/service-groups";
-import { buildGroupByType, fallbackGroup, selectGroup, urlTestGroup } from "../domain/proxy-group";
+import {
+    buildGroupByType,
+    fallbackGroup,
+    selectAllGroup,
+    selectGroup,
+    urlTestGroup,
+} from "../domain/proxy-group";
 import { isNotNull } from "../utils/primitives";
 import type { GroupBuildContext, ProxyGroup } from "../types/proxy";
 
 /** 顶层选择类代理组：选择代理、手动选择、以及链式代理相关组。 */
 function buildFrontGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
+    const manualGroup = ctx.flags.regexFilter
+        ? selectAllGroup(PROXY_GROUPS.MANUAL, ICONS.manual)
+        : selectGroup(PROXY_GROUPS.MANUAL, ICONS.manual, ctx.nodes.allNames);
+
     return [
         selectGroup(PROXY_GROUPS.SELECT, ICONS.select, ctx.lists.defaultSelector),
-        selectGroup(PROXY_GROUPS.MANUAL, ICONS.manual, ctx.nodes.allNames),
+        manualGroup,
         ctx.nodes.landing
             ? selectGroup(PROXY_GROUPS.FRONT_PROXY, ICONS.frontProxy, ctx.lists.frontProxySelector)
             : null,

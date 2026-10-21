@@ -74,6 +74,21 @@ export function selectGroup(
     };
 }
 
+/**
+ * 构造一个由内核动态填充全部节点的选择组。
+ *
+ * 适用于 regex 模式：静态配置无法预知真实节点名称，
+ * 使用 `include-all` 可让 Mihomo 在运行时把订阅节点加入该组。
+ */
+export function selectAllGroup(name: string, icon: string): SelectProxyGroup {
+    return {
+        name,
+        icon,
+        type: "select",
+        "include-all": true,
+    };
+}
+
 /** 构造一个自动测速的代理组。 */
 export function urlTestGroup(name: string, icon: string, proxies: string[]): UrlTestProxyGroup {
     return {

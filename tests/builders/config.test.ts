@@ -78,6 +78,29 @@ describe("assembleConfig", () => {
         assert.ok((fallback?.proxies?.length ?? 0) > 0, "故障转移不应为空");
     });
 
+    it("regex=true 时手动选择组使用 include-all，不枚举节点名称", () => {
+        const result = run({ regex: "true" }, CONFIG);
+        const manual = (result["proxy-groups"] ?? []).find(
+            (group) => group.name === PROXY_GROUPS.MANUAL
+        );
+
+        assert.equal(manual?.["include-all"], true);
+        assert.equal(manual?.proxies, undefined);
+    });
+
+    it("regex=false 时手动选择组仍按上游顺序枚举节点名称", () => {
+        const result = run({}, CONFIG);
+        const manual = (result["proxy-groups"] ?? []).find(
+            (group) => group.name === PROXY_GROUPS.MANUAL
+        );
+
+        assert.equal(manual?.["include-all"], undefined);
+        assert.deepEqual(
+            manual?.proxies,
+            CONFIG.proxies?.map((node) => node.name)
+        );
+    });
+
     it("引用同一份规则集与 Geo 数据源", () => {
         const result = run({}, CONFIG);
         assert.equal(result["rule-providers"], ruleSets);
