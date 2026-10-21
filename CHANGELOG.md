@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.8.1](https://github.com/powerfullz/override-rules/compare/src-v2.8.0...src-v2.8.1) (2026-10-21)
+
+
+### Bug Fixes
+
+- Correct the logic of the previous fix ([cdaa300](https://github.com/powerfullz/override-rules/commit/cdaa300af461954fe21998fa076658915b244499))
+- DIRECT and manual proxy group now only show up when no country groups are available ([f9c1aa9](https://github.com/powerfullz/override-rules/commit/f9c1aa998f028eb30e22b96d9c2e69f4212dc740))
+
+
+### Chores
+
+- Add `.editorconfig` ([9a78daa](https://github.com/powerfullz/override-rules/commit/9a78daa6d70aaf81bec81b9ae1294727a22716ad))
+- 去除 AI Sop 词语 ([8cc4db8](https://github.com/powerfullz/override-rules/commit/8cc4db81f5507c2fb09503b87df661633f6a2ab7))
 ## [2.8.0](https://github.com/powerfullz/override-rules/compare/src-v2.7.6...src-v2.8.0) (2026-10-20)
 
 
