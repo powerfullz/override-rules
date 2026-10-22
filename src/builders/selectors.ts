@@ -100,11 +100,7 @@ export function buildBaseLists({
     // 保留主线的兜底决策：存在地区组时不再重复追加「手动选择」与「DIRECT」；
     // 无地区组时以「DIRECT」兜底，避免生成空 proxies（见 issue #64）。
     const defaultFallback: ProxyGroupCandidate[] = isFlattened
-        ? buildList<ProxyGroupCandidate>(
-              landing && PROXY_GROUPS.LANDING,
-              flattenedNodeSource,
-              "DIRECT"
-          )
+        ? buildList<ProxyGroupCandidate>(landing && PROXY_GROUPS.LANDING, flattenedNodeSource)
         : buildList<ProxyGroupCandidate>(
               landing && PROXY_GROUPS.LANDING,
               suffixedCountryNames,

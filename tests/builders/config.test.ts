@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 
 import { buildFeatureFlags } from "../../src/args/parse";
 import { analyzeNodes } from "../../src/analysis/classify";
-import { buildBaseLists } from "../../src/builders/base-lists";
+import { buildBaseLists } from "../../src/builders/selectors";
 import { assembleConfig } from "../../src/builders/config";
 import { buildProxyGroups } from "../../src/builders/proxy-groups";
 import { PROXY_GROUPS } from "../../src/catalog/group-names";

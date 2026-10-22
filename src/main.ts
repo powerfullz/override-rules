@@ -20,7 +20,7 @@ https://github.com/powerfullz/override-rules
 
 import { buildFeatureFlags } from "./args/parse";
 import { analyzeNodes } from "./analysis/classify";
-import { buildBaseLists } from "./builders/base-lists";
+import { buildBaseLists } from "./builders/selectors";
 import { assembleConfig } from "./builders/config";
 import { buildProxyGroups } from "./builders/proxy-groups";
 import type { ScriptArgs } from "./types/args";

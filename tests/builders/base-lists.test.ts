@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { buildBaseLists } from "../../src/builders/base-lists";
+import { buildBaseLists } from "../../src/builders/selectors";
 import { PROXY_GROUPS } from "../../src/catalog/group-names";
 import type { BuildBaseListsInput } from "../../src/types/proxy";
 
