@@ -67,7 +67,7 @@ const landing = landingNodes.length > 0;
 
 | 达标地区数 | 地区组 | 手动选择 | AUTO / FALLBACK 候选 | 选择代理候选 |
 |---|---|---|---|---|
-| 0 | 无 | 有 | 落地节点? + 非落地节点 + DIRECT | 落地节点? + 非落地节点 + 低倍率? + 手动选择 + DIRECT |
+| 0 | 无 | 有 | 落地节点? + 非落地节点 | 落地节点? + 非落地节点 + 低倍率? + 手动选择 + DIRECT |
 | 1 | 无 | 有 | 同上 | 同上 |
 | ≥2 | 每个地区一个 | 有 | 落地节点? + 地区组 | AUTO + FALLBACK + 落地节点? + 地区组 + 低倍率? + 手动选择 + DIRECT |
 
@@ -75,6 +75,8 @@ const landing = landingNodes.length > 0;
 
 - 展平模式下 `选择代理` 不再嵌套 `自动选择` / `故障转移`，而是直接列出节点。
 - `自动选择` / `故障转移` 仍共用 `defaultFallback`。
+- 列表层不再主动追加 `DIRECT`；当 `defaultFallback` 为空时，由
+  `domain/proxy-group.ts` 的构造工厂统一补 `DIRECT`。
 - 低倍率组继续保留；展平只影响「地区组」和三大核心组的候选来源。
 
 ## 数据模型
@@ -127,10 +129,10 @@ const nodeSource = {
 - `buildLandingExcludeFilter()` 对落地节点名做正则转义并锚定完整名称，
   避免节点名中的 `.`、`(`、`|` 等字符破坏过滤表达式。
 - 若 `flattenedNodes` 为空（全落地或空订阅），不要生成空的 `include-all`：
-  `选择代理` 回退到 `[落地节点?, 手动选择, DIRECT]`，`自动选择` / `故障转移`
-  回退到 `[落地节点?, DIRECT]`。
+  `选择代理` 回退到 `[落地节点?, 手动选择, DIRECT]`；`自动选择` / `故障转移`
+  只保留 `[落地节点?]`，若仍为空则由构造层补 `DIRECT`。
 - `手动选择` 组始终生成；`regex=true` 时沿用主线决策使用 `include-all`；
-  非 regex 模式若 `allNames` 为空，其候选回退为 `[DIRECT]`，避免产生空组。
+  非 regex 模式直接把 `allNames` 交给工厂，空数组由构造层回退为 `[DIRECT]`。
 
 三个主组的列表：
 
@@ -145,13 +147,13 @@ const defaultSelector = buildList(
 
 const defaultFallback = buildList(
     landing && PROXY_GROUPS.LANDING,
-    nodeSource,
-    "DIRECT"
+    nodeSource
 );
 ```
 
 `defaultFallback` 沿用主线的兜底策略：分组模式有地区组时不追加 `手动选择` /
-`DIRECT`；展平模式没有地区组，因此使用 `DIRECT` 兜底。
+`DIRECT`；展平模式没有地区组时也不在列表层追加 `DIRECT`。最终若候选为空，
+由 `domain/proxy-group.ts` 的构造工厂统一补 `DIRECT`。
 
 `defaultProxies` / `defaultProxiesDirect` 保持现有结构；由于展平模式下地区组名列表为空，
 它们不会再引用任何地区组。
@@ -170,8 +172,8 @@ const defaultFallback = buildList(
 |------|------|
 | `src/analysis/classify.ts` | `landing` 删除 `nonLandingNodes.length > 0`；派生 `regionLayout` |
 | `src/types/proxy.ts` | 新增 `RegionLayout`，`NodeAnalysis` 增加字段；基础列表入参增加 `regions` / `landingNodes` |
-| `src/domain/proxy-group.ts` | 统一 `ProxyGroupNodeSource`，让 `selectGroup` / `urlTestGroup` / `fallbackGroup` 支持 `include-all` |
-| `src/builders/base-lists.ts` | 分组与展平分支；显式节点名 / `include-all`；保留 `手动选择` |
+| `src/domain/proxy-group.ts` | 统一 `ProxyGroupNodeSource`，让 `selectGroup` / `urlTestGroup` / `fallbackGroup` 支持 `include-all`；空候选统一回退 `DIRECT` |
+| `src/builders/selectors.ts` | 分组与展平分支；显式节点名 / `include-all`；保留 `手动选择` |
 | `src/builders/proxy-groups.ts` | 展平模式跳过地区组；保留 `手动选择`；AUTO / FALLBACK 共用 `defaultFallback` |
 | `src/catalog/service-groups.ts` | `BILIBILI` / `BAHAMUT` / `TRUTH_SOCIAL` 改按 `groupedCountries` 判断 |
 | `src/main.ts` | 向 `buildBaseLists` 传入 `regions` 与 `landingNodes` |
@@ -181,7 +183,7 @@ const defaultFallback = buildList(
 ### 必须一并处理的引用链
 
 1. **`手动选择` 的引用**
-   - `base-lists.ts` 中的 `defaultSelector` / `defaultProxies` / `defaultProxiesDirect` / `defaultFallback`；
+   - `selectors.ts` 中的 `defaultSelector` / `defaultProxies` / `defaultProxiesDirect` / `defaultFallback`；
    - `service-groups.ts` 中的 `BAHAMUT` / `TRUTH_SOCIAL`。
 2. **服务组的地区判断**
    - 目前按 `countryNames` 判断；展平后仍会引用不存在的 `台湾节点` / `美国节点`，
@@ -191,9 +193,10 @@ const defaultFallback = buildList(
 3. **`regex=true` + landing 的前置代理**
    - 展平模式必须显式写入非落地节点名，不能使用 `include-all`。
 4. **空节点兜底**
-   - `proxies` 为空时，`选择代理` 至少包含 `手动选择` 与 `DIRECT`，
-     `自动选择` / `故障转移` 至少包含 `DIRECT`；
-     `手动选择` 自身回退为 `[DIRECT]`，避免空组。
+   - 候选列表允许为空，`domain/proxy-group.ts` 的构造工厂在既无显式 `proxies`
+     又未启用 `include-all` 时统一补入 `[DIRECT]`；
+   - 因此空订阅时 `选择代理` 为 `[手动选择, DIRECT]`，`自动选择` / `故障转移`
+     与 `手动选择` 自身均为 `[DIRECT]`，不会产生空组。
 
 ## 边界与非目标
 
@@ -218,10 +221,10 @@ const defaultFallback = buildList(
   - 断言 `regionLayout.groupedCountries` / `flattenedNodes`。
 - `tests/builders/base-lists.test.ts`：
   - 展平模式的选择列表包含非落地节点、`手动选择`、`DIRECT`，AUTO / FALLBACK
-    包含非落地节点与 `DIRECT`，不包含地区组名；
+    包含非落地节点，不包含地区组名；
   - 分组模式维持主线的兜底结构；
   - `regex=true` 时包含 `include-all`，有落地节点时包含 `exclude-filter`；
-  - 空 `proxies` 时三大组不为空。
+  - 基础列表允许为空，空候选由代理组构造层兜底。
 - `tests/builders/config.test.ts`：
   - 更新 #64 回归用例：节点名直接出现在 SELECT / AUTO / FALLBACK 中；
   - 只有台湾 / 只有美国时，BAHAMUT / TRUTH_SOCIAL 不产生悬空地区组引用；
@@ -235,5 +238,5 @@ const defaultFallback = buildList(
 ### 方案 1（已落地）
 
 `defaultFallback` 末尾固定追加 `手动选择` 与 `DIRECT` 兜底，保证任何订阅下
-AUTO / FALLBACK 都非空，立即消除 #64 的启动报错。该临时修复会在本方案实现后被
-展平模式取代。
+AUTO / FALLBACK 都非空，立即消除 #64 的启动报错。该临时修复后来被展平模式取代；
+当前空候选的最终兜底统一由 `domain/proxy-group.ts` 的构造工厂负责。
