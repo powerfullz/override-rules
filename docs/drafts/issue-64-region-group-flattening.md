@@ -67,9 +67,9 @@ const landing = landingNodes.length > 0;
 
 | 达标地区数 | 地区组 | 手动选择 | AUTO / FALLBACK 候选 | 选择代理候选 |
 |---|---|---|---|---|
-| 0 | 无 | 有 | 落地节点? + 非落地节点 + 手动选择 + DIRECT | 落地节点? + 非落地节点 + 低倍率? + 手动选择 + DIRECT |
+| 0 | 无 | 有 | 落地节点? + 非落地节点 + DIRECT | 落地节点? + 非落地节点 + 低倍率? + 手动选择 + DIRECT |
 | 1 | 无 | 有 | 同上 | 同上 |
-| ≥2 | 每个地区一个 | 有 | 落地节点? + 地区组 + 手动选择 + DIRECT | AUTO + FALLBACK + 落地节点? + 地区组 + 低倍率? + 手动选择 + DIRECT |
+| ≥2 | 每个地区一个 | 有 | 落地节点? + 地区组 | AUTO + FALLBACK + 落地节点? + 地区组 + 低倍率? + 手动选择 + DIRECT |
 
 说明：
 
@@ -126,10 +126,11 @@ const nodeSource = {
 
 - `buildLandingExcludeFilter()` 对落地节点名做正则转义并锚定完整名称，
   避免节点名中的 `.`、`(`、`|` 等字符破坏过滤表达式。
-- 若 `flattenedNodes` 为空（全落地或空订阅），不要生成空的 `include-all`，
-  直接回退到 `[落地节点?, 手动选择, DIRECT]`。
-- `手动选择` 组始终生成；若 `allNames` 为空，其候选回退为 `[DIRECT]`，
-  避免产生空组。
+- 若 `flattenedNodes` 为空（全落地或空订阅），不要生成空的 `include-all`：
+  `选择代理` 回退到 `[落地节点?, 手动选择, DIRECT]`，`自动选择` / `故障转移`
+  回退到 `[落地节点?, DIRECT]`。
+- `手动选择` 组始终生成；`regex=true` 时沿用主线决策使用 `include-all`；
+  非 regex 模式若 `allNames` 为空，其候选回退为 `[DIRECT]`，避免产生空组。
 
 三个主组的列表：
 
@@ -145,10 +146,12 @@ const defaultSelector = buildList(
 const defaultFallback = buildList(
     landing && PROXY_GROUPS.LANDING,
     nodeSource,
-    PROXY_GROUPS.MANUAL,
     "DIRECT"
 );
 ```
+
+`defaultFallback` 沿用主线的兜底策略：分组模式有地区组时不追加 `手动选择` /
+`DIRECT`；展平模式没有地区组，因此使用 `DIRECT` 兜底。
 
 `defaultProxies` / `defaultProxiesDirect` 保持现有结构；由于展平模式下地区组名列表为空，
 它们不会再引用任何地区组。
@@ -188,7 +191,8 @@ const defaultFallback = buildList(
 3. **`regex=true` + landing 的前置代理**
    - 展平模式必须显式写入非落地节点名，不能使用 `include-all`。
 4. **空节点兜底**
-   - `proxies` 为空时，三大组至少包含 `手动选择` 与 `DIRECT`；
+   - `proxies` 为空时，`选择代理` 至少包含 `手动选择` 与 `DIRECT`，
+     `自动选择` / `故障转移` 至少包含 `DIRECT`；
      `手动选择` 自身回退为 `[DIRECT]`，避免空组。
 
 ## 边界与非目标
@@ -213,8 +217,9 @@ const defaultFallback = buildList(
   - 补 0 / 1 / ≥2 地区、`threshold=1`、全落地场景；
   - 断言 `regionLayout.groupedCountries` / `flattenedNodes`。
 - `tests/builders/base-lists.test.ts`：
-  - 展平模式包含非落地节点、`手动选择`、`DIRECT`，不包含地区组名；
-  - 分组模式维持现状；
+  - 展平模式的选择列表包含非落地节点、`手动选择`、`DIRECT`，AUTO / FALLBACK
+    包含非落地节点与 `DIRECT`，不包含地区组名；
+  - 分组模式维持主线的兜底结构；
   - `regex=true` 时包含 `include-all`，有落地节点时包含 `exclude-filter`；
   - 空 `proxies` 时三大组不为空。
 - `tests/builders/config.test.ts`：

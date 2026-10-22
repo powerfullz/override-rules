@@ -1,5 +1,29 @@
 # Changelog
 
+## [2.8.2](https://github.com/powerfullz/override-rules/compare/src-v2.8.1...src-v2.8.2) (2026-10-21)
+
+
+### Bug Fixes
+
+- 静态 YAML 的手动选择组改用 include-all ([5dbf0dd](https://github.com/powerfullz/override-rules/commit/5dbf0ddd993c427945121410bb0168609d179430))
+
+
+### Documentation
+
+- 同步 regex 模式对「手动选择」组的说明 ([b6f16e2](https://github.com/powerfullz/override-rules/commit/b6f16e24a08782bbae3f1e7fc92bd400d8740e15))
+## [2.8.1](https://github.com/powerfullz/override-rules/compare/src-v2.8.0...src-v2.8.1) (2026-10-21)
+
+
+### Bug Fixes
+
+- Correct the logic of the previous fix ([cdaa300](https://github.com/powerfullz/override-rules/commit/cdaa300af461954fe21998fa076658915b244499))
+- DIRECT and manual proxy group now only show up when no country groups are available ([f9c1aa9](https://github.com/powerfullz/override-rules/commit/f9c1aa998f028eb30e22b96d9c2e69f4212dc740))
+
+
+### Chores
+
+- Add `.editorconfig` ([9a78daa](https://github.com/powerfullz/override-rules/commit/9a78daa6d70aaf81bec81b9ae1294727a22716ad))
+- 去除 AI Sop 词语 ([8cc4db8](https://github.com/powerfullz/override-rules/commit/8cc4db81f5507c2fb09503b87df661633f6a2ab7))
 ## [2.8.0](https://github.com/powerfullz/override-rules/compare/src-v2.7.6...src-v2.8.0) (2026-10-20)
 
 

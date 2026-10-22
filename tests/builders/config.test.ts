@@ -84,16 +84,10 @@ describe("assembleConfig", () => {
             PROXY_GROUPS.MANUAL,
             "DIRECT",
         ]);
-        assert.deepEqual(group(result, PROXY_GROUPS.AUTO)?.proxies, [
-            "NodeA",
-            "NodeB",
-            PROXY_GROUPS.MANUAL,
-            "DIRECT",
-        ]);
+        assert.deepEqual(group(result, PROXY_GROUPS.AUTO)?.proxies, ["NodeA", "NodeB", "DIRECT"]);
         assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, [
             "NodeA",
             "NodeB",
-            PROXY_GROUPS.MANUAL,
             "DIRECT",
         ]);
     });
@@ -107,14 +101,8 @@ describe("assembleConfig", () => {
             "DIRECT",
         ]);
         assert.deepEqual(group(result, PROXY_GROUPS.MANUAL)?.proxies, ["DIRECT"]);
-        assert.deepEqual(group(result, PROXY_GROUPS.AUTO)?.proxies, [
-            PROXY_GROUPS.MANUAL,
-            "DIRECT",
-        ]);
-        assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, [
-            PROXY_GROUPS.MANUAL,
-            "DIRECT",
-        ]);
+        assert.deepEqual(group(result, PROXY_GROUPS.AUTO)?.proxies, ["DIRECT"]);
+        assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, ["DIRECT"]);
 
         for (const item of groups) {
             if (item.proxies) {
@@ -135,7 +123,6 @@ describe("assembleConfig", () => {
         ]);
         assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, [
             PROXY_GROUPS.LANDING,
-            PROXY_GROUPS.MANUAL,
             "DIRECT",
         ]);
     });
@@ -190,6 +177,29 @@ describe("assembleConfig", () => {
             "DIRECT",
         ]);
         assert.ok(!group(result, PROXY_GROUPS.TRUTH_SOCIAL)?.proxies?.includes("美国节点"));
+    });
+
+    it("regex=true 时手动选择组使用 include-all，不枚举节点名称", () => {
+        const result = run({ regex: "true" }, CONFIG);
+        const manual = (result["proxy-groups"] ?? []).find(
+            (group) => group.name === PROXY_GROUPS.MANUAL
+        );
+
+        assert.equal(manual?.["include-all"], true);
+        assert.equal(manual?.proxies, undefined);
+    });
+
+    it("regex=false 时手动选择组仍按上游顺序枚举节点名称", () => {
+        const result = run({}, CONFIG);
+        const manual = (result["proxy-groups"] ?? []).find(
+            (group) => group.name === PROXY_GROUPS.MANUAL
+        );
+
+        assert.equal(manual?.["include-all"], undefined);
+        assert.deepEqual(
+            manual?.proxies,
+            CONFIG.proxies?.map((node) => node.name)
+        );
     });
 
     it("引用同一份规则集与 Geo 数据源", () => {

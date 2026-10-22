@@ -12,18 +12,31 @@ import { countryGroupName, PROXY_GROUPS } from "../catalog/group-names";
 import { ICONS } from "../catalog/icons";
 import { LOW_COST_NODE_MATCHER } from "../catalog/low-cost";
 import { serviceGroups } from "../catalog/service-groups";
-import { buildGroupByType, fallbackGroup, selectGroup, urlTestGroup } from "../domain/proxy-group";
+import {
+    buildGroupByType,
+    fallbackGroup,
+    selectAllGroup,
+    selectGroup,
+    urlTestGroup,
+} from "../domain/proxy-group";
 import { isNotNull } from "../utils/primitives";
 import type { GroupBuildContext, ProxyGroup } from "../types/proxy";
 
 /** 顶层选择类代理组：选择代理、手动选择、以及链式代理相关组。 */
 function buildFrontGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
-    // 空订阅时仍保留一个可用的手动选择组，避免生成空的 proxies 数组。
-    const manualCandidates = ctx.nodes.allNames.length > 0 ? ctx.nodes.allNames : ["DIRECT"];
+    // regex 模式沿用主线决策：静态配置无法预知真实节点名称，交给内核动态填充。
+    // 非 regex 模式仍按上游顺序枚举；空订阅时回退到 DIRECT，避免生成空组。
+    const manualGroup = ctx.flags.regexFilter
+        ? selectAllGroup(PROXY_GROUPS.MANUAL, ICONS.manual)
+        : selectGroup(
+              PROXY_GROUPS.MANUAL,
+              ICONS.manual,
+              ctx.nodes.allNames.length > 0 ? ctx.nodes.allNames : ["DIRECT"]
+          );
 
     return [
         selectGroup(PROXY_GROUPS.SELECT, ICONS.select, ctx.lists.defaultSelector),
-        selectGroup(PROXY_GROUPS.MANUAL, ICONS.manual, manualCandidates),
+        manualGroup,
         ctx.nodes.landing
             ? selectGroup(PROXY_GROUPS.FRONT_PROXY, ICONS.frontProxy, ctx.lists.frontProxySelector)
             : null,

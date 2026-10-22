@@ -62,7 +62,7 @@
 *   `keepalive`：启用 TCP Keep Alive（默认 false）[^fn2]
 *   `fakeip`：DNS 增强模式使用 `fake-ip` 而不是 `redir-host`（开启后可能有助于解决 TUN 模式无法上网的问题；未传参时默认 `true`，显式传 `false` 时使用 `redir-host`）
 *   `quic`：允许 QUIC 流量（UDP 443，默认 false）[^quic]
-*   `regex`：地区代理组及展平后的节点候选改用 `include-all` + 正则过滤模式，由 Mihomo 内核在运行时按正则动态筛选节点，而非在脚本执行时枚举节点名称（默认 false）[^regex]
+*   `regex`：各国家/地区代理组与「手动选择」组改用 `include-all` 模式，由 Mihomo 内核在运行时动态填充节点（地区组再附加正则 `filter`；展平后的节点候选通过 `exclude-filter` 排除落地节点），而非在脚本执行时枚举节点名称（默认 false）[^regex]
 *   `tun`：启用 TUN 模式（gvisor 栈，自动配置路由排除地址与 DNS 劫持，默认 false）
 *   `threshold`：国家/地区节点数量小于该值时不显示分组（默认 2）；过滤后不足 2 个地区时自动展平，不再生成地区组
 
