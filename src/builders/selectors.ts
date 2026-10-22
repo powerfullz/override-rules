@@ -53,7 +53,6 @@ export function buildBaseLists({
     regions,
 }: BuildBaseListsInput): BaseLists {
     const suffixedCountryNames = regions.groupedCountries.map(countryGroupName);
-    const hasCountries = regions.groupedCountries.length > 0;
     const hasLowCost = lowCostNodes.length > 0 || regexFilter;
     const isFlattened = regions.mode === "flattened";
     const flattenedNodeSource = isFlattened
@@ -97,15 +96,11 @@ export function buildBaseLists({
         PROXY_GROUPS.MANUAL
     );
 
-    // 保留主线的兜底决策：存在地区组时不再重复追加「手动选择」与「DIRECT」；
-    // 无地区组时以「DIRECT」兜底，避免生成空 proxies（见 issue #64）。
+    // 保留主线的兜底决策：存在地区组时不再重复追加「手动选择」与「DIRECT」。
+    // 这里允许返回空列表，最终由 `domain/proxy-group.ts` 的构造工厂补 `DIRECT`。
     const defaultFallback: ProxyGroupCandidate[] = isFlattened
         ? buildList<ProxyGroupCandidate>(landing && PROXY_GROUPS.LANDING, flattenedNodeSource)
-        : buildList<ProxyGroupCandidate>(
-              landing && PROXY_GROUPS.LANDING,
-              suffixedCountryNames,
-              hasCountries ? null : "DIRECT"
-          );
+        : buildList<ProxyGroupCandidate>(landing && PROXY_GROUPS.LANDING, suffixedCountryNames);
 
     // 展平模式即使启用 regex 也要显式枚举非落地节点：前置代理组不能包含落地节点，
     // 否则会和 `dialer-proxy: "前置代理"` 形成循环引用。

@@ -22,10 +22,20 @@ interface BuildGroupByTypeInput {
 }
 
 /**
+ * 保证节点来源非空：既没有显式 `proxies`、也没有启用 `include-all` 时，
+ * 回退到 `DIRECT`，避免生成空代理组。
+ */
+function ensureNonEmptyNodeSource(nodeSource: ProxyGroupNodeSource): ProxyGroupNodeSource {
+    if (nodeSource["include-all"]) return nodeSource;
+    if (nodeSource.proxies && nodeSource.proxies.length > 0) return nodeSource;
+    return { ...nodeSource, proxies: ["DIRECT"] };
+}
+
+/**
  * 将候选项合并为单个节点来源。
  *
  * 字符串视为代理组/节点名称并写入 `proxies`；对象来源（如 `include-all`）
- * 的字段与显式名称合并。没有任何候选项时返回空对象，由调用方保证不会产生空组。
+ * 的字段与显式名称合并。结果为空时统一回退到 `DIRECT`。
  */
 function normalizeNodeSource(
     candidates: ProxyGroupCandidate[],
@@ -51,7 +61,7 @@ function normalizeNodeSource(
     if (includeAll) nodeSource["include-all"] = true;
     if (proxies.length > 0) nodeSource.proxies = proxies;
 
-    return nodeSource;
+    return ensureNonEmptyNodeSource(nodeSource);
 }
 
 /**
@@ -64,9 +74,11 @@ export function buildGroupByType({
     groupType,
     nodeSource,
 }: BuildGroupByTypeInput): ProxyGroup {
+    const source = normalizeNodeSource([nodeSource]);
+
     switch (groupType) {
         case 0:
-            return { name, icon, type: "select", ...nodeSource };
+            return { name, icon, type: "select", ...source };
         case 1:
             return {
                 name,
@@ -75,7 +87,7 @@ export function buildGroupByType({
                 url: SPEEDTEST_URL,
                 interval: 60,
                 tolerance: 20,
-                ...nodeSource,
+                ...source,
             };
         case 2:
             return {
@@ -86,7 +98,7 @@ export function buildGroupByType({
                 url: SPEEDTEST_URL,
                 interval: 60,
                 tolerance: 20,
-                ...nodeSource,
+                ...source,
             };
     }
 }

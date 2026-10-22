@@ -25,14 +25,10 @@ import type { GroupBuildContext, ProxyGroup } from "../types/proxy";
 /** 顶层选择类代理组：选择代理、手动选择、以及链式代理相关组。 */
 function buildFrontGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
     // regex 模式沿用主线决策：静态配置无法预知真实节点名称，交给内核动态填充。
-    // 非 regex 模式仍按上游顺序枚举；空订阅时回退到 DIRECT，避免生成空组。
+    // 非 regex 模式按上游顺序枚举；空候选由代理组工厂统一回退到 DIRECT。
     const manualGroup = ctx.flags.regexFilter
         ? selectAllGroup(PROXY_GROUPS.MANUAL, ICONS.manual)
-        : selectGroup(
-              PROXY_GROUPS.MANUAL,
-              ICONS.manual,
-              ctx.nodes.allNames.length > 0 ? ctx.nodes.allNames : ["DIRECT"]
-          );
+        : selectGroup(PROXY_GROUPS.MANUAL, ICONS.manual, ctx.nodes.allNames);
 
     return [
         selectGroup(PROXY_GROUPS.SELECT, ICONS.select, ctx.lists.defaultSelector),

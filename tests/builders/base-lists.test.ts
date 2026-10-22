@@ -18,18 +18,22 @@ function buildInput(overrides: Partial<BuildBaseListsInput> = {}): BuildBaseList
 }
 
 describe("buildBaseLists", () => {
-    it("空订阅时三大主组仍有兜底，不为空", () => {
+    it("空订阅时基础列表允许为空，由代理组构造层兜底", () => {
         const lists = buildBaseLists(buildInput());
 
-        for (const candidates of [
-            lists.defaultSelector,
-            lists.defaultFallback,
-            lists.defaultProxies,
-            lists.defaultProxiesDirect,
-        ]) {
-            assert.ok(candidates.length > 0);
-        }
-        assert.deepEqual(lists.defaultFallback, ["DIRECT"]);
+        assert.deepEqual(lists.defaultFallback, []);
+        assert.deepEqual(lists.defaultSelector, [PROXY_GROUPS.MANUAL, "DIRECT"]);
+        assert.deepEqual(lists.defaultProxies, [
+            PROXY_GROUPS.SELECT,
+            PROXY_GROUPS.MANUAL,
+            "DIRECT",
+        ]);
+        assert.deepEqual(lists.defaultProxiesDirect, [
+            "DIRECT",
+            PROXY_GROUPS.SELECT,
+            PROXY_GROUPS.MANUAL,
+        ]);
+        assert.deepEqual(lists.frontProxySelector, ["DIRECT"]);
     });
 
     it("分组模式下地区组排在兜底之前", () => {
@@ -70,7 +74,7 @@ describe("buildBaseLists", () => {
             PROXY_GROUPS.MANUAL,
             "DIRECT",
         ]);
-        assert.deepEqual(lists.defaultFallback, [{ proxies: ["香港01", "香港02"] }, "DIRECT"]);
+        assert.deepEqual(lists.defaultFallback, [{ proxies: ["香港01", "香港02"] }]);
         assert.deepEqual(lists.defaultProxies, [
             PROXY_GROUPS.SELECT,
             PROXY_GROUPS.MANUAL,
@@ -98,7 +102,6 @@ describe("buildBaseLists", () => {
         assert.deepEqual(lists.defaultFallback, [
             PROXY_GROUPS.LANDING,
             { "include-all": true, "exclude-filter": "^(?:落地A)$" },
-            "DIRECT",
         ]);
         assert.deepEqual(lists.defaultSelector, [
             PROXY_GROUPS.LANDING,
@@ -126,7 +129,7 @@ describe("buildBaseLists", () => {
             PROXY_GROUPS.MANUAL,
             "DIRECT",
         ]);
-        assert.deepEqual(lists.defaultFallback, [PROXY_GROUPS.LANDING, "DIRECT"]);
+        assert.deepEqual(lists.defaultFallback, [PROXY_GROUPS.LANDING]);
         assert.deepEqual(lists.frontProxySelector, ["DIRECT"]);
     });
 

@@ -71,6 +71,29 @@ describe("buildGroupByType", () => {
             "exclude-filter",
         ]);
     });
+
+    it("空 nodeSource 回退到 DIRECT", () => {
+        for (const groupType of [0, 1, 2] as const) {
+            const group = buildGroupByType({
+                name: "香港节点",
+                icon: "icon",
+                groupType,
+                nodeSource: { proxies: [] },
+            });
+            assert.deepEqual(group.proxies, ["DIRECT"]);
+        }
+    });
+
+    it("include-all 且无显式候选时不补 DIRECT", () => {
+        const group = buildGroupByType({
+            name: "香港节点",
+            icon: "icon",
+            groupType: 0,
+            nodeSource: { "include-all": true },
+        });
+        assert.equal(group["include-all"], true);
+        assert.equal(group.proxies, undefined);
+    });
 });
 
 describe("固定结构代理组", () => {
@@ -92,6 +115,24 @@ describe("固定结构代理组", () => {
             "include-all",
         ]);
         assert.equal(selectAllGroup("n", "i").proxies, undefined);
+    });
+
+    it("selectGroup 空候选回退到 DIRECT", () => {
+        assert.deepEqual(selectGroup("n", "i", []).proxies, ["DIRECT"]);
+    });
+
+    it("urlTestGroup 空候选回退到 DIRECT", () => {
+        assert.deepEqual(urlTestGroup("n", "i", []).proxies, ["DIRECT"]);
+    });
+
+    it("fallbackGroup 空候选回退到 DIRECT", () => {
+        assert.deepEqual(fallbackGroup("n", "i", []).proxies, ["DIRECT"]);
+    });
+
+    it("selectGroup include-all 且无候选时不补 DIRECT", () => {
+        const group = selectGroup("n", "i", [], true);
+        assert.deepEqual(Object.keys(group), ["name", "icon", "type", "include-all"]);
+        assert.equal(group.proxies, undefined);
     });
 
     it("urlTestGroup 键顺序", () => {

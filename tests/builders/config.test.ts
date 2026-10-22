@@ -84,12 +84,8 @@ describe("assembleConfig", () => {
             PROXY_GROUPS.MANUAL,
             "DIRECT",
         ]);
-        assert.deepEqual(group(result, PROXY_GROUPS.AUTO)?.proxies, ["NodeA", "NodeB", "DIRECT"]);
-        assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, [
-            "NodeA",
-            "NodeB",
-            "DIRECT",
-        ]);
+        assert.deepEqual(group(result, PROXY_GROUPS.AUTO)?.proxies, ["NodeA", "NodeB"]);
+        assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, ["NodeA", "NodeB"]);
     });
 
     it("空 proxies 时所有代理组都不为空", () => {
@@ -121,10 +117,7 @@ describe("assembleConfig", () => {
             PROXY_GROUPS.MANUAL,
             "DIRECT",
         ]);
-        assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, [
-            PROXY_GROUPS.LANDING,
-            "DIRECT",
-        ]);
+        assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, [PROXY_GROUPS.LANDING]);
     });
 
     it("展平 + regex 时前置代理仍显式排除落地节点", () => {
