@@ -52,10 +52,11 @@ function main(config: ClashConfig): ClashConfig {
     const nodes = analyzeNodes(config.proxies, flags.countryThreshold);
     const lists = buildBaseLists({
         landing: nodes.landing,
+        landingNodes: nodes.landingNodes,
         lowCostNodes: nodes.lowCostNodes,
-        countryNames: nodes.countryNames,
         nonLandingNodes: nodes.nonLandingNodes,
         regexFilter: flags.regexFilter,
+        regions: nodes.regionLayout,
     });
     const proxyGroups = buildProxyGroups({ flags, nodes, lists });
 
