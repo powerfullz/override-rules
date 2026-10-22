@@ -18,7 +18,7 @@ import type {
  *
  * `regex=true` 时使用 `include-all`，并通过 `exclude-filter` 排除落地节点，
  * 避免链式代理形成循环；没有非落地节点时返回 `null`，由调用方回退到
- * 「落地节点」/「手动选择」/`DIRECT`。
+ * 「落地节点」/`DIRECT`。
  */
 function buildFlattenedNodeSource(
     nodes: ProxyNode[],
@@ -59,13 +59,13 @@ export function buildBaseLists({
         ? buildFlattenedNodeSource(regions.flattenedNodes, landingNodes, regexFilter)
         : null;
 
-    // 展平模式不再嵌套 AUTO / FALLBACK，直接使用非落地节点与固定兜底组。
+    // 展平模式下「选择代理」已直接列出全部非落地节点，与「手动选择」高度重合，
+    // 因此不再生成「手动选择」组，也不再在候选列表中引用它。
     const defaultSelector: ProxyGroupCandidate[] = isFlattened
         ? buildList<ProxyGroupCandidate>(
               landing && PROXY_GROUPS.LANDING,
               flattenedNodeSource,
               hasLowCost && PROXY_GROUPS.LOW_COST,
-              PROXY_GROUPS.MANUAL,
               "DIRECT"
           )
         : buildList<ProxyGroupCandidate>(
@@ -83,7 +83,7 @@ export function buildBaseLists({
         landing && PROXY_GROUPS.LANDING,
         suffixedCountryNames,
         hasLowCost && PROXY_GROUPS.LOW_COST,
-        PROXY_GROUPS.MANUAL,
+        !isFlattened && PROXY_GROUPS.MANUAL,
         "DIRECT"
     );
 
@@ -93,10 +93,10 @@ export function buildBaseLists({
         suffixedCountryNames,
         hasLowCost && PROXY_GROUPS.LOW_COST,
         PROXY_GROUPS.SELECT,
-        PROXY_GROUPS.MANUAL
+        !isFlattened && PROXY_GROUPS.MANUAL
     );
 
-    // 保留主线的兜底决策：存在地区组时不再重复追加「手动选择」与「DIRECT」。
+    // 保留主线的兜底决策：分组模式存在地区组时不再重复追加「手动选择」与「DIRECT」。
     // 这里允许返回空列表，最终由 `domain/proxy-group.ts` 的构造工厂补 `DIRECT`。
     const defaultFallback: ProxyGroupCandidate[] = isFlattened
         ? buildList<ProxyGroupCandidate>(landing && PROXY_GROUPS.LANDING, flattenedNodeSource)

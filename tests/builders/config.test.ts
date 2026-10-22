@@ -77,26 +77,19 @@ describe("assembleConfig", () => {
     it("无地区组时三大主组直接使用节点（回归 #64）", () => {
         const result = run({}, { proxies: [{ name: "NodeA" }, { name: "NodeB" }] });
 
-        // defaultSelector 展平后没有 AUTO / FALLBACK 的相互嵌套。
-        assert.deepEqual(group(result, PROXY_GROUPS.SELECT)?.proxies, [
-            "NodeA",
-            "NodeB",
-            PROXY_GROUPS.MANUAL,
-            "DIRECT",
-        ]);
+        // 展平后没有 AUTO / FALLBACK 的相互嵌套，也不再生成「手动选择」组。
+        assert.deepEqual(group(result, PROXY_GROUPS.SELECT)?.proxies, ["NodeA", "NodeB", "DIRECT"]);
         assert.deepEqual(group(result, PROXY_GROUPS.AUTO)?.proxies, ["NodeA", "NodeB"]);
         assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, ["NodeA", "NodeB"]);
+        assert.equal(group(result, PROXY_GROUPS.MANUAL), undefined);
     });
 
-    it("空 proxies 时所有代理组都不为空", () => {
+    it("空 proxies 时所有代理组都不为空，且展平模式不生成手动选择组", () => {
         const result = run({}, { proxies: [] });
         const groups = result["proxy-groups"] ?? [];
 
-        assert.deepEqual(group(result, PROXY_GROUPS.SELECT)?.proxies, [
-            PROXY_GROUPS.MANUAL,
-            "DIRECT",
-        ]);
-        assert.deepEqual(group(result, PROXY_GROUPS.MANUAL)?.proxies, ["DIRECT"]);
+        assert.deepEqual(group(result, PROXY_GROUPS.SELECT)?.proxies, ["DIRECT"]);
+        assert.equal(group(result, PROXY_GROUPS.MANUAL), undefined);
         assert.deepEqual(group(result, PROXY_GROUPS.AUTO)?.proxies, ["DIRECT"]);
         assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, ["DIRECT"]);
 
@@ -114,10 +107,10 @@ describe("assembleConfig", () => {
         assert.deepEqual(group(result, PROXY_GROUPS.FRONT_PROXY)?.proxies, ["DIRECT"]);
         assert.deepEqual(group(result, PROXY_GROUPS.SELECT)?.proxies, [
             PROXY_GROUPS.LANDING,
-            PROXY_GROUPS.MANUAL,
             "DIRECT",
         ]);
         assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, [PROXY_GROUPS.LANDING]);
+        assert.equal(group(result, PROXY_GROUPS.MANUAL), undefined);
     });
 
     it("展平 + regex 时前置代理仍显式排除落地节点", () => {
@@ -148,13 +141,11 @@ describe("assembleConfig", () => {
         assert.ok(!allGroupNames.includes("台湾节点"));
         assert.deepEqual(group(result, PROXY_GROUPS.BAHAMUT)?.proxies, [
             PROXY_GROUPS.SELECT,
-            PROXY_GROUPS.MANUAL,
             "DIRECT",
         ]);
         assert.deepEqual(group(result, PROXY_GROUPS.BILIBILI)?.proxies, [
             "DIRECT",
             PROXY_GROUPS.SELECT,
-            PROXY_GROUPS.MANUAL,
         ]);
         assert.ok(!group(result, PROXY_GROUPS.BAHAMUT)?.proxies?.includes("台湾节点"));
         assert.ok(!group(result, PROXY_GROUPS.BILIBILI)?.proxies?.includes("台湾节点"));
@@ -166,7 +157,6 @@ describe("assembleConfig", () => {
         assert.ok(!(result["proxy-groups"] ?? []).some((item) => item.name === "美国节点"));
         assert.deepEqual(group(result, PROXY_GROUPS.TRUTH_SOCIAL)?.proxies, [
             PROXY_GROUPS.SELECT,
-            PROXY_GROUPS.MANUAL,
             "DIRECT",
         ]);
         assert.ok(!group(result, PROXY_GROUPS.TRUTH_SOCIAL)?.proxies?.includes("美国节点"));
