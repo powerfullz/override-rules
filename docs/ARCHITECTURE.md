@@ -102,7 +102,7 @@ flowchart TD
 - **声明式数据与逻辑分离**：新增/调整一个服务代理组，只需在 `catalog/service-groups.ts` 增加一条记录，无需改动组装逻辑；调整图标只需改 `catalog/icons.ts`；调整参数默认值只需改 `args/schema.ts`。
 - **规则集强类型**：`rules.ts` 中所有 `RULE-SET` 引用都通过 `ruleSet(key, target)` 生成，`key` 受 `RuleSetKey` 约束，规则集改名或拼写错误会在编译期报错。
 - **字段顺序集中管理**：代理组的键插入顺序决定 YAML 输出顺序，因此各类代理组的字段顺序统一由 `domain/proxy-group.ts` 的工厂函数保证，测试中亦有断言锁定。
-- **空代理组兜底集中管理**：`selectors.ts` 只负责生成候选列表，允许出现空列表；`domain/proxy-group.ts` 的 `normalizeNodeSource()` 在既无显式 `proxies` 又未启用 `include-all` 时统一补入 `DIRECT`，确保最终不会输出空组。
+- **空代理组兜底集中管理**：`selectors.ts` 只负责生成候选列表，允许出现空列表；`domain/proxy-group.ts` 的 `normalizeNodeSource()`（以及经其处理的 `buildGroupByType()`）在既无显式 `proxies` 又未启用 `include-all` 时统一补入 `DIRECT`，确保最终不会输出空组。
 - **类型按域拆分**：`types/args.ts`、`types/proxy.ts`、`types/clash.ts` 各自独立，避免单文件成为全局改动的耦合点。
 
 ### 落地/非落地自动检测
@@ -125,7 +125,7 @@ flowchart TD
 
 这些分类维度相互独立，构建阶段通过组合它们来生成完整的代理组树。
 
-分类结果还会派生 `regionLayout`：通过 `threshold` 的地区数 ≥ 2 时为 `grouped`，为每个地区生成 `${地区}节点` 组；不足 2 个时为 `flattened`，不生成任何地区组，`选择代理`、`自动选择`、`故障转移` 直接引用非落地节点。服务组同样按 `regionLayout.groupedCountries` 判断目标地区组是否存在，避免引用已展平的地区组。
+分类结果还会派生 `regionLayout`：通过 `threshold` 的地区数 ≥ 2 时为 `grouped`，为每个地区生成 `${地区}节点` 组，并保留「手动选择」组；不足 2 个时为 `flattened`，不生成任何地区组，`选择代理`、`自动选择`、`故障转移` 直接引用非落地节点，同时不再生成与 `选择代理` 高度重合的「手动选择」组。服务组同样按 `regionLayout.groupedCountries` 判断目标地区组是否存在，避免引用已展平的地区组。
 
 ### Tailscale 集成
 
