@@ -18,9 +18,12 @@ import type { GroupBuildContext, ProxyGroup } from "../types/proxy";
 
 /** 顶层选择类代理组：选择代理、手动选择、以及链式代理相关组。 */
 function buildFrontGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
+    // 空订阅时仍保留一个可用的手动选择组，避免生成空的 proxies 数组。
+    const manualCandidates = ctx.nodes.allNames.length > 0 ? ctx.nodes.allNames : ["DIRECT"];
+
     return [
         selectGroup(PROXY_GROUPS.SELECT, ICONS.select, ctx.lists.defaultSelector),
-        selectGroup(PROXY_GROUPS.MANUAL, ICONS.manual, ctx.nodes.allNames),
+        selectGroup(PROXY_GROUPS.MANUAL, ICONS.manual, manualCandidates),
         ctx.nodes.landing
             ? selectGroup(PROXY_GROUPS.FRONT_PROXY, ICONS.frontProxy, ctx.lists.frontProxySelector)
             : null,
@@ -74,7 +77,7 @@ function buildRegionGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
           })
         : null;
 
-    const countryGroups = nodes.countryNames.map((country) => {
+    const countryGroups = nodes.regionLayout.groupedCountries.map((country) => {
         const meta = countriesMeta[country];
         if (!meta) return null;
 

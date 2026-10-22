@@ -9,6 +9,7 @@ import { buildProxyGroups } from "../../src/builders/proxy-groups";
 import { PROXY_GROUPS } from "../../src/catalog/group-names";
 import { ruleSets } from "../../src/catalog/rule-sets";
 import type { ClashConfig } from "../../src/types/clash";
+import type { ProxyGroup } from "../../src/types/proxy";
 import type { ScriptArgs } from "../../src/types/args";
 
 function run(args: ScriptArgs, config: ClashConfig): ClashConfig {
@@ -17,13 +18,18 @@ function run(args: ScriptArgs, config: ClashConfig): ClashConfig {
     const nodes = analyzeNodes(proxies, flags.countryThreshold);
     const lists = buildBaseLists({
         landing: nodes.landing,
+        landingNodes: nodes.landingNodes,
         lowCostNodes: nodes.lowCostNodes,
-        countryNames: nodes.countryNames,
         nonLandingNodes: nodes.nonLandingNodes,
         regexFilter: flags.regexFilter,
+        regions: nodes.regionLayout,
     });
     const proxyGroups = buildProxyGroups({ flags, nodes, lists });
     return assembleConfig(config, { flags, nodes, proxyGroups });
+}
+
+function group(config: ClashConfig, name: string): ProxyGroup | undefined {
+    return config["proxy-groups"]?.find((item) => item.name === name);
 }
 
 const CONFIG: ClashConfig = {
@@ -41,7 +47,7 @@ describe("assembleConfig", () => {
         assert.equal(global?.["include-all"], true);
         assert.deepEqual(
             global?.proxies,
-            groups.slice(0, -1).map((group) => String(group.name))
+            groups.slice(0, -1).map((item) => String(item.name))
         );
     });
 
@@ -68,14 +74,122 @@ describe("assembleConfig", () => {
         assert.equal(result["mixed-port"], undefined);
     });
 
-    it("无地区组时 AUTO / FALLBACK 仍有兜底候选（回归 #64）", () => {
+    it("无地区组时三大主组直接使用节点（回归 #64）", () => {
         const result = run({}, { proxies: [{ name: "NodeA" }, { name: "NodeB" }] });
-        const groups = result["proxy-groups"] ?? [];
-        const auto = groups.find((group) => group.name === PROXY_GROUPS.AUTO);
-        const fallback = groups.find((group) => group.name === PROXY_GROUPS.FALLBACK);
 
-        assert.ok((auto?.proxies?.length ?? 0) > 0, "自动选择不应为空");
-        assert.ok((fallback?.proxies?.length ?? 0) > 0, "故障转移不应为空");
+        // defaultSelector 展平后没有 AUTO / FALLBACK 的相互嵌套。
+        assert.deepEqual(group(result, PROXY_GROUPS.SELECT)?.proxies, [
+            "NodeA",
+            "NodeB",
+            PROXY_GROUPS.MANUAL,
+            "DIRECT",
+        ]);
+        assert.deepEqual(group(result, PROXY_GROUPS.AUTO)?.proxies, [
+            "NodeA",
+            "NodeB",
+            PROXY_GROUPS.MANUAL,
+            "DIRECT",
+        ]);
+        assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, [
+            "NodeA",
+            "NodeB",
+            PROXY_GROUPS.MANUAL,
+            "DIRECT",
+        ]);
+    });
+
+    it("空 proxies 时所有代理组都不为空", () => {
+        const result = run({}, { proxies: [] });
+        const groups = result["proxy-groups"] ?? [];
+
+        assert.deepEqual(group(result, PROXY_GROUPS.SELECT)?.proxies, [
+            PROXY_GROUPS.MANUAL,
+            "DIRECT",
+        ]);
+        assert.deepEqual(group(result, PROXY_GROUPS.MANUAL)?.proxies, ["DIRECT"]);
+        assert.deepEqual(group(result, PROXY_GROUPS.AUTO)?.proxies, [
+            PROXY_GROUPS.MANUAL,
+            "DIRECT",
+        ]);
+        assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, [
+            PROXY_GROUPS.MANUAL,
+            "DIRECT",
+        ]);
+
+        for (const item of groups) {
+            if (item.proxies) {
+                assert.ok(item.proxies.length > 0, `${item.name} 不应包含空 proxies`);
+            }
+        }
+    });
+
+    it("全落地时保留落地节点组，前置代理仅包含 DIRECT", () => {
+        const result = run({}, { proxies: [{ name: "落地A", "dialer-proxy": "前置代理" }] });
+
+        assert.deepEqual(group(result, PROXY_GROUPS.LANDING)?.proxies, ["落地A"]);
+        assert.deepEqual(group(result, PROXY_GROUPS.FRONT_PROXY)?.proxies, ["DIRECT"]);
+        assert.deepEqual(group(result, PROXY_GROUPS.SELECT)?.proxies, [
+            PROXY_GROUPS.LANDING,
+            PROXY_GROUPS.MANUAL,
+            "DIRECT",
+        ]);
+        assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, [
+            PROXY_GROUPS.LANDING,
+            PROXY_GROUPS.MANUAL,
+            "DIRECT",
+        ]);
+    });
+
+    it("展平 + regex 时前置代理仍显式排除落地节点", () => {
+        const result = run(
+            { regex: "true" },
+            {
+                proxies: [
+                    { name: "香港01" },
+                    { name: "香港02" },
+                    { name: "落地A", "dialer-proxy": "前置代理" },
+                ],
+            }
+        );
+
+        assert.deepEqual(group(result, PROXY_GROUPS.FRONT_PROXY)?.proxies, [
+            "DIRECT",
+            "香港01",
+            "香港02",
+        ]);
+        assert.equal(group(result, PROXY_GROUPS.SELECT)?.["exclude-filter"], "^(?:落地A)$");
+        assert.equal(group(result, PROXY_GROUPS.SELECT)?.["include-all"], true);
+    });
+
+    it("只有台湾时服务组不引用未生成的地区组", () => {
+        const result = run({}, { proxies: [{ name: "台湾01" }, { name: "台湾02" }] });
+        const allGroupNames = (result["proxy-groups"] ?? []).map((item) => item.name);
+
+        assert.ok(!allGroupNames.includes("台湾节点"));
+        assert.deepEqual(group(result, PROXY_GROUPS.BAHAMUT)?.proxies, [
+            PROXY_GROUPS.SELECT,
+            PROXY_GROUPS.MANUAL,
+            "DIRECT",
+        ]);
+        assert.deepEqual(group(result, PROXY_GROUPS.BILIBILI)?.proxies, [
+            "DIRECT",
+            PROXY_GROUPS.SELECT,
+            PROXY_GROUPS.MANUAL,
+        ]);
+        assert.ok(!group(result, PROXY_GROUPS.BAHAMUT)?.proxies?.includes("台湾节点"));
+        assert.ok(!group(result, PROXY_GROUPS.BILIBILI)?.proxies?.includes("台湾节点"));
+    });
+
+    it("只有美国时 Truth Social 不引用未生成的地区组", () => {
+        const result = run({}, { proxies: [{ name: "美国01" }, { name: "美国02" }] });
+
+        assert.ok(!(result["proxy-groups"] ?? []).some((item) => item.name === "美国节点"));
+        assert.deepEqual(group(result, PROXY_GROUPS.TRUTH_SOCIAL)?.proxies, [
+            PROXY_GROUPS.SELECT,
+            PROXY_GROUPS.MANUAL,
+            "DIRECT",
+        ]);
+        assert.ok(!group(result, PROXY_GROUPS.TRUTH_SOCIAL)?.proxies?.includes("美国节点"));
     });
 
     it("引用同一份规则集与 Geo 数据源", () => {

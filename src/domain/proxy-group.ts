@@ -8,17 +8,50 @@ import type { GroupType } from "../types/args";
 import type {
     FallbackProxyGroup,
     ProxyGroup,
+    ProxyGroupCandidate,
+    ProxyGroupNodeSource,
     SelectProxyGroup,
     UrlTestProxyGroup,
 } from "../types/proxy";
-
-type NodeSource = Pick<ProxyGroup, "proxies" | "include-all" | "filter" | "exclude-filter">;
 
 interface BuildGroupByTypeInput {
     name: string;
     icon: string;
     groupType: GroupType;
-    nodeSource: NodeSource;
+    nodeSource: ProxyGroupNodeSource;
+}
+
+/**
+ * 将候选项合并为单个节点来源。
+ *
+ * 字符串视为代理组/节点名称并写入 `proxies`；对象来源（如 `include-all`）
+ * 的字段与显式名称合并。没有任何候选项时返回空对象，由调用方保证不会产生空组。
+ */
+function normalizeNodeSource(
+    candidates: ProxyGroupCandidate[],
+    includeAll = false
+): ProxyGroupNodeSource {
+    const proxies: string[] = [];
+    const nodeSource: ProxyGroupNodeSource = {};
+
+    for (const candidate of candidates) {
+        if (typeof candidate === "string") {
+            proxies.push(candidate);
+            continue;
+        }
+
+        if (candidate.proxies) proxies.push(...candidate.proxies);
+        if (candidate["include-all"]) nodeSource["include-all"] = true;
+        if (candidate.filter !== undefined) nodeSource.filter = candidate.filter;
+        if (candidate["exclude-filter"] !== undefined) {
+            nodeSource["exclude-filter"] = candidate["exclude-filter"];
+        }
+    }
+
+    if (includeAll) nodeSource["include-all"] = true;
+    if (proxies.length > 0) nodeSource.proxies = proxies;
+
+    return nodeSource;
 }
 
 /**
@@ -62,39 +95,46 @@ export function buildGroupByType({
 export function selectGroup(
     name: string,
     icon: string,
-    proxies: string[],
+    candidates: ProxyGroupCandidate[],
     includeAll = false
 ): SelectProxyGroup {
     return {
         name,
         icon,
         type: "select",
-        ...(includeAll ? { "include-all": true as const } : {}),
-        proxies,
+        ...normalizeNodeSource(candidates, includeAll),
     };
 }
 
 /** 构造一个自动测速的代理组。 */
-export function urlTestGroup(name: string, icon: string, proxies: string[]): UrlTestProxyGroup {
+export function urlTestGroup(
+    name: string,
+    icon: string,
+    candidates: ProxyGroupCandidate[]
+): UrlTestProxyGroup {
     return {
         name,
         icon,
         type: "url-test",
         url: SPEEDTEST_URL,
-        proxies,
+        ...normalizeNodeSource(candidates),
         interval: 60,
         tolerance: 20,
     };
 }
 
 /** 构造一个故障转移的代理组。 */
-export function fallbackGroup(name: string, icon: string, proxies: string[]): FallbackProxyGroup {
+export function fallbackGroup(
+    name: string,
+    icon: string,
+    candidates: ProxyGroupCandidate[]
+): FallbackProxyGroup {
     return {
         name,
         icon,
         type: "fallback",
         url: SPEEDTEST_URL,
-        proxies,
+        ...normalizeNodeSource(candidates),
         interval: 60,
         tolerance: 20,
     };

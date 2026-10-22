@@ -71,21 +71,23 @@ export const serviceGroups: ServiceGroupDef[] = [
     {
         name: PROXY_GROUPS.BILIBILI,
         icon: ICONS.bilibili,
-        proxies: (ctx) =>
-            ctx.nodes.countryNames.includes(COUNTRY_KEYS.taiwan) &&
-            ctx.nodes.countryNames.includes(COUNTRY_KEYS.hongKong)
+        proxies: (ctx) => {
+            const groupedCountries = ctx.nodes.regionLayout.groupedCountries;
+            return groupedCountries.includes(COUNTRY_KEYS.taiwan) &&
+                groupedCountries.includes(COUNTRY_KEYS.hongKong)
                 ? [
                       "DIRECT",
                       countryGroupName(COUNTRY_KEYS.taiwan),
                       countryGroupName(COUNTRY_KEYS.hongKong),
                   ]
-                : ctx.lists.defaultProxiesDirect,
+                : ctx.lists.defaultProxiesDirect;
+        },
     },
     {
         name: PROXY_GROUPS.BAHAMUT,
         icon: ICONS.bahamut,
         proxies: (ctx) =>
-            ctx.nodes.countryNames.includes(COUNTRY_KEYS.taiwan)
+            ctx.nodes.regionLayout.groupedCountries.includes(COUNTRY_KEYS.taiwan)
                 ? [
                       countryGroupName(COUNTRY_KEYS.taiwan),
                       PROXY_GROUPS.SELECT,
@@ -139,7 +141,7 @@ export const serviceGroups: ServiceGroupDef[] = [
         name: PROXY_GROUPS.TRUTH_SOCIAL,
         icon: ICONS.truthSocial,
         proxies: (ctx) =>
-            ctx.nodes.countryNames.includes(COUNTRY_KEYS.unitedStates)
+            ctx.nodes.regionLayout.groupedCountries.includes(COUNTRY_KEYS.unitedStates)
                 ? [
                       countryGroupName(COUNTRY_KEYS.unitedStates),
                       PROXY_GROUPS.SELECT,

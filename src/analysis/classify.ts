@@ -9,7 +9,10 @@ import { countryExcludeRegexMap, countryRegexMap } from "../catalog/countries";
 import { PROXY_GROUPS } from "../catalog/group-names";
 import { LOW_COST_NODE_MATCHER } from "../catalog/low-cost";
 import { getActiveCountryNames } from "./active-countries";
-import type { NodeAnalysis, ProxyNode } from "../types/proxy";
+import type { NodeAnalysis, ProxyNode, RegionLayout } from "../types/proxy";
+
+/** 生成地区组所需的最少达标地区数；不足时展平到上层代理组。 */
+const MIN_REGION_GROUPS = 2;
 
 /**
  * 按 `dialer-proxy` 字段将节点分为落地节点与非落地节点。
@@ -75,7 +78,8 @@ function collectTailscale(nodes: ProxyNode[]): ProxyNode[] {
  */
 export function analyzeNodes(nodes: ProxyNode[], threshold: number): NodeAnalysis {
     const { landingNodes, nonLandingNodes } = splitByLanding(nodes);
-    const landing = landingNodes.length > 0 && nonLandingNodes.length > 0;
+    // 只要出现落地节点就启用落地相关代理组；全落地时非落地候选自然为空。
+    const landing = landingNodes.length > 0;
 
     // 链式代理激活时，国家/低倍率分类只扫描非落地节点。
     const scopedNodes = landing ? nonLandingNodes : nodes;
@@ -83,6 +87,11 @@ export function analyzeNodes(nodes: ProxyNode[], threshold: number): NodeAnalysi
     const countryNames = getActiveCountryNames(countryNodes, threshold);
     const lowCostNodes = collectLowCost(scopedNodes);
     const tailscaleNodes = collectTailscale(nodes);
+
+    const regionLayout: RegionLayout =
+        countryNames.length >= MIN_REGION_GROUPS
+            ? { mode: "grouped", groupedCountries: countryNames, flattenedNodes: [] }
+            : { mode: "flattened", groupedCountries: [], flattenedNodes: nonLandingNodes };
 
     return {
         allNodes: nodes,
@@ -92,6 +101,7 @@ export function analyzeNodes(nodes: ProxyNode[], threshold: number): NodeAnalysi
         landing,
         countryNodes,
         countryNames,
+        regionLayout,
         lowCostNodes,
         tailscaleNodes,
         hasTailscale: tailscaleNodes.length > 0,

@@ -76,22 +76,49 @@ export interface CaseInsensitiveNodeMatcher {
     pattern: string;
 }
 
+/**
+ * 节点来源：既可显式枚举 `proxies`，也可通过 `include-all` + `filter` 动态筛选。
+ * 与 `BaseProxyGroup` 共用同一组字段，避免工厂与构建层各自定义。
+ */
+export type ProxyGroupNodeSource = Pick<
+    BaseProxyGroup,
+    "proxies" | "include-all" | "filter" | "exclude-filter"
+>;
+
+/** 代理组候选项：代理组/节点名称，或需要合并进同一组的节点来源。 */
+export type ProxyGroupCandidate = string | ProxyGroupNodeSource;
+
+/**
+ * 地区代理组布局。
+ *
+ * 达标地区数不足 `MIN_REGION_GROUPS` 时进入展平模式，不生成地区组，
+ * 由上层代理组直接引用非落地节点。
+ */
+export interface RegionLayout {
+    mode: "grouped" | "flattened";
+    /** 真正会生成地区组的地区（mode 为 grouped 时非空）。 */
+    groupedCountries: string[];
+    /** 展平模式下直接进入上层列表的非落地节点。 */
+    flattenedNodes: ProxyNode[];
+}
+
 /** 各策略组可复用的基础代理候选列表。 */
 export interface BaseLists {
     defaultProxies: string[];
     defaultProxiesDirect: string[];
-    defaultSelector: string[];
-    defaultFallback: string[];
+    defaultSelector: ProxyGroupCandidate[];
+    defaultFallback: ProxyGroupCandidate[];
     frontProxySelector: string[];
 }
 
 /** 构建基础候选列表所需输入。 */
 export interface BuildBaseListsInput {
     landing: boolean;
+    landingNodes: ProxyNode[];
     lowCostNodes: ProxyNode[];
-    countryNames: string[];
     nonLandingNodes: ProxyNode[];
     regexFilter: boolean;
+    regions: RegionLayout;
 }
 
 /** 节点经过多维度分类后的结果，是配置构建阶段的唯一节点数据来源。 */
@@ -104,12 +131,14 @@ export interface NodeAnalysis {
     landingNodes: ProxyNode[];
     /** 普通/中继节点。 */
     nonLandingNodes: ProxyNode[];
-    /** 落地节点与非落地节点是否同时存在。 */
+    /** 是否存在落地节点。 */
     landing: boolean;
     /** 地区名（不含后缀）→ 节点数组。 */
     countryNodes: Record<string, ProxyNode[]>;
     /** 通过阈值过滤并按权重排序后的地区名（不含后缀）。 */
     countryNames: string[];
+    /** 地区组的实际布局：分组或展平。 */
+    regionLayout: RegionLayout;
     /** 匹配低倍率正则的节点。 */
     lowCostNodes: ProxyNode[];
     /** `type: "tailscale"` 的节点。 */
