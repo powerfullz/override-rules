@@ -1,5 +1,37 @@
 # Changelog
 
+## [2.9.0](https://github.com/powerfullz/override-rules/compare/src-v2.8.2...src-v2.9.0) (2026-10-25)
+
+
+### Bug Fixes
+
+- 空代理组候选统一回退 DIRECT ([a4e3407](https://github.com/powerfullz/override-rules/commit/a4e34078909c341b6d5fd9702a7cd910d4d8c8cd))
+
+
+### Chores
+
+- Use a more intuitive name for `selectors.ts` ([a3d2000](https://github.com/powerfullz/override-rules/commit/a3d20005abd9379c9360290fc300fd078df3fbc1))
+
+
+### Documentation
+
+- Update docs ([a161662](https://github.com/powerfullz/override-rules/commit/a161662b6c8aa5aafddb5985078f39ade5531a2b))
+- 同步静态资源组低倍率优先说明 ([131c1d1](https://github.com/powerfullz/override-rules/commit/131c1d14a6f4aa72bfa2f6398ed22c10e515d5d1))
+- 同步服务组扁平化说明 ([2c20198](https://github.com/powerfullz/override-rules/commit/2c20198dc41842839f41f866f8d5e3564f440c2c))
+- 同步展平模式手动选择组说明 ([044a25a](https://github.com/powerfullz/override-rules/commit/044a25ac130f5ce4f9cdd244c6cdebe7d4a0e40c))
+- 说明空代理组兜底行为 ([81d4920](https://github.com/powerfullz/override-rules/commit/81d4920d840c5ab094be8eea6448b82788fcec27))
+
+
+### Features
+
+- 静态资源组优先使用低倍率节点 ([8c5a40b](https://github.com/powerfullz/override-rules/commit/8c5a40b519d896cba1f4578c81459aed650b4516))
+- 展平模式下服务组直接使用节点候选 ([7f6adc2](https://github.com/powerfullz/override-rules/commit/7f6adc21f9c74e5b30e9a7f4b75711421f93605f))
+- 展平模式移除手动选择组 ([209bcf6](https://github.com/powerfullz/override-rules/commit/209bcf6f38cdbc352be7e1995794eb47e64bb9ad))
+
+
+### Other
+
+- 合并主线并保留代理组兜底决策 ([afe2e89](https://github.com/powerfullz/override-rules/commit/afe2e89438f152a25f5b392f51c66f2ca5414ba0))
 ## [2.8.2](https://github.com/powerfullz/override-rules/compare/src-v2.8.1...src-v2.8.2) (2026-10-21)
 
 
@@ -24,6 +56,17 @@
 
 - Add `.editorconfig` ([9a78daa](https://github.com/powerfullz/override-rules/commit/9a78daa6d70aaf81bec81b9ae1294727a22716ad))
 - 去除 AI Sop 词语 ([8cc4db8](https://github.com/powerfullz/override-rules/commit/8cc4db81f5507c2fb09503b87df661633f6a2ab7))
+
+
+### Documentation
+
+- 同步地区组展平行为说明 ([bbd556d](https://github.com/powerfullz/override-rules/commit/bbd556d0566559da669499ec0e878aa7440a76e5))
+- 定稿地区组展平方案 (issue #64) ([7e96280](https://github.com/powerfullz/override-rules/commit/7e96280caa1542afb50121b6d6b994dd214e90b0))
+
+
+### Features
+
+- 展平不足两个地区的代理组结构 ([e59519d](https://github.com/powerfullz/override-rules/commit/e59519dfe20ccad351a2bd1003a73beb7b542b02))
 ## [2.8.0](https://github.com/powerfullz/override-rules/compare/src-v2.7.6...src-v2.8.0) (2026-10-20)
 
 
