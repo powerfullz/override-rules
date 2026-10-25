@@ -90,6 +90,62 @@ describe("assembleConfig", () => {
             "NodeA",
             "NodeB",
         ]);
+        // 没有低倍率组时，静态资源组保持正常顺序。
+        assert.deepEqual(group(result, PROXY_GROUPS.STATIC_RESOURCES)?.proxies, [
+            "NodeA",
+            "NodeB",
+            "DIRECT",
+        ]);
+    });
+
+    it("存在低倍率组时静态资源组优先使用低倍率节点", () => {
+        const result = run(
+            {},
+            {
+                proxies: [
+                    { name: "香港01" },
+                    { name: "香港02" },
+                    { name: "美国01" },
+                    { name: "美国02" },
+                    { name: "香港 0.2x 大流量" },
+                ],
+            }
+        );
+
+        assert.deepEqual(group(result, PROXY_GROUPS.STATIC_RESOURCES)?.proxies, [
+            PROXY_GROUPS.LOW_COST,
+            PROXY_GROUPS.SELECT,
+            "香港节点",
+            "美国节点",
+            PROXY_GROUPS.MANUAL,
+            "DIRECT",
+        ]);
+        // 其他服务组仍保持正常顺序，低倍率组只移动一次。
+        assert.deepEqual(group(result, PROXY_GROUPS.GOOGLE)?.proxies, [
+            PROXY_GROUPS.SELECT,
+            "香港节点",
+            "美国节点",
+            PROXY_GROUPS.LOW_COST,
+            PROXY_GROUPS.MANUAL,
+            "DIRECT",
+        ]);
+    });
+
+    it("展平模式下静态资源组同样优先使用低倍率节点", () => {
+        const result = run({}, { proxies: [{ name: "NodeA" }, { name: "NodeB 0.2x 大流量" }] });
+
+        assert.deepEqual(group(result, PROXY_GROUPS.STATIC_RESOURCES)?.proxies, [
+            PROXY_GROUPS.LOW_COST,
+            "NodeA",
+            "NodeB 0.2x 大流量",
+            "DIRECT",
+        ]);
+        assert.deepEqual(group(result, PROXY_GROUPS.GOOGLE)?.proxies, [
+            "NodeA",
+            "NodeB 0.2x 大流量",
+            PROXY_GROUPS.LOW_COST,
+            "DIRECT",
+        ]);
     });
 
     it("空 proxies 时所有代理组都不为空，且展平模式不生成手动选择组", () => {
