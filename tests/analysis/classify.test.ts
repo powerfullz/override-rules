@@ -37,10 +37,18 @@ describe("analyzeNodes", () => {
     it("达标地区不足 2 个时展平", () => {
         assert.equal(result.regionLayout.mode, "flattened");
         assert.deepEqual(result.regionLayout.groupedCountries, []);
+        // Tailscale 节点不参与常规代理选择，因此不会进入展平候选。
         assert.deepEqual(
             result.regionLayout.flattenedNodes.map((n) => n.name),
-            result.nonLandingNodes.map((n) => n.name)
+            ["香港01", "香港02", "台湾01", "香港 0.2x 大流量"]
         );
+        assert.deepEqual(result.manualNames, [
+            "香港01",
+            "香港02",
+            "台湾01",
+            "香港 0.2x 大流量",
+            "落地A",
+        ]);
     });
 
     it("threshold=1 且达标地区 ≥ 2 时保留地区组", () => {
@@ -72,6 +80,26 @@ describe("analyzeNodes", () => {
         assert.deepEqual(
             result.tailscaleNodes.map((n) => n.name),
             ["Tailscale出口"]
+        );
+    });
+
+    it("Tailscale 节点不参与国家/低倍率/展平分类", () => {
+        const nodes: ProxyNode[] = [
+            { name: "香港01" },
+            { name: "香港02" },
+            { name: "台湾01" },
+            { name: "台湾02" },
+            { name: "美国-Tailscale 0.2x", type: "tailscale" },
+        ];
+        const grouped = analyzeNodes(nodes, 2);
+
+        assert.deepEqual(grouped.countryNames, ["香港", "台湾"]);
+        assert.deepEqual(Object.keys(grouped.countryNodes).sort(), ["台湾", "香港"]);
+        assert.deepEqual(grouped.lowCostNodes, []);
+        assert.deepEqual(grouped.manualNames, ["香港01", "香港02", "台湾01", "台湾02"]);
+        assert.deepEqual(
+            grouped.tailscaleNodes.map((n) => n.name),
+            ["美国-Tailscale 0.2x"]
         );
     });
 

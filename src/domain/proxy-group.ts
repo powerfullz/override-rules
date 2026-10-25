@@ -108,12 +108,14 @@ export function selectGroup(
     name: string,
     icon: string,
     candidates: ProxyGroupCandidate[],
-    includeAll = false
+    includeAll = false,
+    hidden: boolean = false
 ): SelectProxyGroup {
     return {
         name,
         icon,
         type: "select",
+        ...(hidden ? { hidden: true } : {}),
         ...normalizeNodeSource(candidates, includeAll),
     };
 }
@@ -124,12 +126,17 @@ export function selectGroup(
  * 适用于 regex 模式：静态配置无法预知真实节点名称，
  * 使用 `include-all` 可让 Mihomo 在运行时把订阅节点加入该组。
  */
-export function selectAllGroup(name: string, icon: string): SelectProxyGroup {
+export function selectAllGroup(
+    name: string,
+    icon: string,
+    excludeFilter?: string
+): SelectProxyGroup {
     return {
         name,
         icon,
         type: "select",
         "include-all": true,
+        ...(excludeFilter ? { "exclude-filter": excludeFilter } : {}),
     };
 }
 

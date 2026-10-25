@@ -55,6 +55,7 @@ function main(config: ClashConfig): ClashConfig {
         landingNodes: nodes.landingNodes,
         lowCostNodes: nodes.lowCostNodes,
         nonLandingNodes: nodes.nonLandingNodes,
+        tailscaleNodes: nodes.tailscaleNodes,
         regexFilter: flags.regexFilter,
         regions: nodes.regionLayout,
     });

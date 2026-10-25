@@ -117,6 +117,29 @@ describe("固定结构代理组", () => {
         assert.equal(selectAllGroup("n", "i").proxies, undefined);
     });
 
+    it("selectAllGroup 可附加 exclude-filter", () => {
+        const group = selectAllGroup("n", "i", "^(?:Tailscale出口)$");
+
+        assert.deepEqual(Object.keys(group), [
+            "name",
+            "icon",
+            "type",
+            "include-all",
+            "exclude-filter",
+        ]);
+        assert.equal(group["exclude-filter"], "^(?:Tailscale出口)$");
+    });
+
+    it("selectGroup 仅在 hidden=true 时输出 hidden 字段", () => {
+        const visible = selectGroup("n", "i", ["a"]);
+        assert.equal(visible.hidden, undefined);
+        assert.deepEqual(Object.keys(visible), ["name", "icon", "type", "proxies"]);
+
+        const hidden = selectGroup("n", "i", ["a"], false, true);
+        assert.equal(hidden.hidden, true);
+        assert.deepEqual(Object.keys(hidden), ["name", "icon", "type", "hidden", "proxies"]);
+    });
+
     it("selectGroup 空候选回退到 DIRECT", () => {
         assert.deepEqual(selectGroup("n", "i", []).proxies, ["DIRECT"]);
     });

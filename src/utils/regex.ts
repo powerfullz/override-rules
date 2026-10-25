@@ -26,10 +26,28 @@ function escapeRegExp(value: string): string {
 }
 
 /**
- * 构造 `exclude-filter`，从 `include-all` 的动态节点中排除全部落地节点。
+ * 构造 `exclude-filter`，从 `include-all` 的动态节点中排除指定的节点名称。
  * 使用完整的锚定分组，避免节点名中的特殊字符导致误匹配。
+ * @returns 无有效节点名时返回 `undefined`，表示无需排除。
  */
-export function buildLandingExcludeFilter(landingNodes: ProxyNode[]): string {
-    const names = landingNodes.map((node) => node.name).filter(Boolean);
+export function buildNodeExcludeFilter(nodes: ProxyNode[]): string | undefined {
+    const names = [...new Set(nodes.map((node) => node.name).filter(Boolean))];
+    if (names.length === 0) return undefined;
+
     return `^(?:${names.map(escapeRegExp).join("|")})$`;
+}
+
+/**
+ * 合并两段 `exclude-filter`。
+ * @param base - 已有过滤规则（如地区误匹配正则）
+ * @param extra - 追加的过滤规则
+ */
+export function combineExcludeFilters(
+    base: string | undefined,
+    extra: string | undefined
+): string | undefined {
+    if (!base) return extra;
+    if (!extra) return base;
+
+    return `${base}|${extra}`;
 }

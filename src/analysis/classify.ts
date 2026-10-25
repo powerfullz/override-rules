@@ -67,8 +67,17 @@ function collectLowCost(nodes: ProxyNode[]): ProxyNode[] {
 }
 
 /** 筛选出所有 Tailscale 节点。 */
+function isTailscaleNode(node: ProxyNode): boolean {
+    return node.type === "tailscale";
+}
+
 function collectTailscale(nodes: ProxyNode[]): ProxyNode[] {
-    return nodes.filter((node) => node.type === "tailscale");
+    return nodes.filter(isTailscaleNode);
+}
+
+/** 过滤掉 Tailscale 节点，得到可进入常规代理选择列表的节点。 */
+function excludeTailscale(nodes: ProxyNode[]): ProxyNode[] {
+    return nodes.filter((node) => !isTailscaleNode(node));
 }
 
 /**
@@ -80,22 +89,26 @@ export function analyzeNodes(nodes: ProxyNode[], threshold: number): NodeAnalysi
     const { landingNodes, nonLandingNodes } = splitByLanding(nodes);
     // 只要出现落地节点就启用落地相关代理组；全落地时非落地候选自然为空。
     const landing = landingNodes.length > 0;
+    const tailscaleNodes = collectTailscale(nodes);
 
-    // 链式代理激活时，国家/低倍率分类只扫描非落地节点。
-    const scopedNodes = landing ? nonLandingNodes : nodes;
+    // 链式代理激活时，国家/低倍率分类只扫描非落地节点；Tailscale 节点不参与常规分类。
+    const scopedNodes = excludeTailscale(landing ? nonLandingNodes : nodes);
     const countryNodes = collectCountries(scopedNodes);
     const countryNames = getActiveCountryNames(countryNodes, threshold);
     const lowCostNodes = collectLowCost(scopedNodes);
-    const tailscaleNodes = collectTailscale(nodes);
 
     const regionLayout: RegionLayout =
         countryNames.length >= MIN_REGION_GROUPS
             ? { mode: "grouped", groupedCountries: countryNames, flattenedNodes: [] }
-            : { mode: "flattened", groupedCountries: [], flattenedNodes: nonLandingNodes };
+            : {
+                  mode: "flattened",
+                  groupedCountries: [],
+                  flattenedNodes: excludeTailscale(nonLandingNodes),
+              };
 
     return {
         allNodes: nodes,
-        allNames: nodes.map((node) => node.name),
+        manualNames: excludeTailscale(nodes).map((node) => node.name),
         landingNodes,
         nonLandingNodes,
         landing,

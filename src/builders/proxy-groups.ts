@@ -20,6 +20,7 @@ import {
     urlTestGroup,
 } from "../domain/proxy-group";
 import { isNotNull } from "../utils/primitives";
+import { buildNodeExcludeFilter, combineExcludeFilters } from "../utils/regex";
 import type { GroupBuildContext, ProxyGroup } from "../types/proxy";
 
 /** 顶层选择类代理组：选择代理、手动选择、以及链式代理相关组。 */
@@ -29,8 +30,12 @@ function buildFrontGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
     const manualGroup =
         ctx.nodes.regionLayout.mode === "grouped"
             ? ctx.flags.regexFilter
-                ? selectAllGroup(PROXY_GROUPS.MANUAL, ICONS.manual)
-                : selectGroup(PROXY_GROUPS.MANUAL, ICONS.manual, ctx.nodes.allNames)
+                ? selectAllGroup(
+                      PROXY_GROUPS.MANUAL,
+                      ICONS.manual,
+                      buildNodeExcludeFilter(ctx.nodes.tailscaleNodes)
+                  )
+                : selectGroup(PROXY_GROUPS.MANUAL, ICONS.manual, ctx.nodes.manualNames)
             : null;
 
     return [
@@ -63,7 +68,9 @@ function buildTailGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
             ? selectGroup(
                   PROXY_GROUPS.TAILSCALE,
                   ICONS.tailscale,
-                  ctx.nodes.tailscaleNodes.map((node) => node.name)
+                  ctx.nodes.tailscaleNodes.map((node) => node.name),
+                  false,
+                  true
               )
             : null,
         selectGroup(PROXY_GROUPS.AD_BLOCK, ICONS.adBlock, ["REJECT", "REJECT-DROP", "DIRECT"]),
@@ -77,6 +84,7 @@ function buildTailGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
 function buildRegionGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
     const { flags, nodes } = ctx;
     const hasLowCost = nodes.lowCostNodes.length > 0 || flags.regexFilter;
+    const tailscaleExcludeFilter = buildNodeExcludeFilter(nodes.tailscaleNodes);
 
     const lowCostGroup = hasLowCost
         ? buildGroupByType({
@@ -85,7 +93,13 @@ function buildRegionGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
               groupType: flags.groupType,
               nodeSource: !flags.regexFilter
                   ? { proxies: nodes.lowCostNodes.map((node) => node.name) }
-                  : { "include-all": true as const, filter: LOW_COST_NODE_MATCHER.pattern },
+                  : {
+                        "include-all": true as const,
+                        filter: LOW_COST_NODE_MATCHER.pattern,
+                        ...(tailscaleExcludeFilter
+                            ? { "exclude-filter": tailscaleExcludeFilter }
+                            : {}),
+                    },
           })
         : null;
 
@@ -93,11 +107,12 @@ function buildRegionGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
         const meta = countriesMeta[country];
         if (!meta) return null;
 
+        const excludeFilter = combineExcludeFilters(meta.excludePattern, tailscaleExcludeFilter);
         const nodeSource = flags.regexFilter
             ? {
                   "include-all": true as const,
                   filter: meta.pattern,
-                  ...(meta.excludePattern ? { "exclude-filter": meta.excludePattern } : {}),
+                  ...(excludeFilter ? { "exclude-filter": excludeFilter } : {}),
               }
             : { proxies: nodes.countryNodes[country]?.map((node) => node.name) };
 

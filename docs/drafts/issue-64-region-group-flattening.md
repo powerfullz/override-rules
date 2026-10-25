@@ -229,7 +229,7 @@ const defaultProxiesDirect = buildList(
 - 不保留草案早期提出的「地区组 ≥ 2 时逐地区展平单节点地区」；
 - `threshold=1` 且地区数 ≥ 2 时，单节点地区仍会生成单节点组；
 - `threshold=1` 且地区数 = 1 时，仍按 `< 2` 规则展平；
-- Tailscale 节点属于非落地节点，展平模式下会直接出现在三大组中，同时保留 Tailscale 组；
+- Tailscale 节点虽然属于非落地节点，但不会进入展平候选或常规选择列表，仅保留 Tailscale 组并通过定向规则使用；
 - 上游节点名与既有代理组重名的风险与当前「手动选择」枚举节点名时一致，不在本次处理范围；
 - `regex=true` 使用 `include-all` 时，运行时会包含 provider 节点，可能多于转换时的
   `config.proxies`；这是 regex 模式的预期行为；

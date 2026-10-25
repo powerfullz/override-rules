@@ -11,6 +11,7 @@ function buildInput(overrides: Partial<BuildBaseListsInput> = {}): BuildBaseList
         landingNodes: [],
         lowCostNodes: [],
         nonLandingNodes: [],
+        tailscaleNodes: [],
         regexFilter: false,
         regions: { mode: "flattened", groupedCountries: [], flattenedNodes: [] },
         ...overrides,
@@ -175,5 +176,48 @@ describe("buildBaseLists", () => {
             "include-all": true,
             "exclude-filter": "^(?:落地\\(A\\.1\\))$",
         });
+    });
+
+    it("展平 + regex 同时排除落地节点与 Tailscale 节点", () => {
+        const tailscale = { name: "Tailscale出口", type: "tailscale" };
+        const lists = buildBaseLists(
+            buildInput({
+                landing: true,
+                landingNodes: [{ name: "落地A", "dialer-proxy": "前置代理" }],
+                nonLandingNodes: [{ name: "香港01" }, tailscale],
+                tailscaleNodes: [tailscale],
+                regexFilter: true,
+                regions: {
+                    mode: "flattened",
+                    groupedCountries: [],
+                    flattenedNodes: [{ name: "香港01" }],
+                },
+            })
+        );
+
+        const expectedSource = {
+            "include-all": true,
+            "exclude-filter": "^(?:落地A|Tailscale出口)$",
+        };
+        assert.deepEqual(lists.defaultSelector[1], expectedSource);
+        assert.deepEqual(lists.defaultProxies[1], expectedSource);
+        assert.deepEqual(lists.defaultProxiesDirect[2], expectedSource);
+        // 前置代理显式枚举非落地节点时也不能包含 Tailscale。
+        assert.deepEqual(lists.frontProxySelector, ["DIRECT", "香港01"]);
+    });
+
+    it("分组模式下前置代理排除 Tailscale 节点", () => {
+        const tailscale = { name: "Tailscale出口", type: "tailscale" };
+        const lists = buildBaseLists(
+            buildInput({
+                landing: true,
+                landingNodes: [{ name: "落地A", "dialer-proxy": "前置代理" }],
+                nonLandingNodes: [{ name: "香港01" }, tailscale],
+                tailscaleNodes: [tailscale],
+                regions: { mode: "grouped", groupedCountries: ["香港"], flattenedNodes: [] },
+            })
+        );
+
+        assert.deepEqual(lists.frontProxySelector, ["香港节点", "DIRECT", "香港01"]);
     });
 });

@@ -25,6 +25,7 @@ export interface BaseProxyGroup {
     "include-all"?: boolean;
     filter?: string;
     "exclude-filter"?: string;
+    hidden?: boolean;
 }
 
 export interface SelectProxyGroup extends BaseProxyGroup {
@@ -117,6 +118,7 @@ export interface BuildBaseListsInput {
     landingNodes: ProxyNode[];
     lowCostNodes: ProxyNode[];
     nonLandingNodes: ProxyNode[];
+    tailscaleNodes: ProxyNode[];
     regexFilter: boolean;
     regions: RegionLayout;
 }
@@ -125,8 +127,8 @@ export interface BuildBaseListsInput {
 export interface NodeAnalysis {
     /** 全部节点（原样）。 */
     allNodes: ProxyNode[];
-    /** 全部节点名称。 */
-    allNames: string[];
+    /** 可进入手动选择列表的节点名称（全部节点名，已排除 Tailscale）。 */
+    manualNames: string[];
     /** 带 `dialer-proxy: "前置代理"` 的落地节点。 */
     landingNodes: ProxyNode[];
     /** 普通/中继节点。 */

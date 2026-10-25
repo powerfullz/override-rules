@@ -21,6 +21,7 @@ function run(args: ScriptArgs, config: ClashConfig): ClashConfig {
         landingNodes: nodes.landingNodes,
         lowCostNodes: nodes.lowCostNodes,
         nonLandingNodes: nodes.nonLandingNodes,
+        tailscaleNodes: nodes.tailscaleNodes,
         regexFilter: flags.regexFilter,
         regions: nodes.regionLayout,
     });
@@ -275,6 +276,109 @@ describe("assembleConfig", () => {
             manual?.proxies,
             CONFIG.proxies?.map((node) => node.name)
         );
+    });
+
+    it("Tailscale 组隐藏且不进入手动选择列表", () => {
+        const result = run(
+            {},
+            {
+                proxies: [
+                    { name: "香港01" },
+                    { name: "香港02" },
+                    { name: "美国01" },
+                    { name: "美国02" },
+                    { name: "Tailscale出口", type: "tailscale" },
+                ],
+            }
+        );
+
+        const tailscale = group(result, PROXY_GROUPS.TAILSCALE);
+        assert.equal(tailscale?.hidden, true);
+        assert.deepEqual(tailscale?.proxies, ["Tailscale出口"]);
+
+        assert.deepEqual(group(result, PROXY_GROUPS.MANUAL)?.proxies, [
+            "香港01",
+            "香港02",
+            "美国01",
+            "美国02",
+        ]);
+    });
+
+    it("展平模式下 Tailscale 节点不进入任何常规选择列表", () => {
+        const result = run(
+            {},
+            {
+                proxies: [{ name: "香港01" }, { name: "Tailscale出口", type: "tailscale" }],
+            }
+        );
+
+        assert.equal(group(result, PROXY_GROUPS.MANUAL), undefined);
+        assert.deepEqual(group(result, PROXY_GROUPS.SELECT)?.proxies, ["香港01", "DIRECT"]);
+        assert.deepEqual(group(result, PROXY_GROUPS.AUTO)?.proxies, ["香港01"]);
+        assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, ["香港01"]);
+        assert.deepEqual(group(result, PROXY_GROUPS.GOOGLE)?.proxies, ["香港01", "DIRECT"]);
+        assert.equal(group(result, PROXY_GROUPS.TAILSCALE)?.hidden, true);
+    });
+
+    it("regex 分组模式下手动选择组排除 Tailscale", () => {
+        const result = run(
+            { regex: "true" },
+            {
+                proxies: [
+                    { name: "香港01" },
+                    { name: "香港02" },
+                    { name: "美国01" },
+                    { name: "美国02" },
+                    { name: "Tailscale出口", type: "tailscale" },
+                ],
+            }
+        );
+
+        const manual = group(result, PROXY_GROUPS.MANUAL);
+        assert.equal(manual?.["include-all"], true);
+        assert.equal(manual?.["exclude-filter"], "^(?:Tailscale出口)$");
+    });
+
+    it("regex 地区组与低倍率组均排除 Tailscale", () => {
+        const result = run(
+            { regex: "true" },
+            {
+                proxies: [
+                    { name: "香港01" },
+                    { name: "香港02" },
+                    { name: "美国01" },
+                    { name: "美国02" },
+                    { name: "美国-Tailscale 低倍率", type: "tailscale" },
+                ],
+            }
+        );
+
+        assert.equal(
+            group(result, "美国节点")?.["exclude-filter"],
+            "美属|亚美尼亚|圣多美|普林西比|^(?:美国-Tailscale 低倍率)$"
+        );
+        assert.equal(
+            group(result, PROXY_GROUPS.LOW_COST)?.["exclude-filter"],
+            "^(?:美国-Tailscale 低倍率)$"
+        );
+    });
+
+    it("regex 展平模式同时排除落地节点与 Tailscale", () => {
+        const result = run(
+            { regex: "true" },
+            {
+                proxies: [
+                    { name: "香港01" },
+                    { name: "落地A", "dialer-proxy": "前置代理" },
+                    { name: "Tailscale出口", type: "tailscale" },
+                ],
+            }
+        );
+
+        const expected = "^(?:落地A|Tailscale出口)$";
+        assert.equal(group(result, PROXY_GROUPS.SELECT)?.["exclude-filter"], expected);
+        assert.equal(group(result, PROXY_GROUPS.GOOGLE)?.["exclude-filter"], expected);
+        assert.equal(group(result, PROXY_GROUPS.TAILSCALE)?.hidden, true);
     });
 
     it("引用同一份规则集与 Geo 数据源", () => {
