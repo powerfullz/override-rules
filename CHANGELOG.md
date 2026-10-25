@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.9.1](https://github.com/powerfullz/override-rules/compare/src-v2.9.0...src-v2.9.1) (2026-10-25)
+
+
+### Features
+
+- Tailscale 代理组现在会自动隐藏 ([360ac8f](https://github.com/powerfullz/override-rules/commit/360ac8fa02e805a638c362648ccb27831fe73921))
+- Tun模式默认网络栈采用 mips ([193be43](https://github.com/powerfullz/override-rules/commit/193be43f8fd12f707401782090202abe76e77038))
 ## [2.9.0](https://github.com/powerfullz/override-rules/compare/src-v2.8.2...src-v2.9.0) (2026-10-25)
 
 
