@@ -82,6 +82,14 @@ describe("assembleConfig", () => {
         assert.deepEqual(group(result, PROXY_GROUPS.AUTO)?.proxies, ["NodeA", "NodeB"]);
         assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, ["NodeA", "NodeB"]);
         assert.equal(group(result, PROXY_GROUPS.MANUAL), undefined);
+
+        // 服务组也直接使用展平节点，不再引用「选择代理」。
+        assert.deepEqual(group(result, PROXY_GROUPS.GOOGLE)?.proxies, ["NodeA", "NodeB", "DIRECT"]);
+        assert.deepEqual(group(result, PROXY_GROUPS.FINANCE)?.proxies, [
+            "DIRECT",
+            "NodeA",
+            "NodeB",
+        ]);
     });
 
     it("空 proxies 时所有代理组都不为空，且展平模式不生成手动选择组", () => {
@@ -92,6 +100,8 @@ describe("assembleConfig", () => {
         assert.equal(group(result, PROXY_GROUPS.MANUAL), undefined);
         assert.deepEqual(group(result, PROXY_GROUPS.AUTO)?.proxies, ["DIRECT"]);
         assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, ["DIRECT"]);
+        assert.deepEqual(group(result, PROXY_GROUPS.GOOGLE)?.proxies, ["DIRECT"]);
+        assert.deepEqual(group(result, PROXY_GROUPS.FINANCE)?.proxies, ["DIRECT"]);
 
         for (const item of groups) {
             if (item.proxies) {
@@ -111,6 +121,14 @@ describe("assembleConfig", () => {
         ]);
         assert.deepEqual(group(result, PROXY_GROUPS.FALLBACK)?.proxies, [PROXY_GROUPS.LANDING]);
         assert.equal(group(result, PROXY_GROUPS.MANUAL), undefined);
+        assert.deepEqual(group(result, PROXY_GROUPS.GOOGLE)?.proxies, [
+            PROXY_GROUPS.LANDING,
+            "DIRECT",
+        ]);
+        assert.deepEqual(group(result, PROXY_GROUPS.FINANCE)?.proxies, [
+            "DIRECT",
+            PROXY_GROUPS.LANDING,
+        ]);
     });
 
     it("展平 + regex 时前置代理仍显式排除落地节点", () => {
@@ -132,6 +150,16 @@ describe("assembleConfig", () => {
         ]);
         assert.equal(group(result, PROXY_GROUPS.SELECT)?.["exclude-filter"], "^(?:落地A)$");
         assert.equal(group(result, PROXY_GROUPS.SELECT)?.["include-all"], true);
+
+        const google = group(result, PROXY_GROUPS.GOOGLE);
+        assert.equal(google?.["include-all"], true);
+        assert.equal(google?.["exclude-filter"], "^(?:落地A)$");
+        assert.deepEqual(google?.proxies, [PROXY_GROUPS.LANDING, PROXY_GROUPS.LOW_COST, "DIRECT"]);
+        assert.deepEqual(group(result, PROXY_GROUPS.FINANCE)?.proxies, [
+            "DIRECT",
+            PROXY_GROUPS.LANDING,
+            PROXY_GROUPS.LOW_COST,
+        ]);
     });
 
     it("只有台湾时服务组不引用未生成的地区组", () => {
@@ -140,15 +168,19 @@ describe("assembleConfig", () => {
 
         assert.ok(!allGroupNames.includes("台湾节点"));
         assert.deepEqual(group(result, PROXY_GROUPS.BAHAMUT)?.proxies, [
-            PROXY_GROUPS.SELECT,
+            "台湾01",
+            "台湾02",
             "DIRECT",
         ]);
         assert.deepEqual(group(result, PROXY_GROUPS.BILIBILI)?.proxies, [
             "DIRECT",
-            PROXY_GROUPS.SELECT,
+            "台湾01",
+            "台湾02",
         ]);
         assert.ok(!group(result, PROXY_GROUPS.BAHAMUT)?.proxies?.includes("台湾节点"));
         assert.ok(!group(result, PROXY_GROUPS.BILIBILI)?.proxies?.includes("台湾节点"));
+        assert.ok(!group(result, PROXY_GROUPS.BAHAMUT)?.proxies?.includes(PROXY_GROUPS.SELECT));
+        assert.ok(!group(result, PROXY_GROUPS.BILIBILI)?.proxies?.includes(PROXY_GROUPS.SELECT));
     });
 
     it("只有美国时 Truth Social 不引用未生成的地区组", () => {
@@ -156,10 +188,14 @@ describe("assembleConfig", () => {
 
         assert.ok(!(result["proxy-groups"] ?? []).some((item) => item.name === "美国节点"));
         assert.deepEqual(group(result, PROXY_GROUPS.TRUTH_SOCIAL)?.proxies, [
-            PROXY_GROUPS.SELECT,
+            "美国01",
+            "美国02",
             "DIRECT",
         ]);
         assert.ok(!group(result, PROXY_GROUPS.TRUTH_SOCIAL)?.proxies?.includes("美国节点"));
+        assert.ok(
+            !group(result, PROXY_GROUPS.TRUTH_SOCIAL)?.proxies?.includes(PROXY_GROUPS.SELECT)
+        );
     });
 
     it("regex=true 时手动选择组使用 include-all，不枚举节点名称", () => {

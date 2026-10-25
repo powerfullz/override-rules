@@ -104,8 +104,8 @@ export interface RegionLayout {
 
 /** 各策略组可复用的基础代理候选列表。 */
 export interface BaseLists {
-    defaultProxies: string[];
-    defaultProxiesDirect: string[];
+    defaultProxies: ProxyGroupCandidate[];
+    defaultProxiesDirect: ProxyGroupCandidate[];
     defaultSelector: ProxyGroupCandidate[];
     defaultFallback: ProxyGroupCandidate[];
     frontProxySelector: string[];

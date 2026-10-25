@@ -78,23 +78,39 @@ export function buildBaseLists({
               "DIRECT"
           );
 
-    const defaultProxies = buildList(
-        PROXY_GROUPS.SELECT,
-        landing && PROXY_GROUPS.LANDING,
-        suffixedCountryNames,
-        hasLowCost && PROXY_GROUPS.LOW_COST,
-        !isFlattened && PROXY_GROUPS.MANUAL,
-        "DIRECT"
-    );
+    // 展平模式下服务组也不再引用「选择代理」，而是与 SELECT 共用同一份展平节点来源，
+    // 避免服务组仍然停留在「引用一个已展平的组」的中间状态。
+    const defaultProxies: ProxyGroupCandidate[] = isFlattened
+        ? buildList<ProxyGroupCandidate>(
+              landing && PROXY_GROUPS.LANDING,
+              flattenedNodeSource,
+              hasLowCost && PROXY_GROUPS.LOW_COST,
+              "DIRECT"
+          )
+        : buildList(
+              PROXY_GROUPS.SELECT,
+              landing && PROXY_GROUPS.LANDING,
+              suffixedCountryNames,
+              hasLowCost && PROXY_GROUPS.LOW_COST,
+              PROXY_GROUPS.MANUAL,
+              "DIRECT"
+          );
 
-    const defaultProxiesDirect = buildList(
-        "DIRECT",
-        landing && PROXY_GROUPS.LANDING,
-        suffixedCountryNames,
-        hasLowCost && PROXY_GROUPS.LOW_COST,
-        PROXY_GROUPS.SELECT,
-        !isFlattened && PROXY_GROUPS.MANUAL
-    );
+    const defaultProxiesDirect: ProxyGroupCandidate[] = isFlattened
+        ? buildList<ProxyGroupCandidate>(
+              "DIRECT",
+              landing && PROXY_GROUPS.LANDING,
+              flattenedNodeSource,
+              hasLowCost && PROXY_GROUPS.LOW_COST
+          )
+        : buildList(
+              "DIRECT",
+              landing && PROXY_GROUPS.LANDING,
+              suffixedCountryNames,
+              hasLowCost && PROXY_GROUPS.LOW_COST,
+              PROXY_GROUPS.SELECT,
+              PROXY_GROUPS.MANUAL
+          );
 
     // 保留主线的兜底决策：分组模式存在地区组时不再重复追加「手动选择」与「DIRECT」。
     // 这里允许返回空列表，最终由 `domain/proxy-group.ts` 的构造工厂补 `DIRECT`。

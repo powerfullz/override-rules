@@ -8,7 +8,7 @@
 import { COUNTRY_KEYS } from "./countries";
 import { countryGroupName, PROXY_GROUPS } from "./group-names";
 import { ICONS } from "./icons";
-import type { GroupBuildContext } from "../types/proxy";
+import type { GroupBuildContext, ProxyGroupCandidate } from "../types/proxy";
 
 export interface ServiceGroupDef {
     /** 代理组显示名称。 */
@@ -18,7 +18,7 @@ export interface ServiceGroupDef {
     /** 是否附加 `include-all: true`。 */
     includeAll?: boolean;
     /** 根据构建上下文返回候选代理列表。 */
-    proxies: (ctx: GroupBuildContext) => string[];
+    proxies: (ctx: GroupBuildContext) => ProxyGroupCandidate[];
 }
 
 /** 服务代理组，按输出顺序排列。 */
