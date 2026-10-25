@@ -59,7 +59,7 @@ export function buildBaseLists({
         ? buildFlattenedNodeSource(regions.flattenedNodes, landingNodes, regexFilter)
         : null;
 
-    // 展平模式下「选择代理」已直接列出全部非落地节点，与「手动选择」高度重合，
+    // 展平模式下「选择代理」已直接列出全部非落地节点
     // 因此不再生成「手动选择」组，也不再在候选列表中引用它。
     const defaultSelector: ProxyGroupCandidate[] = isFlattened
         ? buildList<ProxyGroupCandidate>(
@@ -112,7 +112,6 @@ export function buildBaseLists({
               PROXY_GROUPS.MANUAL
           );
 
-    // 保留主线的兜底决策：分组模式存在地区组时不再重复追加「手动选择」与「DIRECT」。
     // 这里允许返回空列表，最终由 `domain/proxy-group.ts` 的构造工厂补 `DIRECT`。
     const defaultFallback: ProxyGroupCandidate[] = isFlattened
         ? buildList<ProxyGroupCandidate>(landing && PROXY_GROUPS.LANDING, flattenedNodeSource)
