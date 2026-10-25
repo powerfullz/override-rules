@@ -27,6 +27,7 @@ activeRegions.length <  2  → 展平模式
 - `选择代理` / `自动选择` / `故障转移` 直接使用非落地节点，不再引用地区组；
 - 若存在落地节点，额外引用 `落地节点` 组；
 - 不再生成 `手动选择` 组（其候选与 `选择代理` 高度重合）；
+- 服务代理组不再引用 `选择代理`，而是直接使用同一份展平节点来源；
 - 保留 `落地节点`、`前置代理`、`低倍率节点`、`Tailscale` 及服务代理组；
 - `regex=true` 时，非落地节点部分使用 `include-all`，而不是枚举节点名。
 
@@ -59,7 +60,7 @@ const landing = landingNodes.length > 0;
 | 手动选择组 | 展平模式不生成（与 `选择代理` 高度重合）；分组模式保留现状（`allNames`，包含落地节点） |
 | `regex=true` 时如何处理动态节点 | 非落地节点部分使用 `include-all` |
 | 只有 1 个地区达标时 | 同样展平，取消该地区组 |
-| 服务组目标地区未建组时 | 回退 `defaultProxies` / `defaultProxiesDirect`，不内联地区节点 |
+| 服务组目标地区未建组时 | 回退 `defaultProxies` / `defaultProxiesDirect`；展平模式下这两个列表直接使用展平节点来源，不再引用 `选择代理` |
 | 全落地节点时 | 生成 `落地节点` 组；`前置代理` 组仅含 `DIRECT` |
 | `threshold=1` 且地区数 ≥ 2 | 单节点地区继续生成单节点组 |
 | `threshold=1` 且地区数 = 1 | 仍按主规则展平 |
@@ -155,8 +156,27 @@ const defaultFallback = buildList(
 `DIRECT`；展平模式没有地区组时也不在列表层追加 `DIRECT`。最终若候选为空，
 由 `domain/proxy-group.ts` 的构造工厂统一补 `DIRECT`。
 
-`defaultProxies` / `defaultProxiesDirect` 在分组模式下保持现有结构；展平模式下会同时
-移除地区组与 `手动选择` 的引用，只保留 `选择代理` / `DIRECT` 等实际存在的组。
+`defaultProxies` / `defaultProxiesDirect` 在分组模式下保持现有结构；展平模式下也使用
+同一份 `nodeSource`，不再引用地区组、`手动选择` 或 `选择代理`：
+
+```ts
+const defaultProxies = buildList(
+    landing && PROXY_GROUPS.LANDING,
+    nodeSource,
+    hasLowCost && PROXY_GROUPS.LOW_COST,
+    "DIRECT"
+);
+
+const defaultProxiesDirect = buildList(
+    "DIRECT",
+    landing && PROXY_GROUPS.LANDING,
+    nodeSource,
+    hasLowCost && PROXY_GROUPS.LOW_COST
+);
+```
+
+因此 `BaseLists.defaultProxies` / `defaultProxiesDirect` 以及服务组的 `proxies()`
+返回值都必须是 `ProxyGroupCandidate[]`，以承载 `include-all` 节点来源。
 
 ### 前置代理组
 
@@ -171,20 +191,23 @@ const defaultFallback = buildList(
 | 位置 | 改动 |
 |------|------|
 | `src/analysis/classify.ts` | `landing` 删除 `nonLandingNodes.length > 0`；派生 `regionLayout` |
-| `src/types/proxy.ts` | 新增 `RegionLayout`，`NodeAnalysis` 增加字段；基础列表入参增加 `regions` / `landingNodes` |
+| `src/types/proxy.ts` | 新增 `RegionLayout`，`NodeAnalysis` 增加字段；基础列表入参增加 `regions` / `landingNodes`；`defaultProxies` / `defaultProxiesDirect` 改为 `ProxyGroupCandidate[]` |
 | `src/domain/proxy-group.ts` | 统一 `ProxyGroupNodeSource`，让 `selectGroup` / `urlTestGroup` / `fallbackGroup` 支持 `include-all`；空候选统一回退 `DIRECT` |
-| `src/builders/selectors.ts` | 分组与展平分支；显式节点名 / `include-all`；展平模式移除 `手动选择` 引用 |
+| `src/builders/selectors.ts` | 分组与展平分支；显式节点名 / `include-all`；展平模式移除 `手动选择` 与 `选择代理` 引用 |
 | `src/builders/proxy-groups.ts` | 展平模式跳过地区组与 `手动选择` 组；AUTO / FALLBACK 共用 `defaultFallback` |
-| `src/catalog/service-groups.ts` | `BILIBILI` / `BAHAMUT` / `TRUTH_SOCIAL` 改按 `groupedCountries` 判断 |
+| `src/catalog/service-groups.ts` | `BILIBILI` / `BAHAMUT` / `TRUTH_SOCIAL` 改按 `groupedCountries` 判断；`proxies()` 返回 `ProxyGroupCandidate[]` |
 | `src/main.ts` | 向 `buildBaseLists` 传入 `regions` 与 `landingNodes` |
 | `README.md` / `docs/ARCHITECTURE.md` | 同步展平、`regex`、`threshold` 与 landing 行为说明 |
 | `tests/` | 覆盖 0 / 1 / ≥2 地区、`threshold=1`、landing、regex、空 `proxies` |
 
 ### 必须一并处理的引用链
 
-1. **`手动选择` 的引用（仅分组模式）**
+1. **`手动选择` / `选择代理` 的引用**
    - `selectors.ts` 中的 `defaultSelector` / `defaultProxies` / `defaultProxiesDirect` 在展平模式下必须移除 `手动选择`；
-   - `service-groups.ts` 中的 `BAHAMUT` / `TRUTH_SOCIAL` 只有在分组模式才会引用 `手动选择`，展平模式回退列表已不含它。
+   - `defaultProxies` / `defaultProxiesDirect` 还必须移除 `选择代理`，直接携带展平 `nodeSource`，
+     否则服务组只是从「引用地区组」变成「引用一个已展平的组」，并没有真正展平；
+   - `service-groups.ts` 中的 `BAHAMUT` / `TRUTH_SOCIAL` 只有在分组模式才会引用 `手动选择`，
+     展平模式回退列表已不含它。
 2. **服务组的地区判断**
    - 目前按 `countryNames` 判断；展平后仍会引用不存在的 `台湾节点` / `美国节点`，
      因此必须改为按 `groupedCountries` 判断。
@@ -227,10 +250,14 @@ const defaultFallback = buildList(
   - 基础列表允许为空，空候选由代理组构造层兜底。
 - `tests/builders/config.test.ts`：
   - 更新 #64 回归用例：节点名直接出现在 SELECT / AUTO / FALLBACK 中；
-  - 只有台湾 / 只有美国时，BAHAMUT / TRUTH_SOCIAL 不产生悬空地区组引用；
-  - 空 `proxies` 时 AUTO / FALLBACK 至少含 `DIRECT`；
-  - 全落地时仍生成 `落地节点` 组，`前置代理` 仅含 `DIRECT`；
-  - regex + landing 时前置代理仍包含非落地节点名。
+  - 展平模式下服务组直接包含展平节点，不出现 `选择代理` 引用；
+  - 只有台湾 / 只有美国时，BAHAMUT / TRUTH_SOCIAL 不产生悬空地区组引用，
+    BILIBILI / TRUTH_SOCIAL 直接使用对应节点名；
+  - 空 `proxies` 时 AUTO / FALLBACK / 服务组至少含 `DIRECT`；
+  - 全落地时仍生成 `落地节点` 组，`前置代理` 仅含 `DIRECT`，服务组使用
+    `落地节点` / `DIRECT`；
+  - regex + landing 时前置代理仍包含非落地节点名，服务组使用 `include-all` +
+    `exclude-filter`。
 - 提交前运行 `npm run artifacts` 做全量校验。
 
 ## 历史
