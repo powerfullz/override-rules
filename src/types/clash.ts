@@ -22,7 +22,7 @@ export interface SnifferConfig {
 
 export interface TunConfig {
     enable: boolean;
-    stack: "gvisor" | "system" | "mixed";
+    stack: "mips" | "gvisor" | "system" | "mixed";
     device: string;
     "route-exclude-address": string[];
     "dns-hijack": string[];

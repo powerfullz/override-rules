@@ -17,7 +17,7 @@ import type { TunConfig } from "../types/clash";
 export function buildTunConfig(tunEnabled: boolean, hasTailscale: boolean): TunConfig {
     return {
         enable: tunEnabled,
-        stack: "gvisor",
+        stack: "mips",
         device: "mihomo",
         "route-exclude-address": [
             !hasTailscale ? "100.64.0.0/10" : null,
