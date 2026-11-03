@@ -69,6 +69,7 @@ flowchart TD
 | `src/args/schema.ts` | URL 参数默认值的唯一来源 | `ARG_DEFAULTS` |
 | `src/args/parse.ts` | URL 参数解析与默认值回填 | `buildFeatureFlags()` |
 | `src/catalog/endpoints.ts` | CDN 与测速端点 | `CDN_URL`, `SPEEDTEST_URL` |
+| `src/catalog/dns.ts` | DNS 默认服务器与 fake-ip 过滤域名 | `DEFAULT_NAMESERVERS`, `DEFAULT_FALLBACK_DNS`, `FAKE_IP_FILTER` |
 | `src/catalog/icons.ts` | 代理组图标集中定义 | `ICONS` |
 | `src/catalog/group-names.ts` | 代理组名称与命名辅助 | `PROXY_GROUPS`, `NODE_SUFFIX`, `countryGroupName()` |
 | `src/catalog/countries.ts` | 国家/地区元数据；派生匹配正则 | `countriesMeta`, `countryRegexMap`, `countryExcludeRegexMap` |
@@ -82,7 +83,7 @@ flowchart TD
 | `src/builders/proxy-groups.ts` | 代理组组装（前置/服务/尾部/地区） | `buildProxyGroups()` |
 | `src/builders/rules.ts` | 路由规则构建 | `buildRules()` |
 | `src/builders/rule-set` 引用 | 规则集名称受 `RuleSetKey` 约束，改名可编译期报错 | — |
-| `src/builders/dns.ts` | DNS 配置、fake-ip 过滤与上游字段继承 | `buildDns()` |
+| `src/builders/dns.ts` | DNS 核心配置生成与上游字段合并 | `buildDns()` |
 | `src/builders/sniffer.ts` | 域名嗅探配置 | `snifferConfig` |
 | `src/builders/tun.ts` | TUN 模式配置 | `buildTunConfig()` |
 | `src/builders/full-config.ts` | `full=true` 时追加的完整内核参数 | `buildFullConfig()` |
@@ -160,7 +161,7 @@ flowchart TD
 脚本不会无条件覆盖上游配置的全部字段：
 
 - 始终保留上游 `hosts`；
-- 在生成 DNS 配置后，合并上游的 `nameserver-policy`、`proxy-server-nameserver-policy` 和 `fake-ip-filter`；
+- 在生成 DNS 配置后，合并上游的 `nameserver-policy`、`proxy-server-nameserver-policy`、`proxy-server-nameserver` 和 `fake-ip-filter`（列表字段会去重）；
 - 脚本生成的 DNS 核心设置（如增强模式、IPv6 开关和默认 DNS 列表）保持优先级。
 
 这样既能维持脚本的统一 DNS 行为，也能保留订阅提供方针对特定域名的策略。

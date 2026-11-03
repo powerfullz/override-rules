@@ -37,6 +37,31 @@ describe("buildDns", () => {
         assert.ok(dns["fake-ip-filter"]?.includes("+.example.org"));
     });
 
+    it("继承上游 proxy-server-nameserver 并去重", () => {
+        const dns = buildDns({
+            fakeIPEnabled: false,
+            ipv6Enabled: false,
+            upstreamDns: {
+                enable: true,
+                ipv6: false,
+                "prefer-h3": true,
+                "enhanced-mode": "redir-host",
+                nameserver: [],
+                fallback: [],
+                "proxy-server-nameserver": [
+                    "223.5.5.5",
+                    "223.5.5.5",
+                    "https://dns.example/dns-query",
+                ],
+            },
+        });
+
+        assert.deepEqual(dns["proxy-server-nameserver"], [
+            "223.5.5.5",
+            "https://dns.example/dns-query",
+        ]);
+    });
+
     it("脚本控制字段优先级高于上游", () => {
         const dns = buildDns({
             fakeIPEnabled: false,
