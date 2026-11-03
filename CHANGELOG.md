@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.9.2](https://github.com/powerfullz/override-rules/compare/src-v2.9.1...src-v2.9.2) (2026-11-03)
+
+
+### Refactoring
+
+- 重构 DNS 构建与上游字段继承 ([9a8e739](https://github.com/powerfullz/override-rules/commit/9a8e7395d4a5eff8b00c68f7a1dd6f46e50af582))
 ## [2.9.1](https://github.com/powerfullz/override-rules/compare/src-v2.9.0...src-v2.9.1) (2026-10-25)
 
 
