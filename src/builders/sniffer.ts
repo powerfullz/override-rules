@@ -18,6 +18,6 @@ export const snifferConfig: SnifferConfig = {
     },
     "override-destination": false,
     enable: true,
-    "force-dns-mapping": true,
+    "force-dns-mapping": false,
     "skip-domain": ["Mijia Cloud", "dlg.io.mi.com", "+.push.apple.com"],
 };
