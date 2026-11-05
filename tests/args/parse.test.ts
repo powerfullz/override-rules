@@ -9,9 +9,13 @@ describe("buildFeatureFlags", () => {
         const flags = buildFeatureFlags({});
         assert.equal(flags.groupType, ARG_DEFAULTS.groupType);
         assert.equal(flags.countryThreshold, ARG_DEFAULTS.countryThreshold);
-        assert.equal(flags.fakeIPEnabled, true);
-        assert.equal(flags.ipv6Enabled, false);
-        assert.equal(flags.regexFilter, false);
+        assert.equal(flags.ipv6Enabled, ARG_DEFAULTS.ipv6Enabled);
+        assert.equal(flags.fullConfig, ARG_DEFAULTS.fullConfig);
+        assert.equal(flags.keepAliveEnabled, ARG_DEFAULTS.keepAliveEnabled);
+        assert.equal(flags.fakeIPEnabled, ARG_DEFAULTS.fakeIPEnabled);
+        assert.equal(flags.quicEnabled, ARG_DEFAULTS.quicEnabled);
+        assert.equal(flags.regexFilter, ARG_DEFAULTS.regexFilter);
+        assert.equal(flags.tunEnabled, ARG_DEFAULTS.tunEnabled);
         assert.equal(flags.adblockSource, ARG_DEFAULTS.adblockSource);
     });
 

@@ -43,13 +43,13 @@ function parseAdblockSource(args: ScriptArgs): AdblockSource {
 export function buildFeatureFlags(args: ScriptArgs): FeatureFlags {
     return {
         groupType: parseGroupType(args),
-        ipv6Enabled: parseBool(args.ipv6),
-        fullConfig: parseBool(args.full),
-        keepAliveEnabled: parseBool(args.keepalive),
+        ipv6Enabled: parseBool(args.ipv6, ARG_DEFAULTS.ipv6Enabled),
+        fullConfig: parseBool(args.full, ARG_DEFAULTS.fullConfig),
+        keepAliveEnabled: parseBool(args.keepalive, ARG_DEFAULTS.keepAliveEnabled),
         fakeIPEnabled: parseBool(args.fakeip, ARG_DEFAULTS.fakeIPEnabled),
-        quicEnabled: parseBool(args.quic),
-        regexFilter: parseBool(args.regex),
-        tunEnabled: parseBool(args.tun),
+        quicEnabled: parseBool(args.quic, ARG_DEFAULTS.quicEnabled),
+        regexFilter: parseBool(args.regex, ARG_DEFAULTS.regexFilter),
+        tunEnabled: parseBool(args.tun, ARG_DEFAULTS.tunEnabled),
         countryThreshold: parseNumber(args.threshold, ARG_DEFAULTS.countryThreshold),
         adblockSource: parseAdblockSource(args),
     };
