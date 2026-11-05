@@ -51,11 +51,11 @@ export function assembleConfig(
 ): ClashConfig {
     const { ADBlock, AdditionalFilter, ...baseRuleSets } = ruleSets;
     const adblockProvider =
-        flags.adblockLevel === 0
+        flags.adblockSource === 0
             ? undefined
-            : flags.adblockLevel === 2
+            : flags.adblockSource === 2
               ? ADBlock
-              : adblockAlternatives[flags.adblockLevel];
+              : adblockAlternatives[flags.adblockSource];
 
     return {
         proxies: config.proxies,
@@ -69,7 +69,7 @@ export function assembleConfig(
         rules: buildRules({
             quicEnabled: flags.quicEnabled,
             hasTailscale: nodes.hasTailscale,
-            adblockLevel: flags.adblockLevel,
+            adblockSource: flags.adblockSource,
         }),
         sniffer: snifferConfig,
         dns: buildDns({

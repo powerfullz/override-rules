@@ -10,6 +10,6 @@ export const ARG_DEFAULTS = {
     countryThreshold: 2,
     /** 默认使用 fake-ip 增强模式。 */
     fakeIPEnabled: true,
-    /** 去广告规则级别：0=关闭（默认），1=adrules.top，2=217heidai，3=AWAvenue。 */
-    adblockLevel: 0,
+    /** 去广告规则来源：0=关闭（默认），1=adrules.top，2=217heidai，3=AWAvenue。 */
+    adblockSource: 0,
 } as const;

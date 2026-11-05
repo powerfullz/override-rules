@@ -8,29 +8,33 @@
 import { PROXY_GROUPS } from "../catalog/group-names";
 import { ruleSet } from "../catalog/rule-sets";
 import { isNotNull } from "../utils/primitives";
-import type { AdblockLevel } from "../types/args";
+import type { AdblockSource } from "../types/args";
 
 export interface BuildRulesInput {
     quicEnabled: boolean;
     hasTailscale: boolean;
-    adblockLevel: AdblockLevel;
+    adblockSource: AdblockSource;
 }
 
 /**
  * 构建最终的规则列表。
  * @param input.quicEnabled - 是否允许 QUIC（未启用时插入 UDP:443 拦截规则）
  * @param input.hasTailscale - 是否存在 Tailscale 节点（决定是否生成 Tailscale 分流规则）
- * @param input.adblockLevel - 去广告规则级别（0=关闭，1=adrules.top，2=217heidai，3=AWAvenue）
+ * @param input.adblockSource - 去广告规则来源（0=关闭，1=adrules.top，2=217heidai，3=AWAvenue）
  */
-export function buildRules({ quicEnabled, hasTailscale, adblockLevel }: BuildRulesInput): string[] {
+export function buildRules({
+    quicEnabled,
+    hasTailscale,
+    adblockSource,
+}: BuildRulesInput): string[] {
     return [
         !quicEnabled ? `AND,((DST-PORT,443),(NETWORK,UDP)),REJECT` : null,
         hasTailscale ? `IP-CIDR,100.64.0.0/10,${PROXY_GROUPS.TAILSCALE},no-resolve` : null,
         hasTailscale ? `IP-CIDR,fd7a:115c:a1e0::/48,${PROXY_GROUPS.TAILSCALE},no-resolve` : null,
         hasTailscale ? `DOMAIN-SUFFIX,ts.net,${PROXY_GROUPS.TAILSCALE}` : null,
         `GEOIP,private,DIRECT,no-resolve`,
-        adblockLevel > 0 ? ruleSet("ADBlock", PROXY_GROUPS.AD_BLOCK) : null,
-        adblockLevel > 0 ? ruleSet("AdditionalFilter", PROXY_GROUPS.AD_BLOCK) : null,
+        adblockSource > 0 ? ruleSet("ADBlock", PROXY_GROUPS.AD_BLOCK) : null,
+        adblockSource > 0 ? ruleSet("AdditionalFilter", PROXY_GROUPS.AD_BLOCK) : null,
         ruleSet("SogouInput", PROXY_GROUPS.SOGOU_INPUT),
         `DOMAIN-SUFFIX,truthsocial.com,${PROXY_GROUPS.TRUTH_SOCIAL}`,
         ruleSet("StaticResources", PROXY_GROUPS.STATIC_RESOURCES),
