@@ -14,6 +14,7 @@ export interface ScriptArgs {
     regex?: string;
     threshold?: string;
     tun?: string;
+    adblock?: string;
 }
 
 /** 地区代理组类型：0=select（手动选择），1=url-test（自动测速），2=load-balance（负载均衡）。 */
@@ -30,4 +31,6 @@ export interface FeatureFlags {
     regexFilter: boolean;
     countryThreshold: number;
     tunEnabled: boolean;
+    /** 去广告规则级别：0=关闭，1=adrules.top，2=217heidai，3=AWAvenue。 */
+    adblockLevel: number;
 }

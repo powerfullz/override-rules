@@ -9,7 +9,7 @@ import type { FeatureFlags, GroupType, ScriptArgs } from "../types/args";
 /**
  * 解析 `grouptype` 参数，并向后兼容旧的 `loadbalance` 参数。
  * - `grouptype`：0=select，1=url-test，2=load-balance，优先级最高；
- * - 仅当 `grouptype` 未指定（或非法）时，才回退到旧参数 `loadbalance`：true→2，false→1；
+ * - 仅当 `grouptype` 未指定（或非法）时，才回退到旧参数 `loadback`：true→2，false→1；
  * - 两者都不可用时回退为默认值。
  */
 function parseGroupType(args: ScriptArgs): GroupType {
@@ -21,6 +21,20 @@ function parseGroupType(args: ScriptArgs): GroupType {
     }
 
     return ARG_DEFAULTS.groupType;
+}
+
+/**
+ * 解析 `adblock` 参数。
+ * - `0`：关闭去广告规则（默认）
+ * - `1`：adrules.top
+ * - `2`：217heidai
+ * - `3`：AWAvenue
+ * - 非法值回退为默认值。
+ */
+function parseAdblockLevel(args: ScriptArgs): number {
+    const raw = parseNumber(args.adblock, Number.NaN);
+    if (raw >= 0 && raw <= 3) return raw;
+    return ARG_DEFAULTS.adblockLevel;
 }
 
 /**
@@ -38,5 +52,6 @@ export function buildFeatureFlags(args: ScriptArgs): FeatureFlags {
         regexFilter: parseBool(args.regex),
         tunEnabled: parseBool(args.tun),
         countryThreshold: parseNumber(args.threshold, ARG_DEFAULTS.countryThreshold),
+        adblockLevel: parseAdblockLevel(args),
     };
 }

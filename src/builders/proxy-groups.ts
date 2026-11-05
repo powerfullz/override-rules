@@ -57,7 +57,7 @@ function buildFrontGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
 /** 由声明式目录生成的服务代理组。 */
 function buildServiceGroups(ctx: GroupBuildContext): ProxyGroup[] {
     return serviceGroups.map((def) =>
-        selectGroup(def.name, def.icon, def.proxies(ctx), def.includeAll)
+        selectGroup(def.name, def.icon, def.proxies(ctx), def.includeAll && ctx.flags.regexFilter)
     );
 }
 

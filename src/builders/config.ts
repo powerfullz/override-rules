@@ -4,7 +4,7 @@
 
 import { PROXY_GROUPS } from "../catalog/group-names";
 import { ICONS } from "../catalog/icons";
-import { ruleSets } from "../catalog/rule-sets";
+import { getFilteredRuleSets } from "../catalog/rule-sets";
 import { buildDns } from "./dns";
 import { buildFullConfig } from "./full-config";
 import { geoxUrl } from "./geox";
@@ -54,8 +54,12 @@ export function assembleConfig(
         ...(config.hosts !== undefined && { hosts: config.hosts }),
         ...(flags.fullConfig && buildFullConfig(flags)),
         "proxy-groups": appendGlobalGroup(proxyGroups),
-        "rule-providers": ruleSets,
-        rules: buildRules({ quicEnabled: flags.quicEnabled, hasTailscale: nodes.hasTailscale }),
+        "rule-providers": getFilteredRuleSets(flags.adblockLevel),
+        rules: buildRules({
+            quicEnabled: flags.quicEnabled,
+            hasTailscale: nodes.hasTailscale,
+            adblockLevel: flags.adblockLevel,
+        }),
         sniffer: snifferConfig,
         dns: buildDns({
             fakeIPEnabled: flags.fakeIPEnabled,

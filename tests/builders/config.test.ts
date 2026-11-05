@@ -7,7 +7,7 @@ import { buildBaseLists } from "../../src/builders/selectors";
 import { assembleConfig } from "../../src/builders/config";
 import { buildProxyGroups } from "../../src/builders/proxy-groups";
 import { PROXY_GROUPS } from "../../src/catalog/group-names";
-import { ruleSets } from "../../src/catalog/rule-sets";
+import { getFilteredRuleSets } from "../../src/catalog/rule-sets";
 import type { ClashConfig } from "../../src/types/clash";
 import type { ProxyGroup } from "../../src/types/proxy";
 import type { ScriptArgs } from "../../src/types/args";
@@ -383,8 +383,58 @@ describe("assembleConfig", () => {
 
     it("引用同一份规则集与 Geo 数据源", () => {
         const result = run({}, CONFIG);
-        assert.equal(result["rule-providers"], ruleSets);
+        assert.deepEqual(result["rule-providers"], getFilteredRuleSets(0));
         assert.equal(result["geodata-mode"], true);
         assert.ok(result["geox-url"]?.geoip);
+    });
+
+    it("adblock=0 时 rule-providers 不包含广告规则集", () => {
+        const result = run({}, CONFIG);
+        const providers = result["rule-providers"] ?? {};
+        assert.ok(!("ADBlock" in providers));
+        assert.ok(!("AdditionalFilter" in providers));
+        assert.ok(!("ADRulesTop" in providers));
+        assert.ok(!("AWAvenue" in providers));
+    });
+
+    it("adblock=1 时 rule-providers 仅包含 ADRulesTop", () => {
+        const result = run({ adblock: "1" }, CONFIG);
+        const providers = result["rule-providers"] ?? {};
+        assert.ok("ADRulesTop" in providers);
+        assert.ok(!("ADBlock" in providers));
+        assert.ok(!("AdditionalFilter" in providers));
+        assert.ok(!("AWAvenue" in providers));
+    });
+
+    it("adblock=2 时 rule-providers 包含 ADBlock 和 AdditionalFilter", () => {
+        const result = run({ adblock: "2" }, CONFIG);
+        const providers = result["rule-providers"] ?? {};
+        assert.ok("ADBlock" in providers);
+        assert.ok("AdditionalFilter" in providers);
+        assert.ok(!("ADRulesTop" in providers));
+        assert.ok(!("AWAvenue" in providers));
+    });
+
+    it("adblock=3 时 rule-providers 仅包含 AWAvenue", () => {
+        const result = run({ adblock: "3" }, CONFIG);
+        const providers = result["rule-providers"] ?? {};
+        assert.ok("AWAvenue" in providers);
+        assert.ok(!("ADBlock" in providers));
+        assert.ok(!("AdditionalFilter" in providers));
+        assert.ok(!("ADRulesTop" in providers));
+    });
+
+    it("非 regex 模式下 Weibo 组不使用 include-all", () => {
+        const result = run({}, CONFIG);
+        const weibo = group(result, PROXY_GROUPS.WEIBO);
+        assert.equal(weibo?.["include-all"], undefined);
+        assert.ok(weibo?.proxies !== undefined);
+        assert.ok(weibo?.proxies!.length > 0);
+    });
+
+    it("regex 模式下 Weibo 组使用 include-all", () => {
+        const result = run({ regex: "true" }, CONFIG);
+        const weibo = group(result, PROXY_GROUPS.WEIBO);
+        assert.equal(weibo?.["include-all"], true);
     });
 });

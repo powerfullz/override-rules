@@ -12,6 +12,7 @@ describe("buildFeatureFlags", () => {
         assert.equal(flags.fakeIPEnabled, true);
         assert.equal(flags.ipv6Enabled, false);
         assert.equal(flags.regexFilter, false);
+        assert.equal(flags.adblockLevel, ARG_DEFAULTS.adblockLevel);
     });
 
     it("解析 grouptype 的合法取值", () => {
@@ -36,5 +37,18 @@ describe("buildFeatureFlags", () => {
 
     it("fakeip 显式传 false 时关闭", () => {
         assert.equal(buildFeatureFlags({ fakeip: "false" }).fakeIPEnabled, false);
+    });
+
+    it("解析 adblock 的合法取值", () => {
+        assert.equal(buildFeatureFlags({ adblock: "0" }).adblockLevel, 0);
+        assert.equal(buildFeatureFlags({ adblock: "1" }).adblockLevel, 1);
+        assert.equal(buildFeatureFlags({ adblock: "2" }).adblockLevel, 2);
+        assert.equal(buildFeatureFlags({ adblock: "3" }).adblockLevel, 3);
+    });
+
+    it("非法 adblock 回退为默认值", () => {
+        assert.equal(buildFeatureFlags({ adblock: "9" }).adblockLevel, ARG_DEFAULTS.adblockLevel);
+        assert.equal(buildFeatureFlags({ adblock: "-1" }).adblockLevel, ARG_DEFAULTS.adblockLevel);
+        assert.equal(buildFeatureFlags({ adblock: "abc" }).adblockLevel, ARG_DEFAULTS.adblockLevel);
     });
 });

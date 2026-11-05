@@ -5,7 +5,8 @@
  *
  * 支持的布尔参数在下面的 FLAGS 数组中定义，与 convert.js 内保持一致。
  * grouptype 参数（0=select, 1=url-test, 2=load-balance）控制代理组类型。
- * 生成所有可能的参数组合（布尔标志 × grouptype），文件名基于参数动态生成。
+ * adblock 参数（0=关闭, 1=adrules.top, 2=217heidai, 3=AWAvenue）控制去广告规则。
+ * 生成所有可能的参数组合（布尔标志 × grouptype × adblock），文件名基于参数动态生成。
  *
  * 可通过环境变量 LIMIT_COMBOS（整数）限制生成前 N 个组合。
  */
@@ -43,11 +44,19 @@ type FlagArgs = Record<FlagName, boolean>;
 const GROUPTYPE_VALUES = [0, 1, 2] as const;
 type GroupTypeValue = (typeof GROUPTYPE_VALUES)[number];
 
-type GeneratorScriptArgs = { [K in FlagName]: boolean } & { regex: true; grouptype: string };
+const ADBLOCK_VALUES = [0, 1, 2, 3] as const;
+type AdblockValue = (typeof ADBLOCK_VALUES)[number];
+
+type GeneratorScriptArgs = { [K in FlagName]: boolean } & {
+    regex: true;
+    grouptype: string;
+    adblock: string;
+};
 
 interface ComboArgs {
     flags: FlagArgs;
     grouptype: GroupTypeValue;
+    adblock: AdblockValue;
 }
 
 interface VmSandbox extends Record<string, unknown> {
@@ -86,7 +95,9 @@ function generateArgCombos(): ComboArgs[] {
             flags[flag] = Boolean(mask & (1 << i));
         });
         for (const grouptype of GROUPTYPE_VALUES) {
-            combos.push({ flags, grouptype });
+            for (const adblock of ADBLOCK_VALUES) {
+                combos.push({ flags, grouptype, adblock });
+            }
         }
     }
     return combos;
@@ -95,7 +106,12 @@ function generateArgCombos(): ComboArgs[] {
 function runConvert(baseConfig: ClashConfig, args: ComboArgs): ClashConfig {
     const code = readFileSync(CONVERT_FILE, "utf-8");
     const sandbox: VmSandbox = {
-        $arguments: { ...args.flags, grouptype: String(args.grouptype), regex: true },
+        $arguments: {
+            ...args.flags,
+            grouptype: String(args.grouptype),
+            regex: true,
+            adblock: String(args.adblock),
+        },
         console,
     };
 
@@ -116,7 +132,7 @@ function getShortName(flag: FlagName): string {
 
 function fileNameFromArgs(args: ComboArgs): string {
     const flagParts = FLAGS.map((flag) => `${getShortName(flag)}-${Number(args.flags[flag])}`);
-    return `config_gt-${args.grouptype}_${flagParts.join("_")}.yaml`;
+    return `config_gt-${args.grouptype}_adblock-${args.adblock}_${flagParts.join("_")}.yaml`;
 }
 
 function ensureDir(dirPath: string): void {
@@ -127,7 +143,9 @@ function ensureDir(dirPath: string): void {
 
 function cleanupLegacyYamlFiles(): void {
     const flagPatterns = FLAGS.map((flag) => `${getShortName(flag)}-\\d`);
-    const currentPattern = new RegExp(`^config_gt-\\d_${flagPatterns.join("_")}\\.yaml$`);
+    const currentPattern = new RegExp(
+        `^config_gt-\\d_adblock-\\d_${flagPatterns.join("_")}\\.yaml$`
+    );
 
     for (const fileName of readdirSync(OUTPUT_DIR)) {
         if (!/^config_.*\.yaml$/.test(fileName)) {
