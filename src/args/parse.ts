@@ -32,9 +32,8 @@ function parseGroupType(args: ScriptArgs): GroupType {
  * - 非法值回退为默认值。
  */
 function parseAdblockLevel(args: ScriptArgs): number {
-    const raw = parseNumber(args.adblock, Number.NaN);
-    if (raw >= 0 && raw <= 3) return raw;
-    return ARG_DEFAULTS.adblockLevel;
+    const raw = parseNumber(args.adblock, ARG_DEFAULTS.adblockLevel);
+    return raw >= 0 && raw <= 3 ? raw : ARG_DEFAULTS.adblockLevel;
 }
 
 /**

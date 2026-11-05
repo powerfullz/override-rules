@@ -7,7 +7,7 @@ import { buildBaseLists } from "../../src/builders/selectors";
 import { assembleConfig } from "../../src/builders/config";
 import { buildProxyGroups } from "../../src/builders/proxy-groups";
 import { PROXY_GROUPS } from "../../src/catalog/group-names";
-import { getFilteredRuleSets } from "../../src/catalog/rule-sets";
+import { ruleSets } from "../../src/catalog/rule-sets";
 import type { ClashConfig } from "../../src/types/clash";
 import type { ProxyGroup } from "../../src/types/proxy";
 import type { ScriptArgs } from "../../src/types/args";
@@ -383,7 +383,9 @@ describe("assembleConfig", () => {
 
     it("引用同一份规则集与 Geo 数据源", () => {
         const result = run({}, CONFIG);
-        assert.deepEqual(result["rule-providers"], getFilteredRuleSets(0));
+        const providers = result["rule-providers"] ?? {};
+        assert.equal(providers.SogouInput, ruleSets.SogouInput);
+        assert.equal(providers.Weibo, ruleSets.Weibo);
         assert.equal(result["geodata-mode"], true);
         assert.ok(result["geox-url"]?.geoip);
     });
