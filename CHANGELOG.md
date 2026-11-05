@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.9.3](https://github.com/powerfullz/override-rules/compare/src-v2.9.2...src-v2.9.3) (2026-11-05)
+
+
+### Bug Fixes
+
+- 继承上游 dns.listen 以保留本地 DNS 监听 ([b9ad42b](https://github.com/powerfullz/override-rules/commit/b9ad42b1d2e47bb379823b7ac7db30644a245c82))
+
+
+### Features
+
+- 将 mtu 默认改为 9000 ([a21d26c](https://github.com/powerfullz/override-rules/commit/a21d26cb6a8f069648335d629f9e05baea12732c))
 ## [2.9.2](https://github.com/powerfullz/override-rules/compare/src-v2.9.1...src-v2.9.2) (2026-11-03)
 
 
