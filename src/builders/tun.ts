@@ -25,6 +25,6 @@ export function buildTunConfig(tunEnabled: boolean, hasTailscale: boolean): TunC
             "192.168.0.0/16",
         ].filter(isNotNull),
         "dns-hijack": ["any:53"],
-        mtu: 1500,
+        mtu: 9000,
     };
 }

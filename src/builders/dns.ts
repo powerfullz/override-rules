@@ -11,8 +11,12 @@ const POLICY_FIELDS = ["nameserver-policy", "proxy-server-nameserver-policy"] as
 /** 可继承的上游 DNS 字符串列表字段。 */
 const LIST_FIELDS = ["proxy-server-nameserver", "fake-ip-filter"] as const;
 
+/** 可继承的上游 DNS 标量字段。 */
+const SCALAR_FIELDS = ["listen"] as const;
+
 type PolicyField = (typeof POLICY_FIELDS)[number];
 type ListField = (typeof LIST_FIELDS)[number];
+type ScalarField = (typeof SCALAR_FIELDS)[number];
 
 /** 判断值是否为非数组对象。 */
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -71,6 +75,24 @@ function inheritPolicyFields(
     return inherited;
 }
 
+/** 继承上游的标量字段；当前配置已设置时保持优先。 */
+function inheritScalarFields(
+    generated: DnsConfig,
+    upstream: Partial<DnsConfig>
+): Partial<Record<ScalarField, string>> {
+    const inherited: Partial<Record<ScalarField, string>> = {};
+
+    for (const field of SCALAR_FIELDS) {
+        const current = generated[field];
+        const value = upstream[field];
+        if (current === undefined && typeof value === "string" && value.length > 0) {
+            inherited[field] = value;
+        }
+    }
+
+    return inherited;
+}
+
 /** 合并所有可继承的字符串列表字段。 */
 function inheritListFields(
     generated: DnsConfig,
@@ -94,6 +116,7 @@ function inheritDnsFields(generated: DnsConfig, upstream?: Partial<DnsConfig>): 
         ...generated,
         ...inheritPolicyFields(generated, upstream),
         ...inheritListFields(generated, upstream),
+        ...inheritScalarFields(generated, upstream),
     };
 }
 
