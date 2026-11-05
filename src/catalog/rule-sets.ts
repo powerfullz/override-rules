@@ -65,14 +65,6 @@ export const ruleSets = {
         url: `${CDN_URL}/gh/powerfullz/override-rules@master/ruleset/SteamFix.list`,
         path: "./ruleset/SteamFix.list",
     },
-    GoogleFCM: {
-        type: "http",
-        behavior: "classical",
-        format: "text",
-        interval: 86400,
-        url: `${CDN_URL}/gh/powerfullz/override-rules@master/ruleset/FirebaseCloudMessaging.list`,
-        path: "./ruleset/FirebaseCloudMessaging.list",
-    },
     AdditionalFilter: {
         type: "http",
         behavior: "classical",

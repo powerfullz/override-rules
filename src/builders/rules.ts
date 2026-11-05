@@ -1,5 +1,5 @@
 /**
- * 路由规则构建。
+ * 分流规则
  *
  * 规则中引用的规则集名称通过 `ruleSet()` 生成，受 `RuleSetKey` 类型约束，
  * 不会出现引用未注册规则集的静默错误。
@@ -60,7 +60,6 @@ export function buildRules({
         ruleSet("EHentai", PROXY_GROUPS.EHENTAI),
         ruleSet("TikTok", PROXY_GROUPS.TIKTOK),
         ruleSet("SteamFix", "DIRECT"),
-        ruleSet("GoogleFCM", "DIRECT"),
         `GEOSITE,google-play@cn,DIRECT`,
         `GEOSITE,microsoft@cn,DIRECT`,
         `GEOSITE,apple,${PROXY_GROUPS.APPLE}`,
