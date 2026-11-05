@@ -8,11 +8,12 @@
 import { PROXY_GROUPS } from "../catalog/group-names";
 import { ruleSet } from "../catalog/rule-sets";
 import { isNotNull } from "../utils/primitives";
+import type { AdblockLevel } from "../types/args";
 
 export interface BuildRulesInput {
     quicEnabled: boolean;
     hasTailscale: boolean;
-    adblockLevel: number;
+    adblockLevel: AdblockLevel;
 }
 
 /**
@@ -28,10 +29,8 @@ export function buildRules({ quicEnabled, hasTailscale, adblockLevel }: BuildRul
         hasTailscale ? `IP-CIDR,fd7a:115c:a1e0::/48,${PROXY_GROUPS.TAILSCALE},no-resolve` : null,
         hasTailscale ? `DOMAIN-SUFFIX,ts.net,${PROXY_GROUPS.TAILSCALE}` : null,
         `GEOIP,private,DIRECT,no-resolve`,
-        adblockLevel === 1 ? ruleSet("ADRulesTop", PROXY_GROUPS.AD_BLOCK) : null,
-        adblockLevel === 2 ? ruleSet("ADBlock", PROXY_GROUPS.AD_BLOCK) : null,
-        adblockLevel === 2 ? ruleSet("AdditionalFilter", PROXY_GROUPS.AD_BLOCK) : null,
-        adblockLevel === 3 ? ruleSet("AWAvenue", PROXY_GROUPS.AD_BLOCK) : null,
+        adblockLevel > 0 ? ruleSet("ADBlock", PROXY_GROUPS.AD_BLOCK) : null,
+        adblockLevel > 0 ? ruleSet("AdditionalFilter", PROXY_GROUPS.AD_BLOCK) : null,
         ruleSet("SogouInput", PROXY_GROUPS.SOGOU_INPUT),
         `DOMAIN-SUFFIX,truthsocial.com,${PROXY_GROUPS.TRUTH_SOCIAL}`,
         ruleSet("StaticResources", PROXY_GROUPS.STATIC_RESOURCES),

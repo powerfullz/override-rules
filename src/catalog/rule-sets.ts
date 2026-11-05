@@ -17,22 +17,6 @@ export const ruleSets = {
         url: `${CDN_URL}/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.yaml`,
         path: "./ruleset/ADBlock.yaml",
     },
-    ADRulesTop: {
-        type: "http",
-        behavior: "domain",
-        format: "mrs",
-        interval: 86400,
-        url: "https://adrules.top/adrules-mihomo.mrs",
-        path: "./ruleset/ADRulesTop.mrs",
-    },
-    AWAvenue: {
-        type: "http",
-        behavior: "domain",
-        format: "mrs",
-        interval: 86400,
-        url: `${CDN_URL}/gh/TG-Twilight/AWAvenue-Ads-Rule@main/Filters/AWAvenue-Ads-Rule-Clash.mrs`,
-        path: "./ruleset/AWAvenue.mrs",
-    },
     SogouInput: {
         type: "http",
         behavior: "classical",
@@ -122,6 +106,26 @@ export const ruleSets = {
         path: "./ruleset/GFWList.yaml",
     },
 } satisfies Record<string, RuleProvider>;
+
+/** `ADBlock` 的替代下载源（1=adrules.top，3=AWAvenue；2 使用 `ruleSets.ADBlock`）。 */
+export const adblockAlternatives = {
+    1: {
+        type: "http",
+        behavior: "domain",
+        format: "mrs",
+        interval: 86400,
+        url: "https://adrules.top/adrules-mihomo.mrs",
+        path: "./ruleset/ADBlock.mrs",
+    },
+    3: {
+        type: "http",
+        behavior: "domain",
+        format: "mrs",
+        interval: 86400,
+        url: `${CDN_URL}/gh/TG-Twilight/AWAvenue-Ads-Rule@main/Filters/AWAvenue-Ads-Rule-Clash.mrs`,
+        path: "./ruleset/ADBlock.mrs",
+    },
+} satisfies Record<1 | 3, RuleProvider>;
 
 /** 所有合法的规则集名称。 */
 export type RuleSetKey = keyof typeof ruleSets;

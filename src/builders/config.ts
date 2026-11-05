@@ -4,7 +4,7 @@
 
 import { PROXY_GROUPS } from "../catalog/group-names";
 import { ICONS } from "../catalog/icons";
-import { ruleSets } from "../catalog/rule-sets";
+import { adblockAlternatives, ruleSets } from "../catalog/rule-sets";
 import { buildDns } from "./dns";
 import { buildFullConfig } from "./full-config";
 import { geoxUrl } from "./geox";
@@ -49,7 +49,13 @@ export function assembleConfig(
     config: ClashConfig,
     { flags, nodes, proxyGroups }: AssembleConfigInput
 ): ClashConfig {
-    const { ADBlock, AdditionalFilter, ADRulesTop, AWAvenue, ...baseRuleSets } = ruleSets;
+    const { ADBlock, AdditionalFilter, ...baseRuleSets } = ruleSets;
+    const adblockProvider =
+        flags.adblockLevel === 0
+            ? undefined
+            : flags.adblockLevel === 2
+              ? ADBlock
+              : adblockAlternatives[flags.adblockLevel];
 
     return {
         proxies: config.proxies,
@@ -58,9 +64,7 @@ export function assembleConfig(
         "proxy-groups": appendGlobalGroup(proxyGroups),
         "rule-providers": {
             ...baseRuleSets,
-            ...(flags.adblockLevel === 1 && { ADRulesTop }),
-            ...(flags.adblockLevel === 2 && { ADBlock, AdditionalFilter }),
-            ...(flags.adblockLevel === 3 && { AWAvenue }),
+            ...(adblockProvider && { ADBlock: adblockProvider, AdditionalFilter }),
         },
         rules: buildRules({
             quicEnabled: flags.quicEnabled,

@@ -45,25 +45,11 @@ describe("buildRules", () => {
         assert.ok(!rules.some((rule) => rule.includes("广告拦截")));
     });
 
-    it("adblock=1 时使用 ADRulesTop 规则集", () => {
-        const rules = buildRules({ quicEnabled: true, hasTailscale: false, adblockLevel: 1 });
-        assert.ok(rules.includes("RULE-SET,ADRulesTop,广告拦截"));
-        assert.ok(!rules.some((rule) => rule.startsWith("RULE-SET,ADBlock,")));
-        assert.ok(!rules.some((rule) => rule.startsWith("RULE-SET,AWAvenue,")));
-    });
-
-    it("adblock=2 时使用 217heidai 规则集", () => {
-        const rules = buildRules({ quicEnabled: true, hasTailscale: false, adblockLevel: 2 });
-        assert.ok(rules.includes("RULE-SET,ADBlock,广告拦截"));
-        assert.ok(rules.includes("RULE-SET,AdditionalFilter,广告拦截"));
-        assert.ok(!rules.some((rule) => rule.startsWith("RULE-SET,ADRulesTop,")));
-        assert.ok(!rules.some((rule) => rule.startsWith("RULE-SET,AWAvenue,")));
-    });
-
-    it("adblock=3 时使用 AWAvenue 规则集", () => {
-        const rules = buildRules({ quicEnabled: true, hasTailscale: false, adblockLevel: 3 });
-        assert.ok(rules.includes("RULE-SET,AWAvenue,广告拦截"));
-        assert.ok(!rules.some((rule) => rule.startsWith("RULE-SET,ADBlock,")));
-        assert.ok(!rules.some((rule) => rule.startsWith("RULE-SET,ADRulesTop,")));
+    it("adblock>0 时统一引用 ADBlock 与 AdditionalFilter", () => {
+        for (const adblockLevel of [1, 2, 3] as const) {
+            const rules = buildRules({ quicEnabled: true, hasTailscale: false, adblockLevel });
+            assert.ok(rules.includes("RULE-SET,ADBlock,广告拦截"));
+            assert.ok(rules.includes("RULE-SET,AdditionalFilter,广告拦截"));
+        }
     });
 });

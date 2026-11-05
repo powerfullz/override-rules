@@ -4,7 +4,7 @@
 
 import { parseBool, parseNumber } from "../utils/primitives";
 import { ARG_DEFAULTS } from "./schema";
-import type { FeatureFlags, GroupType, ScriptArgs } from "../types/args";
+import type { AdblockLevel, FeatureFlags, GroupType, ScriptArgs } from "../types/args";
 
 /**
  * 解析 `grouptype` 参数，并向后兼容旧的 `loadbalance` 参数。
@@ -31,9 +31,9 @@ function parseGroupType(args: ScriptArgs): GroupType {
  * - `3`：AWAvenue
  * - 非法值回退为默认值。
  */
-function parseAdblockLevel(args: ScriptArgs): number {
+function parseAdblockLevel(args: ScriptArgs): AdblockLevel {
     const raw = parseNumber(args.adblock, ARG_DEFAULTS.adblockLevel);
-    return raw >= 0 && raw <= 3 ? raw : ARG_DEFAULTS.adblockLevel;
+    return raw === 0 || raw === 1 || raw === 2 || raw === 3 ? raw : ARG_DEFAULTS.adblockLevel;
 }
 
 /**

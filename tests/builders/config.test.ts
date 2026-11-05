@@ -395,35 +395,29 @@ describe("assembleConfig", () => {
         const providers = result["rule-providers"] ?? {};
         assert.ok(!("ADBlock" in providers));
         assert.ok(!("AdditionalFilter" in providers));
-        assert.ok(!("ADRulesTop" in providers));
-        assert.ok(!("AWAvenue" in providers));
     });
 
-    it("adblock=1 时 rule-providers 仅包含 ADRulesTop", () => {
+    it("adblock=1 时 ADBlock 指向 adrules.top", () => {
         const result = run({ adblock: "1" }, CONFIG);
         const providers = result["rule-providers"] ?? {};
-        assert.ok("ADRulesTop" in providers);
-        assert.ok(!("ADBlock" in providers));
-        assert.ok(!("AdditionalFilter" in providers));
-        assert.ok(!("AWAvenue" in providers));
+        assert.equal(providers.ADBlock?.url, "https://adrules.top/adrules-mihomo.mrs");
+        assert.equal(providers.ADBlock?.format, "mrs");
+        assert.ok("AdditionalFilter" in providers);
     });
 
-    it("adblock=2 时 rule-providers 包含 ADBlock 和 AdditionalFilter", () => {
+    it("adblock=2 时 ADBlock 使用默认的 217heidai 规则集", () => {
         const result = run({ adblock: "2" }, CONFIG);
         const providers = result["rule-providers"] ?? {};
-        assert.ok("ADBlock" in providers);
+        assert.equal(providers.ADBlock, ruleSets.ADBlock);
         assert.ok("AdditionalFilter" in providers);
-        assert.ok(!("ADRulesTop" in providers));
-        assert.ok(!("AWAvenue" in providers));
     });
 
-    it("adblock=3 时 rule-providers 仅包含 AWAvenue", () => {
+    it("adblock=3 时 ADBlock 指向 AWAvenue", () => {
         const result = run({ adblock: "3" }, CONFIG);
         const providers = result["rule-providers"] ?? {};
-        assert.ok("AWAvenue" in providers);
-        assert.ok(!("ADBlock" in providers));
-        assert.ok(!("AdditionalFilter" in providers));
-        assert.ok(!("ADRulesTop" in providers));
+        assert.match(providers.ADBlock?.url ?? "", /AWAvenue-Ads-Rule/);
+        assert.equal(providers.ADBlock?.format, "mrs");
+        assert.ok("AdditionalFilter" in providers);
     });
 
     it("非 regex 模式下 Weibo 组不使用 include-all", () => {

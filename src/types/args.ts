@@ -20,6 +20,9 @@ export interface ScriptArgs {
 /** 地区代理组类型：0=select（手动选择），1=url-test（自动测速），2=load-balance（负载均衡）。 */
 export type GroupType = 0 | 1 | 2;
 
+/** 去广告规则级别：0=关闭，1=adrules.top，2=217heidai，3=AWAvenue。 */
+export type AdblockLevel = 0 | 1 | 2 | 3;
+
 /** 解析后的功能开关集合，下游模块无需再关心参数来源或缺失情况。 */
 export interface FeatureFlags {
     groupType: GroupType;
@@ -31,6 +34,5 @@ export interface FeatureFlags {
     regexFilter: boolean;
     countryThreshold: number;
     tunEnabled: boolean;
-    /** 去广告规则级别：0=关闭，1=adrules.top，2=217heidai，3=AWAvenue。 */
-    adblockLevel: number;
+    adblockLevel: AdblockLevel;
 }
