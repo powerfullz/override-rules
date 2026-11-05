@@ -73,7 +73,13 @@ function buildTailGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
                   true
               )
             : null,
-        selectGroup(PROXY_GROUPS.AD_BLOCK, ICONS.adBlock, ["REJECT", "REJECT-DROP", "DIRECT"]),
+        selectGroup(
+            PROXY_GROUPS.AD_BLOCK,
+            ICONS.adBlock,
+            ["REJECT", "REJECT-DROP", "DIRECT"],
+            false,
+            ctx.flags.adblockSource === 0
+        ),
         selectGroup(PROXY_GROUPS.FINAL, ICONS.final, [PROXY_GROUPS.SELECT, "DIRECT"]),
         urlTestGroup(PROXY_GROUPS.AUTO, ICONS.auto, ctx.lists.defaultFallback),
         fallbackGroup(PROXY_GROUPS.FALLBACK, ICONS.fallback, ctx.lists.defaultFallback),

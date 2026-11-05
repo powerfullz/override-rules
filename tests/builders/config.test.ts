@@ -390,6 +390,16 @@ describe("assembleConfig", () => {
         assert.ok(result["geox-url"]?.geoip);
     });
 
+    it("adblock=0 时广告拦截组隐藏", () => {
+        const result = run({}, CONFIG);
+        assert.equal(group(result, PROXY_GROUPS.AD_BLOCK)?.hidden, true);
+    });
+
+    it("adblock>0 时广告拦截组可见", () => {
+        const result = run({ adblock: "2" }, CONFIG);
+        assert.equal(group(result, PROXY_GROUPS.AD_BLOCK)?.hidden, undefined);
+    });
+
     it("adblock=0 时 rule-providers 不包含广告规则集", () => {
         const result = run({}, CONFIG);
         const providers = result["rule-providers"] ?? {};
