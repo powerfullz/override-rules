@@ -23,5 +23,5 @@ export const ARG_DEFAULTS = {
     /** 启用 TUN 模式。 */
     tunEnabled: false,
     /** 去广告规则来源：0=关闭，1=adrules.top，2=217heidai，3=AWAvenue。 */
-    adblockSource: 0,
+    adblockSource: 3,
 } as const;
