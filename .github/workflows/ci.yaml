@@ -31,5 +31,21 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Knip (dead code analysis)
+        run: npm run knip
+
+      - name: Test with coverage
+        run: npm run test:cov
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 14
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev
+
       - name: Verify reproducible artifacts build
         run: npm run artifacts
