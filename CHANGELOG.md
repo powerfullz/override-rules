@@ -1,5 +1,33 @@
 # Changelog
 
+## [2.10.1](https://github.com/powerfullz/override-rules/compare/src-v2.10.0...src-v2.10.1) (2026-11-08)
+
+
+### Bug Fixes
+
+- Adjust default adblock source ([670a0fe](https://github.com/powerfullz/override-rules/commit/670a0fe563b4932e712e7a297d83fb4c7c6eb222))
+
+
+### Documentation
+
+- Document code quality tooling in AGENTS.md ([74b198f](https://github.com/powerfullz/override-rules/commit/74b198f6a73e51efa3fb44323a74522153210348))
+- Update docs ([96f25ee](https://github.com/powerfullz/override-rules/commit/96f25eee62151540fc81886e0d84cd2e79074290))
+- Rewrite `AGENTS.md` ([31c0dc3](https://github.com/powerfullz/override-rules/commit/31c0dc3c7871881c281025d070ff7752eab68e40))
+
+
+### Features
+
+- Add code quality analysis toolchain ([5f346e5](https://github.com/powerfullz/override-rules/commit/5f346e5f3e22d6ccf2f95a420fe26ec7370f379b))
+
+
+### Refactoring
+
+- Fix issues surfaced by static analysis ([9b5aa25](https://github.com/powerfullz/override-rules/commit/9b5aa25a6048e86383fd9c41bf75ea66b85f64da))
+
+
+### Testing
+
+- Pin explicit adblock=0 in config tests ([d6821a1](https://github.com/powerfullz/override-rules/commit/d6821a14cc556a7fc19aca5c08d336c67f6dcb18))
 ## [2.10.0](https://github.com/powerfullz/override-rules/compare/src-v2.9.3...src-v2.10.0) (2026-11-05)
 
 
