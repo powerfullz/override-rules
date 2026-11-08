@@ -26,6 +26,8 @@ export function parseNumber(value: unknown, defaultValue = 0): number {
         return defaultValue;
     }
 
+    // 函数契约就是接受任意用户输入并尽力解析，宽松字符串化是预期行为
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
     const num = parseInt(String(value), 10);
     return Number.isNaN(num) ? defaultValue : num;
 }

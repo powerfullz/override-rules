@@ -157,8 +157,8 @@ export const countryRegexMap: Record<string, RegExp> = Object.fromEntries(
 );
 
 /** 地区名 → 用于排除误匹配的正则（仅包含配置了 `excludePattern` 的地区）。 */
-export const countryExcludeRegexMap: Record<string, RegExp> = Object.fromEntries(
-    Object.entries(countriesMeta)
-        .filter(([, meta]) => meta.excludePattern)
-        .map(([country, meta]) => [country, new RegExp(meta.excludePattern!)])
+export const countryExcludeRegexMap: Partial<Record<string, RegExp>> = Object.fromEntries(
+    Object.entries(countriesMeta).flatMap<[string, RegExp]>(([country, meta]) =>
+        meta.excludePattern ? [[country, new RegExp(meta.excludePattern)]] : []
+    )
 );

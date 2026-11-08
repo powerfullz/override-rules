@@ -13,12 +13,10 @@ export interface ProxyNode {
     [key: string]: unknown;
 }
 
-export type ProxyGroupType = "select" | "url-test" | "load-balance" | "fallback";
-
-export type LoadBalanceStrategy = "sticky-sessions" | "consistent-hashing" | "round-robin";
+type LoadBalanceStrategy = "sticky-sessions" | "consistent-hashing" | "round-robin";
 
 /** 所有代理组共有的字段。 */
-export interface BaseProxyGroup {
+interface BaseProxyGroup {
     name: string;
     icon?: string;
     proxies?: string[];
@@ -39,7 +37,7 @@ export interface UrlTestProxyGroup extends BaseProxyGroup {
     tolerance: number;
 }
 
-export interface LoadBalanceProxyGroup extends BaseProxyGroup {
+interface LoadBalanceProxyGroup extends BaseProxyGroup {
     type: "load-balance";
     url: string;
     interval: number;

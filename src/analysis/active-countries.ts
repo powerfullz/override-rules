@@ -18,8 +18,8 @@ export function getActiveCountryNames(
     return Object.entries(countryNodes)
         .filter(([, nodes]) => nodes.length >= minCount)
         .sort(([a], [b]) => {
-            const wa = countriesMeta[a]?.weight ?? Infinity;
-            const wb = countriesMeta[b]?.weight ?? Infinity;
+            const wa = countriesMeta[a].weight ?? Infinity;
+            const wb = countriesMeta[b].weight ?? Infinity;
             return wa - wb;
         })
         .map(([country]) => country);

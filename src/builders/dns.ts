@@ -26,7 +26,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 /** 读取仅包含字符串的数组，拒绝格式错误的上游字段。 */
 function toStringList(value: unknown): string[] | undefined {
     return Array.isArray(value) && value.every((item) => typeof item === "string")
-        ? (value as string[])
+        ? value
         : undefined;
 }
 

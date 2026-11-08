@@ -3,7 +3,7 @@
  */
 
 /** 地区代理组名称的统一后缀，例如「香港」→「香港节点」。 */
-export const NODE_SUFFIX = "节点";
+const NODE_SUFFIX = "节点";
 
 /** 所有策略组的显示名称。 */
 export const PROXY_GROUPS = {

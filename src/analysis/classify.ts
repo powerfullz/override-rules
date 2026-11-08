@@ -44,7 +44,7 @@ function splitByLanding(nodes: ProxyNode[]): {
  * 按 `countriesMeta` 中定义的地区归类节点，命中首个地区即停止，并排除误匹配。
  */
 function collectCountries(nodes: ProxyNode[]): Record<string, ProxyNode[]> {
-    const countryNodes: Record<string, ProxyNode[]> = Object.create(null);
+    const countryNodes = new Map<string, ProxyNode[]>();
 
     for (const node of nodes) {
         const name = node.name || "";
@@ -53,12 +53,17 @@ function collectCountries(nodes: ProxyNode[]): Record<string, ProxyNode[]> {
             if (!regex.test(name)) continue;
             if (countryExcludeRegexMap[country]?.test(name)) continue;
 
-            (countryNodes[country] ??= []).push(node);
+            const bucket = countryNodes.get(country);
+            if (bucket) {
+                bucket.push(node);
+            } else {
+                countryNodes.set(country, [node]);
+            }
             break;
         }
     }
 
-    return countryNodes;
+    return Object.fromEntries(countryNodes);
 }
 
 /** 筛选出所有匹配低倍率正则的节点。 */

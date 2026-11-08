@@ -116,6 +116,8 @@ function runConvert(baseConfig: ClashConfig, args: ComboArgs): ClashConfig {
     };
 
     vm.createContext(sandbox);
+    // 在沙箱中执行本仓库自行构建的 convert.js 以生成 YAML，代码来源受控
+    // eslint-disable-next-line sonarjs/code-eval
     vm.runInContext(code, sandbox, { filename: "convert.js" });
 
     if (typeof sandbox.main !== "function") {

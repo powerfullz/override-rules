@@ -4,7 +4,7 @@
 
 import type { ProxyGroup, ProxyNode } from "./proxy";
 
-export interface SnifferProtocolConfig {
+interface SnifferProtocolConfig {
     ports: number[];
 }
 
@@ -57,9 +57,9 @@ export interface DnsConfig {
 /** Clash DNS Policy 支持的值类型。 */
 export type DnsPolicyValue = string | string[];
 
-export type RuleProviderType = "http" | "file";
-export type RuleProviderBehavior = "domain" | "classical" | "ipcidr";
-export type RuleProviderFormat = "mrs" | "text" | "yaml";
+type RuleProviderType = "http" | "file";
+type RuleProviderBehavior = "domain" | "classical" | "ipcidr";
+type RuleProviderFormat = "mrs" | "text" | "yaml";
 
 export interface RuleProvider {
     type: RuleProviderType;
@@ -77,7 +77,7 @@ export interface GeoxUrl {
     asn?: string;
 }
 
-export interface ClashProfile {
+interface ClashProfile {
     "store-selected"?: boolean;
     "store-fake-ip"?: boolean;
 }

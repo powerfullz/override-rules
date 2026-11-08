@@ -27,16 +27,16 @@ import type { GroupBuildContext, ProxyGroup } from "../types/proxy";
 function buildFrontGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
     // 展平模式下「选择代理」已直接列出全部非落地节点，不再生成高度重合的「手动选择」组。
     // 分组模式保留该组：regex 模式交给内核动态填充，否则按上游顺序枚举。
-    const manualGroup =
-        ctx.nodes.regionLayout.mode === "grouped"
-            ? ctx.flags.regexFilter
-                ? selectAllGroup(
-                      PROXY_GROUPS.MANUAL,
-                      ICONS.manual,
-                      buildNodeExcludeFilter(ctx.nodes.tailscaleNodes)
-                  )
-                : selectGroup(PROXY_GROUPS.MANUAL, ICONS.manual, ctx.nodes.manualNames)
-            : null;
+    let manualGroup: ProxyGroup | null = null;
+    if (ctx.nodes.regionLayout.mode === "grouped") {
+        manualGroup = ctx.flags.regexFilter
+            ? selectAllGroup(
+                  PROXY_GROUPS.MANUAL,
+                  ICONS.manual,
+                  buildNodeExcludeFilter(ctx.nodes.tailscaleNodes)
+              )
+            : selectGroup(PROXY_GROUPS.MANUAL, ICONS.manual, ctx.nodes.manualNames);
+    }
 
     return [
         selectGroup(PROXY_GROUPS.SELECT, ICONS.select, ctx.lists.defaultSelector),
@@ -111,7 +111,6 @@ function buildRegionGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
 
     const countryGroups = nodes.regionLayout.groupedCountries.map((country) => {
         const meta = countriesMeta[country];
-        if (!meta) return null;
 
         const excludeFilter = combineExcludeFilters(meta.excludePattern, tailscaleExcludeFilter);
         const nodeSource = flags.regexFilter
@@ -120,7 +119,7 @@ function buildRegionGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
                   filter: meta.pattern,
                   ...(excludeFilter ? { "exclude-filter": excludeFilter } : {}),
               }
-            : { proxies: nodes.countryNodes[country]?.map((node) => node.name) };
+            : { proxies: nodes.countryNodes[country].map((node) => node.name) };
 
         return buildGroupByType({
             name: countryGroupName(country),

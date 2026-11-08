@@ -50,12 +50,14 @@ export function assembleConfig(
     { flags, nodes, proxyGroups }: AssembleConfigInput
 ): ClashConfig {
     const { ADBlock, AdditionalFilter, ...baseRuleSets } = ruleSets;
-    const adblockProvider =
-        flags.adblockSource === 0
-            ? undefined
-            : flags.adblockSource === 2
-              ? ADBlock
-              : adblockAlternatives[flags.adblockSource];
+    type AdblockProvider =
+        typeof ADBlock | (typeof adblockAlternatives)[keyof typeof adblockAlternatives];
+    let adblockProvider: AdblockProvider | undefined;
+    if (flags.adblockSource === 2) {
+        adblockProvider = ADBlock;
+    } else if (flags.adblockSource !== 0) {
+        adblockProvider = adblockAlternatives[flags.adblockSource];
+    }
 
     return {
         proxies: config.proxies,

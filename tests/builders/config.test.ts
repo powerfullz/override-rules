@@ -435,7 +435,7 @@ describe("assembleConfig", () => {
         const weibo = group(result, PROXY_GROUPS.WEIBO);
         assert.equal(weibo?.["include-all"], undefined);
         assert.ok(weibo?.proxies !== undefined);
-        assert.ok(weibo?.proxies!.length > 0);
+        assert.ok((weibo?.proxies?.length ?? 0) > 0);
     });
 
     it("regex 模式下 Weibo 组使用 include-all", () => {
