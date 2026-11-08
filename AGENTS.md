@@ -109,6 +109,9 @@ $arguments
 | --- | --- | --- |
 | `npm run typecheck` | 全量类型检查 | 使用 `typescript-native`（TS 7），不产出文件；不要用 `npx tsc` 代替 |
 | `npm test` | 运行全部单元测试 | Node 内置 test runner，通过 `tsx` 加载 TS |
+| `npm run test:cov` | 测试并产出覆盖率报告 | 经 `c8`，终端摘要 + `coverage/` 下的 HTML 报告 |
+| `npm run knip` | 死代码分析 | 检测未使用的导出、文件与依赖；配置见 `knip.json` |
+| `npm run audit` | 生产依赖安全审计 | 等价于 `npm audit --omit=dev` |
 | `node --import tsx --test tests/args/parse.test.ts` | 运行单个测试文件 | 路径替换为目标测试即可 |
 | `npm run lint` | ESLint 检查 | `npm run lint:fix` 自动修复 |
 | `npm run format` | Prettier 格式化 | `npm run format:check` 只检查不写入 |
@@ -199,8 +202,10 @@ $arguments
 
 - Prettier：4 空格缩进、双引号、分号、行宽 100、LF 换行。
 - ESLint：禁止 `var`，要求 `===`，优先 `const`；未使用变量可以 `_` 开头。
+- ESLint 采用**类型感知规则集**（`recommendedTypeChecked` + 精选规则，经 `projectService` 走 `typescript@6`），并叠加 `eslint-plugin-sonarjs` 代码异味检测。新增类型感知规则时**不要**把 `projectService` 指向 `typescript-native`。
+- 行级豁免（`eslint-disable-next-line`）必须附带说明原因的注释，仅用于刻意设计（如 `vm.runInContext` 沙箱执行自产构建产物）。
 - 修改后运行 `npm run format` 与 `npm run lint:fix`，不要手工对抗格式化规则。
-- 提交时 Husky 会执行 `npx lint-staged`，对暂存的文件运行 Prettier。
+- 提交时 Husky 会执行 `npx lint-staged`，对暂存的文件运行 Prettier；提交信息经 `commitlint`（约定式提交）校验，钩子在 `.husky/commit-msg`，`npm version` 生成的纯版本号提交已被豁免。
 
 ### TypeScript
 
@@ -262,8 +267,10 @@ $arguments
   - `npm run typecheck`
   - `npm run format:check`
   - `npm run lint`
+  - `npm run test:cov`（覆盖率报告作为 artifact 上传）
+  - `npm run knip`（死代码分析）
+  - `npm audit --omit=dev`（生产依赖安全审计）
   - `npm run artifacts`
-- CI 不单独运行 `npm test`，请在本地确保测试通过。
 - 不要直接向 `main` 强推，也不要向 `dist` / `preview` 提交。
 
 ---
