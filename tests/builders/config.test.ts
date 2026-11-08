@@ -391,7 +391,7 @@ describe("assembleConfig", () => {
     });
 
     it("adblock=0 时广告拦截组隐藏", () => {
-        const result = run({}, CONFIG);
+        const result = run({ adblock: "0" }, CONFIG);
         assert.equal(group(result, PROXY_GROUPS.AD_BLOCK)?.hidden, true);
     });
 
@@ -401,7 +401,7 @@ describe("assembleConfig", () => {
     });
 
     it("adblock=0 时 rule-providers 不包含广告规则集", () => {
-        const result = run({}, CONFIG);
+        const result = run({ adblock: "0" }, CONFIG);
         const providers = result["rule-providers"] ?? {};
         assert.ok(!("ADBlock" in providers));
         assert.ok(!("AdditionalFilter" in providers));
