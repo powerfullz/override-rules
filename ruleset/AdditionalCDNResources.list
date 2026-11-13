@@ -12,6 +12,7 @@ DOMAIN,builds.dotnet.microsoft.com
 DOMAIN,downloadmirror.intel.com
 DOMAIN,pkgs.tailscale.com
 DOMAIN,dl.tailscale.com
+DOMAIN,vscode.download.prss.microsoft.com
 
 # Brave
 DOMAIN,updates-cdn.bravesoftware.com
