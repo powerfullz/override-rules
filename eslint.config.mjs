@@ -81,6 +81,7 @@ export default [
             // 类型收窄正确性
             "@typescript-eslint/no-unnecessary-condition": "warn",
             "@typescript-eslint/no-unnecessary-type-assertion": "warn",
+            "@typescript-eslint/no-unnecessary-type-conversion": "warn",
             "@typescript-eslint/switch-exhaustiveness-check": "error",
             // 语法现代化
             "@typescript-eslint/prefer-nullish-coalescing": "warn",
