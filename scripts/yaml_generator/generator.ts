@@ -65,19 +65,13 @@ interface VmSandbox extends Record<string, unknown> {
     main?: (config: ClashConfig) => ClashConfig;
 }
 
-const FLAG_SHORT_NAMES: Record<FlagName, string> = {
-    ipv6: "ipv6",
-    full: "full",
-    keepalive: "keepalive",
-    fakeip: "fakeip",
-    quic: "quic",
-    tun: "tun",
-};
+/** 完成初始化的沙箱：convert.js 已暴露可用的 main 函数。 */
+type ConvertContext = VmSandbox & { main: (config: ClashConfig) => ClashConfig };
 
 function loadFakeConfig(): ClashConfig {
     const raw = readFileSync(FAKE_PROXIES_FILE, "utf-8");
     const json = JSON.parse(raw) as ClashConfig;
-    if (!json.proxies || !Array.isArray(json.proxies)) {
+    if (!Array.isArray(json.proxies)) {
         throw new Error("fake_proxies.json 缺少 proxies 数组");
     }
     return json;
@@ -103,14 +97,19 @@ function generateArgCombos(): ComboArgs[] {
     return combos;
 }
 
-function runConvert(baseConfig: ClashConfig, args: ComboArgs): ClashConfig {
-    const code = readFileSync(CONVERT_FILE, "utf-8");
+/** 求值 convert.js 一次；之后每个组合只替换 $arguments，避免重复读取与创建沙箱。 */
+function loadConvertContext(code: string): ConvertContext {
     const sandbox: VmSandbox = {
         $arguments: {
-            ...args.flags,
-            grouptype: String(args.grouptype),
+            ipv6: false,
+            full: false,
+            keepalive: false,
+            fakeip: false,
+            quic: false,
+            tun: false,
             regex: true,
-            adblock: String(args.adblock),
+            grouptype: "1",
+            adblock: "0",
         },
         console,
     };
@@ -124,16 +123,22 @@ function runConvert(baseConfig: ClashConfig, args: ComboArgs): ClashConfig {
         throw new Error("convert.js 未暴露 main 函数 (未在顶层定义?)");
     }
 
-    const configCopy = JSON.parse(JSON.stringify(baseConfig)) as ClashConfig;
-    return sandbox.main(configCopy);
+    return sandbox as ConvertContext;
 }
 
-function getShortName(flag: FlagName): string {
-    return FLAG_SHORT_NAMES[flag];
+function runConvert(ctx: ConvertContext, baseConfig: ClashConfig, args: ComboArgs): ClashConfig {
+    ctx.$arguments = {
+        ...args.flags,
+        grouptype: String(args.grouptype),
+        regex: true,
+        adblock: String(args.adblock),
+    };
+
+    return ctx.main(structuredClone(baseConfig));
 }
 
 function fileNameFromArgs(args: ComboArgs): string {
-    const flagParts = FLAGS.map((flag) => `${getShortName(flag)}-${Number(args.flags[flag])}`);
+    const flagParts = FLAGS.map((flag) => `${flag}-${Number(args.flags[flag])}`);
     return `config_gt-${args.grouptype}_adblock-${args.adblock}_${flagParts.join("_")}.yaml`;
 }
 
@@ -144,7 +149,7 @@ function ensureDir(dirPath: string): void {
 }
 
 function cleanupLegacyYamlFiles(): void {
-    const flagPatterns = FLAGS.map((flag) => `${getShortName(flag)}-\\d`);
+    const flagPatterns = FLAGS.map((flag) => `${flag}-\\d`);
     const currentPattern = new RegExp(
         `^config_gt-\\d_adblock-\\d_${flagPatterns.join("_")}\\.yaml$`
     );
@@ -182,6 +187,7 @@ export function main(): void {
     }
 
     const baseConfig = loadFakeConfig();
+    const context = loadConvertContext(readFileSync(CONVERT_FILE, "utf-8"));
     ensureDir(OUTPUT_DIR);
     cleanupLegacyYamlFiles();
 
@@ -194,7 +200,7 @@ export function main(): void {
     for (const args of combos) {
         if (count >= limit) break;
 
-        const config = runConvert(baseConfig, args);
+        const config = runConvert(context, baseConfig, args);
         delete config.proxies;
 
         const yaml = toYAML(config);
