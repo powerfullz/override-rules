@@ -36,7 +36,7 @@ function buildFlattenedNodeSource(
         };
     }
 
-    const proxies = nodes.map((node) => node.name).filter(Boolean);
+    const proxies = nodes.map((node) => node.name);
     return proxies.length > 0 ? { proxies } : null;
 }
 
@@ -77,17 +77,13 @@ function buildFlattenedBaseLists({
     // 否则会和 `dialer-proxy: "前置代理"` 形成循环引用。Tailscale 节点同理不应作为前置代理。
     const frontProxySelector = buildList(
         "DIRECT",
-        flattenedNodes.map((node) => node.name).filter(Boolean)
+        flattenedNodes.map((node) => node.name)
     );
 
     return {
         defaultSelector,
-        defaultProxies: buildList<ProxyGroupCandidate>(
-            landing && PROXY_GROUPS.LANDING,
-            flattenedNodeSource,
-            hasLowCost && PROXY_GROUPS.LOW_COST,
-            "DIRECT"
-        ),
+        // 展平模式下与 defaultSelector 候选完全一致，仅独立成数组避免共享引用。
+        defaultProxies: [...defaultSelector],
         defaultProxiesDirect: buildList<ProxyGroupCandidate>(
             "DIRECT",
             landing && PROXY_GROUPS.LANDING,
@@ -121,11 +117,10 @@ function buildGroupedBaseLists({
 }: GroupedListsInput): BaseLists {
     // 前置代理组不能包含落地节点（会与 `dialer-proxy: "前置代理"` 形成循环引用），
     // Tailscale 节点同理不应作为前置代理。
-    const tailscaleNames = new Set(tailscaleNodes.map((node) => node.name).filter(Boolean));
+    const tailscaleNames = new Set(tailscaleNodes.map((node) => node.name));
     const frontProxyNames = nonLandingNodes
         .filter((node) => !tailscaleNames.has(node.name))
-        .map((node) => node.name)
-        .filter(Boolean);
+        .map((node) => node.name);
 
     // 这里允许返回空列表，最终由 `domain/proxy-group.ts` 的构造工厂补 `DIRECT`。
     const defaultFallback: ProxyGroupCandidate[] = buildList<ProxyGroupCandidate>(

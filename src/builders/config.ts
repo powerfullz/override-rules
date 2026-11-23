@@ -11,7 +11,7 @@ import { geoxUrl } from "./geox";
 import { buildRules } from "./rules";
 import { snifferConfig } from "./sniffer";
 import { buildTunConfig } from "./tun";
-import type { FeatureFlags } from "../types/args";
+import type { AdblockSource, FeatureFlags } from "../types/args";
 import type { ClashConfig } from "../types/clash";
 import type { NodeAnalysis, ProxyGroup } from "../types/proxy";
 
@@ -24,7 +24,7 @@ function appendGlobalGroup(groups: ProxyGroup[]): ProxyGroup[] {
         icon: ICONS.global,
         "include-all": true,
         type: "select",
-        proxies: groups.map((group) => String(group.name)),
+        proxies: groups.map((group) => group.name),
     };
 
     return [...groups, global];
@@ -52,15 +52,16 @@ export function assembleConfig(
     const { ADBlock, AdditionalFilter, ...baseRuleSets } = ruleSets;
     type AdblockProvider =
         typeof ADBlock | (typeof adblockAlternatives)[keyof typeof adblockAlternatives];
-    let adblockProvider: AdblockProvider | undefined;
-    if (flags.adblockSource === 2) {
-        adblockProvider = ADBlock;
-    } else if (flags.adblockSource !== 0) {
-        adblockProvider = adblockAlternatives[flags.adblockSource];
-    }
+    const providersBySource: Record<AdblockSource, AdblockProvider | undefined> = {
+        0: undefined,
+        1: adblockAlternatives[1],
+        2: ADBlock,
+        3: adblockAlternatives[3],
+    };
+    const adblockProvider = providersBySource[flags.adblockSource];
 
     return {
-        proxies: config.proxies,
+        proxies: nodes.allNodes,
         ...(config.hosts !== undefined && { hosts: config.hosts }),
         ...(flags.fullConfig && buildFullConfig(flags)),
         "proxy-groups": appendGlobalGroup(proxyGroups),

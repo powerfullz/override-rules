@@ -28,8 +28,6 @@ function splitByLanding(nodes: ProxyNode[]): {
     const nonLandingNodes: ProxyNode[] = [];
 
     for (const node of nodes) {
-        if (!node.name) continue;
-
         if (node["dialer-proxy"] === PROXY_GROUPS.FRONT_PROXY) {
             landingNodes.push(node);
         } else {
@@ -47,11 +45,9 @@ function collectCountries(nodes: ProxyNode[]): Record<string, ProxyNode[]> {
     const countryNodes = new Map<string, ProxyNode[]>();
 
     for (const node of nodes) {
-        const name = node.name || "";
-
         for (const [country, regex] of Object.entries(countryRegexMap)) {
-            if (!regex.test(name)) continue;
-            if (countryExcludeRegexMap[country]?.test(name)) continue;
+            if (!regex.test(node.name)) continue;
+            if (countryExcludeRegexMap[country]?.test(node.name)) continue;
 
             const bucket = countryNodes.get(country);
             if (bucket) {
@@ -68,7 +64,7 @@ function collectCountries(nodes: ProxyNode[]): Record<string, ProxyNode[]> {
 
 /** 筛选出所有匹配低倍率正则的节点。 */
 function collectLowCost(nodes: ProxyNode[]): ProxyNode[] {
-    return nodes.filter((node) => LOW_COST_NODE_MATCHER.regex.test(node.name || ""));
+    return nodes.filter((node) => LOW_COST_NODE_MATCHER.regex.test(node.name));
 }
 
 /** 筛选出所有 Tailscale 节点。 */
@@ -91,13 +87,17 @@ function excludeTailscale(nodes: ProxyNode[]): ProxyNode[] {
  * @param threshold - 地区节点数量的最小阈值
  */
 export function analyzeNodes(nodes: ProxyNode[], threshold: number): NodeAnalysis {
-    const { landingNodes, nonLandingNodes } = splitByLanding(nodes);
+    // 上游配置未经校验；无名称或空名称的节点无法通过 Mihomo 启动检查，统一在此丢弃。
+    const validNodes = nodes.filter(
+        (node) => typeof node.name === "string" && node.name.length > 0
+    );
+    const { landingNodes, nonLandingNodes } = splitByLanding(validNodes);
     // 只要出现落地节点就启用落地相关代理组；全落地时非落地候选自然为空。
     const landing = landingNodes.length > 0;
-    const tailscaleNodes = collectTailscale(nodes);
+    const tailscaleNodes = collectTailscale(validNodes);
 
     // 链式代理激活时，国家/低倍率分类只扫描非落地节点；Tailscale 节点不参与常规分类。
-    const scopedNodes = excludeTailscale(landing ? nonLandingNodes : nodes);
+    const scopedNodes = excludeTailscale(landing ? nonLandingNodes : validNodes);
     const countryNodes = collectCountries(scopedNodes);
     const countryNames = getActiveCountryNames(countryNodes, threshold);
     const lowCostNodes = collectLowCost(scopedNodes);
@@ -112,8 +112,8 @@ export function analyzeNodes(nodes: ProxyNode[], threshold: number): NodeAnalysi
               };
 
     return {
-        allNodes: nodes,
-        manualNames: excludeTailscale(nodes).map((node) => node.name),
+        allNodes: validNodes,
+        manualNames: excludeTailscale(validNodes).map((node) => node.name),
         landingNodes,
         nonLandingNodes,
         landing,

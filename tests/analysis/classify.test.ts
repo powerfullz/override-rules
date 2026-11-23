@@ -103,6 +103,17 @@ describe("analyzeNodes", () => {
         );
     });
 
+    it("丢弃无名称或空名称的节点", () => {
+        const filtered = analyzeNodes([{ name: "" }, { name: "香港01" }, { name: "香港02" }], 1);
+
+        assert.deepEqual(
+            filtered.allNodes.map((n) => n.name),
+            ["香港01", "香港02"]
+        );
+        assert.deepEqual(filtered.manualNames, ["香港01", "香港02"]);
+        assert.deepEqual(filtered.nonLandingNodes, filtered.allNodes);
+    });
+
     it("无落地节点时不启用 landing", () => {
         const plain = analyzeNodes([{ name: "香港01" }, { name: "美国01" }], 1);
         assert.equal(plain.landing, false);

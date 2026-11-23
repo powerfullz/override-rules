@@ -31,7 +31,7 @@ function escapeRegExp(value: string): string {
  * @returns 无有效节点名时返回 `undefined`，表示无需排除。
  */
 export function buildNodeExcludeFilter(nodes: ProxyNode[]): string | undefined {
-    const names = [...new Set(nodes.map((node) => node.name).filter(Boolean))];
+    const names = [...new Set(nodes.map((node) => node.name))];
     if (names.length === 0) return undefined;
 
     return `^(?:${names.map(escapeRegExp).join("|")})$`;

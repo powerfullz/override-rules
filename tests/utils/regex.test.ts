@@ -4,9 +4,9 @@ import { describe, it } from "node:test";
 import { buildNodeExcludeFilter, combineExcludeFilters } from "../../src/utils/regex";
 
 describe("buildNodeExcludeFilter", () => {
-    it("无有效节点名时返回 undefined", () => {
+    // 节点名由 analyzeNodes 在入口保证非空，这里无需重复过滤。
+    it("无节点时返回 undefined", () => {
         assert.equal(buildNodeExcludeFilter([]), undefined);
-        assert.equal(buildNodeExcludeFilter([{ name: "" }]), undefined);
     });
 
     it("转义节点名中的正则元字符并去重", () => {

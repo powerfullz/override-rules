@@ -48,7 +48,7 @@ describe("assembleConfig", () => {
         assert.equal(global?.["include-all"], true);
         assert.deepEqual(
             global?.proxies,
-            groups.slice(0, -1).map((item) => String(item.name))
+            groups.slice(0, -1).map((item) => item.name)
         );
     });
 
@@ -56,6 +56,13 @@ describe("assembleConfig", () => {
         const result = run({}, CONFIG);
         assert.deepEqual(result.proxies, CONFIG.proxies);
         assert.deepEqual(result.hosts, CONFIG.hosts);
+    });
+
+    it("丢弃无名称节点，不写入 proxies 或代理组", () => {
+        const result = run({}, { proxies: [{ name: "" }, { name: "香港01" }] });
+
+        assert.deepEqual(result.proxies, [{ name: "香港01" }]);
+        assert.deepEqual(group(result, PROXY_GROUPS.SELECT)?.proxies, ["香港01", "DIRECT"]);
     });
 
     it("无上游 hosts 时不输出 hosts 字段", () => {
@@ -234,10 +241,6 @@ describe("assembleConfig", () => {
             "台湾01",
             "台湾02",
         ]);
-        assert.ok(!group(result, PROXY_GROUPS.BAHAMUT)?.proxies?.includes("台湾节点"));
-        assert.ok(!group(result, PROXY_GROUPS.BILIBILI)?.proxies?.includes("台湾节点"));
-        assert.ok(!group(result, PROXY_GROUPS.BAHAMUT)?.proxies?.includes(PROXY_GROUPS.SELECT));
-        assert.ok(!group(result, PROXY_GROUPS.BILIBILI)?.proxies?.includes(PROXY_GROUPS.SELECT));
     });
 
     it("只有美国时 Truth Social 不引用未生成的地区组", () => {
@@ -249,10 +252,6 @@ describe("assembleConfig", () => {
             "美国02",
             "DIRECT",
         ]);
-        assert.ok(!group(result, PROXY_GROUPS.TRUTH_SOCIAL)?.proxies?.includes("美国节点"));
-        assert.ok(
-            !group(result, PROXY_GROUPS.TRUTH_SOCIAL)?.proxies?.includes(PROXY_GROUPS.SELECT)
-        );
     });
 
     it("regex=true 时手动选择组使用 include-all，不枚举节点名称", () => {
@@ -435,7 +434,7 @@ describe("assembleConfig", () => {
         const weibo = group(result, PROXY_GROUPS.WEIBO);
         assert.equal(weibo?.["include-all"], undefined);
         assert.ok(weibo?.proxies !== undefined);
-        assert.ok((weibo?.proxies?.length ?? 0) > 0);
+        assert.ok(weibo?.proxies?.length);
     });
 
     it("regex 模式下 Weibo 组使用 include-all", () => {
