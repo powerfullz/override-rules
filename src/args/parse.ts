@@ -9,7 +9,7 @@ import type { AdblockSource, FeatureFlags, GroupType, ScriptArgs } from "../type
 /**
  * 解析 `grouptype` 参数，并向后兼容旧的 `loadbalance` 参数。
  * - `grouptype`：0=select，1=url-test，2=load-balance，优先级最高；
- * - 仅当 `grouptype` 未指定（或非法）时，才回退到旧参数 `loadback`：true→2，false→1；
+ * - 仅当 `grouptype` 未指定（或非法）时，才回退到旧参数 `loadbalance`：true→2，false→1；
  * - 两者都不可用时回退为默认值。
  */
 function parseGroupType(args: ScriptArgs): GroupType {

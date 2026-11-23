@@ -8,7 +8,7 @@ import type { TunConfig } from "../types/clash";
 /**
  * 构建 Clash 内核的 TUN 模式配置。
  *
- * 使用 gvisor 网络栈，并排除 Tailscale 与局域网地址段以避免路由冲突。
+ * 使用 mips 网络栈，并排除 Tailscale 与局域网地址段以避免路由冲突。
  * @param tunEnabled - 是否启用 TUN 模式
  * @param hasTailscale - 是否存在 Tailscale 节点
  * @returns TUN 配置对象。`100.64.0.0/10` 与 `fd7a:115c:a1e0::/48` 为 Tailscale
