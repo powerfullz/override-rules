@@ -37,7 +37,7 @@ export function parseNumber(value: unknown, defaultValue = 0): number {
  * @param elements - 任意数量的元素或元素数组，允许混入假值
  */
 export function buildList<T>(...elements: Array<T | T[] | false | null | undefined>): T[] {
-    return elements.flat().filter(Boolean) as T[];
+    return elements.flat().filter((item): item is T => Boolean(item));
 }
 
 /**

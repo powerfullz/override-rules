@@ -45,7 +45,7 @@ function readRawArgs(): ScriptArgs {
  * @param config - 上游订阅配置
  */
 function main(config: ClashConfig): ClashConfig {
-    if (!config.proxies || !Array.isArray(config.proxies)) {
+    if (!Array.isArray(config.proxies)) {
         throw new Error("[powerfullz 的覆写脚本] 错误：Clash 配置中缺少有效的 proxies 字段");
     }
 

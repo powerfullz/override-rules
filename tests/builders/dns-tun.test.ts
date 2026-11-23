@@ -9,7 +9,7 @@ describe("buildDns", () => {
         const dns = buildDns({ fakeIPEnabled: true, ipv6Enabled: false });
         assert.equal(dns["enhanced-mode"], "fake-ip");
         assert.ok(Array.isArray(dns["fake-ip-filter"]));
-        assert.ok((dns["fake-ip-filter"] ?? []).length > 0);
+        assert.ok(dns["fake-ip-filter"]?.length);
     });
 
     it("redir-host 模式不含 fake-ip-filter", () => {

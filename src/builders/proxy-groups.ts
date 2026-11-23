@@ -23,24 +23,28 @@ import { isNotNull } from "../utils/primitives";
 import { buildNodeExcludeFilter, combineExcludeFilters } from "../utils/regex";
 import type { GroupBuildContext, ProxyGroup } from "../types/proxy";
 
+/**
+ * 生成「手动选择」组：展平模式下「选择代理」已直接列出全部非落地节点，不再生成该组。
+ * 分组模式保留该组：regex 模式交给内核动态填充，否则按上游顺序枚举。
+ */
+function buildManualGroup(ctx: GroupBuildContext): ProxyGroup | null {
+    if (ctx.nodes.regionLayout.mode !== "grouped") return null;
+
+    if (ctx.flags.regexFilter) {
+        return selectAllGroup(
+            PROXY_GROUPS.MANUAL,
+            ICONS.manual,
+            buildNodeExcludeFilter(ctx.nodes.tailscaleNodes)
+        );
+    }
+    return selectGroup(PROXY_GROUPS.MANUAL, ICONS.manual, ctx.nodes.manualNames);
+}
+
 /** 顶层选择类代理组：选择代理、手动选择、以及链式代理相关组。 */
 function buildFrontGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
-    // 展平模式下「选择代理」已直接列出全部非落地节点，不再生成高度重合的「手动选择」组。
-    // 分组模式保留该组：regex 模式交给内核动态填充，否则按上游顺序枚举。
-    let manualGroup: ProxyGroup | null = null;
-    if (ctx.nodes.regionLayout.mode === "grouped") {
-        manualGroup = ctx.flags.regexFilter
-            ? selectAllGroup(
-                  PROXY_GROUPS.MANUAL,
-                  ICONS.manual,
-                  buildNodeExcludeFilter(ctx.nodes.tailscaleNodes)
-              )
-            : selectGroup(PROXY_GROUPS.MANUAL, ICONS.manual, ctx.nodes.manualNames);
-    }
-
     return [
         selectGroup(PROXY_GROUPS.SELECT, ICONS.select, ctx.lists.defaultSelector),
-        manualGroup,
+        buildManualGroup(ctx),
         ctx.nodes.landing
             ? selectGroup(PROXY_GROUPS.FRONT_PROXY, ICONS.frontProxy, ctx.lists.frontProxySelector)
             : null,

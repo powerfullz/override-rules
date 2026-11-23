@@ -52,9 +52,11 @@ function mergePolicyMap(
     for (const [domain, value] of Object.entries(upstream)) {
         if (typeof value === "string") {
             inherited[domain] = value;
-        } else if (toStringList(value)) {
-            inherited[domain] = value as string[];
+            continue;
         }
+
+        const list = toStringList(value);
+        if (list) inherited[domain] = list;
     }
 
     return { ...(current ?? {}), ...inherited };

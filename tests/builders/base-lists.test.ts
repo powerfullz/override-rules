@@ -81,11 +81,6 @@ describe("buildBaseLists", () => {
         assert.deepEqual(lists.defaultProxies, [{ proxies: ["香港01", "香港02"] }, "DIRECT"]);
         assert.deepEqual(lists.defaultProxiesDirect, ["DIRECT", { proxies: ["香港01", "香港02"] }]);
         assert.deepEqual(lists.frontProxySelector, ["DIRECT", "香港01", "香港02"]);
-        assert.ok(!lists.defaultSelector.some((item) => String(item).includes("香港节点")));
-        assert.ok(!lists.defaultProxies.some((item) => String(item).includes(PROXY_GROUPS.SELECT)));
-        assert.ok(
-            !lists.defaultProxiesDirect.some((item) => String(item).includes(PROXY_GROUPS.SELECT))
-        );
     });
 
     it("展平 + regex 使用 include-all，并排除落地节点", () => {
