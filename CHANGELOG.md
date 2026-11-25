@@ -1,5 +1,36 @@
 # Changelog
 
+## [2.10.2](https://github.com/powerfullz/override-rules/compare/src-v2.10.1...src-v2.10.2) (2026-11-25)
+
+
+### Bug Fixes
+
+- Delete `snssdk.com` for douyin to function correctly ([3e64065](https://github.com/powerfullz/override-rules/commit/3e6406513f0fe17ef4206e8f37e9a5827e531ee6))
+- Drop nameless proxy nodes at analysis boundary ([b724ac4](https://github.com/powerfullz/override-rules/commit/b724ac40881ed61064c3be502797c6a553abbb14))
+- Add vscode download domain to avoid slow download speed ([57ddf3c](https://github.com/powerfullz/override-rules/commit/57ddf3c92870950c8c7a10c2e7cc3403f54a88f1))
+
+
+### Chores
+
+- Enable no-unnecessary-type-conversion lint rule ([f686a94](https://github.com/powerfullz/override-rules/commit/f686a94f6bec06c109ea70b029f72c58a3338897))
+- Update dependencies ([218e2c1](https://github.com/powerfullz/override-rules/commit/218e2c18f25db8cc71345a3158cb7fc0b7f04b54))
+
+
+### Documentation
+
+- Describe asynchronous YAML generation ([90b92a0](https://github.com/powerfullz/override-rules/commit/90b92a09f9c89f6ab1ddbd001b2ab75c9419e2ec))
+- Fix stale comments in tun config and arg parser ([53438c1](https://github.com/powerfullz/override-rules/commit/53438c16ffcb3753fdef0029af94ab69ae6aeca8))
+
+
+### Performance
+
+- Reuse convert.js VM context in YAML generator ([c2b0f7e](https://github.com/powerfullz/override-rules/commit/c2b0f7eaae07964e4f78f47592a6deea23a9905f))
+
+
+### Refactoring
+
+- Make YAML generator file I/O asynchronous ([bdc8bcb](https://github.com/powerfullz/override-rules/commit/bdc8bcb2e7ec39c06c35330092ee8f250281feac))
+- Remove redundant conversions and defensive checks ([4274e3e](https://github.com/powerfullz/override-rules/commit/4274e3e2035fa0678c8e2ec293cf13e2ad89655f))
 ## [2.10.1](https://github.com/powerfullz/override-rules/compare/src-v2.10.0...src-v2.10.1) (2026-11-08)
 
 
