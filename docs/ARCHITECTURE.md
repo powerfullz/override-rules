@@ -202,6 +202,8 @@ flowchart TD
 
 **备用模式。** 通过 `scripts/yaml_generator/generator.ts` 预先生成的 YAML 配置文件，存放在 `yamls/` 目录下。这些文件使用 `scripts/yaml_generator/fake_proxies.json` 中的模拟节点数据穷举所有参数组合生成，供无法运行 JS 脚本的客户端直接引用。
 
+生成器异步读取输入、清理旧文件并按参数组合顺序写入 YAML。`convert.js` 只读取和执行一次，各组合复用同一个 VM 上下文，转换和 YAML 序列化仍同步执行。
+
 YAML 模式的特点：
 
 - 地区组使用正则过滤（`include-all` + `filter`），「手动选择」组使用 `include-all`，而非枚举具体节点名称——这是静态文件无法预知真实节点列表的必然选择
