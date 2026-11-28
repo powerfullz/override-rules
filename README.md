@@ -6,12 +6,13 @@
 
 本仓库为 Mihomo/Substore 设计，提供高效、灵活的覆写规则（**不建议用于 Stash**）。核心特色如下：
 
-* 集成 [SukkaW/Surge](https://github.com/SukkaW/Surge) 与 [217heidai/adblockfilters](https://github.com/217heidai/adblockfilters) 等优质规则，兼容性强，覆盖面广。
-* 针对 Truth Social、E-Hentai、TikTok、加密货币等场景，新增专用分流规则，满足多样化需求。
-* 精简冗余，结构清晰，维护便捷。
-* 深度融合 [Loyalsoldier/v2ray-rules-dat](https://github.com/Loyalsoldier/v2ray-rules-dat) GeoSite/GeoIP，分流更精准。
-* IP 规则默认添加 `no-resolve`，有效减少本地 DNS 解析，提升速度与隐私。
-* 动态覆写：自动识别节点国家/地区，仅生成实际存在的分组，节点名称实时枚举，配置更智能。
+* 集成 [SukkaW/Surge](https://github.com/SukkaW/Surge)、[Cats-Team/AdRules](https://adrules.top/)、[秋风广告规则](https://awavenue.top/)、 [217heidai/adblockfilters](https://github.com/217heidai/adblockfilters) 等优质规则，兼容性强，覆盖面广。
+* 对于支持传入参数的客户端，如 SubStore，提供了如`adblock`、`grouptype`等多种参数，无须更改脚本文件即可通过传入参数改变脚本行为，随心定制输出。
+* 针对 Truth Social、E-Hentai、TikTok、加密货币等场景，新增专用分流规则，使用更方便。
+* 定期精简冗余规则，目录结构清晰，维护便捷。
+* 尽可能使用 [domain-list-community](https://github.com/v2fly/domain-list-community) 等社区维护列表 GeoSite/GeoIP，规则列表采用`rule-providers`引入，独立于配置文件订阅更新，即使不更新订阅分流规则也能与时俱进。
+* IP 规则默认添加 `no-resolve`，有效减少本地 DNS 解析，提升上网速度，防止 DNS 泄露。
+* 动态覆写：自动识别节点国家/地区，根据传入的`threshold`参数量身定制国家/地区节点组，配置更智能。
 
 本项目为本人自用，欢迎交流建议（Issue/PR）。如无反馈，将优先满足个人需求以及修复自己在日常使用中发现的问题。
 
