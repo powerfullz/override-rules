@@ -13,9 +13,9 @@
 * IP 规则默认添加 `no-resolve`，有效减少本地 DNS 解析，提升速度与隐私。
 * 动态覆写：自动识别节点国家/地区，仅生成实际存在的分组，节点名称实时枚举，配置更智能。
 
-> 本项目为本人自用，欢迎交流建议（Issue/PR）。如无特殊反馈，将优先满足个人需求与体验优化。
+本项目为本人自用，欢迎交流建议（Issue/PR）。如无反馈，将优先满足个人需求以及修复自己在日常使用中发现的问题。
 
-[点击访问 Forgejo 上的镜像](https://git.l3zc.com/powerfullz/override-rules)
+[点击访问 GitLab 上的镜像](https://git.l3zc.com/powerfullz/override-rules)
 
 ### AFF
 
@@ -158,11 +158,6 @@ https://cdn.jsdelivr.net/gh/powerfullz/override-rules/yamls/config_gt-0_adblock-
 ```text
 https://cdn.jsdelivr.net/gh/powerfullz/override-rules@v0.1.0/yamls/config_gt-0_adblock-0_ipv6-0_full-1_keepalive-0_fakeip-0_quic-0_tun-0.yaml
 ```
-
-如果使用镜像：
-```text
-https://git.l3zc.com/powerfullz/override-rules/raw/branch/dist/yamls/config_gt-0_adblock-0_ipv6-0_full-1_keepalive-0_fakeip-0_quic-0_tun-0.yaml
-``````
 
 *注：CI 仅套用了一份虚拟的 `fake_proxies.json` 来模拟生成 YAML，因此它无法像 JS 动态脚本那样根据你的实际节点智能生成专属分组策略，只能保守地包含常用的国家/地区。为了最高效的分流体验，仍强烈推荐使用 JS 覆写。*
 
