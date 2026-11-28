@@ -24,26 +24,26 @@
     "postversion": "git push --follow-tags"
   },
   "dependencies": {
-    "yaml": "^2.9.0"
+    "yaml": "^2.9.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
     "@eslint/js": "^10.0.1",
-    "@types/node": "^26.2.0",
-    "c8": "^12.0.0",
+    "@types/node": "^26.6.11",
+    "c8": "^9.1.0",
     "esbuild": "^0.28.2",
-    "eslint": "^10.10.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-sonarjs": "^4.2.2",
-    "git-cliff": "^2.13.1",
+    "eslint": "^10.16.0",
+    "eslint-config-prettier": "^10.1.9",
+    "eslint-plugin-sonarjs": "^4.2.3",
+    "git-cliff": "^2.14.2",
     "husky": "^9.1.7",
-    "knip": "^6.44.2",
-    "lint-staged": "^17.5.1",
-    "prettier": "^3.9.7",
-    "tsx": "^4.23.13",
+    "knip": "^6.49.0",
+    "lint-staged": "^17.6.3",
+    "prettier": "^3.10.1",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.70.0",
+    "typescript-eslint": "^8.74.0",
     "typescript-native": "npm:typescript@^7.0.2"
   },
   "lint-staged": {
@@ -52,6 +52,6 @@
     ]
   },
   "allowScripts": {
-    "esbuild@0.28.2": true
+    "esbuild": true
   }
 }
